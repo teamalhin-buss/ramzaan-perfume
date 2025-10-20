@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - users can read/write their own data, admins can read all
+    match /users/{userId} {
+      allow read, write: if request.auth != null && (request.auth.uid == userId || getUserRole(request.auth.uid) == 'admin');
+      allow create: if request.auth != null;
+    }
+
+    // Orders collection - users can read/write their own orders, admins can manage all
+    match /orders/{orderId} {
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || getUserRole(request.auth.uid) == 'admin');
+      allow write: if request.auth != null && (resource.data.userId == request.auth.uid || getUserRole(request.auth.uid) == 'admin');
+      allow create: if request.auth != null;
+    }
+
+    // Reviews collection - anyone can read approved reviews, authenticated users can create, admins can manage all
+    match /reviews/{reviewId} {
+      allow read: if resource.data.approved == true || (request.auth != null && getUserRole(request.auth.uid) == 'admin');
+      allow write: if request.auth != null && getUserRole(request.auth.uid) == 'admin';
+      allow create: if request.auth != null;
+    }
+
+    // Products collection - anyone can read, only admins can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null && getUserRole(request.auth.uid) == 'admin';
+    }
+
+    // Carts collection - users can read/write their own cart
+    match /carts/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Helper function to get user role
+    function getUserRole(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.role;
+    }
+  }
+}
