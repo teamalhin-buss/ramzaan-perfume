@@ -1,0 +1,348 @@
+// Firestore service functions for data operations
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  Timestamp
+} from 'firebase/firestore';
+import { db } from '../config/firebase';
+
+// Collections
+const COLLECTIONS = {
+  USERS: 'users',
+  ORDERS: 'orders',
+  REVIEWS: 'reviews',
+  PRODUCTS: 'products',
+  CARTS: 'carts'
+};
+
+// User operations
+export const userService = {
+  // Create user document
+  createUser: async (userId, userData) => {
+    try {
+      await setDoc(doc(db, COLLECTIONS.USERS, userId), {
+        ...userData,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error creating user:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Get user by ID
+  getUser: async (userId) => {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.USERS, userId));
+      if (docSnap.exists()) {
+        return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
+      } else {
+        return { success: false, error: 'User not found' };
+      }
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Update user
+  updateUser: async (userId, updates) => {
+    try {
+      await updateDoc(doc(db, COLLECTIONS.USERS, userId), {
+        ...updates,
+        updatedAt: Timestamp.now()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Get all users (admin only)
+  getAllUsers: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+      const users = [];
+      querySnapshot.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      return { success: true, data: users };
+    } catch (error) {
+      console.error('Error getting users:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};
+
+// Order operations
+export const orderService = {
+  // Create order
+  createOrder: async (orderData) => {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.ORDERS), {
+        ...orderData,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Error creating order:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Get orders by user ID
+  getUserOrders: async (userId) => {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.ORDERS),
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const orders = [];
+      querySnapshot.forEach((doc) => {
+        orders.push({ id: doc.id, ...doc.data() });
+      });
+      return { success: true, data: orders };
+    } catch (error) {
+      console.error('Error getting user orders:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Get all orders (admin only)
+  getAllOrders: async () => {
+    try {
+      const q = query(collection(db, COLLECTIONS.ORDERS), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const orders = [];
+      querySnapshot.forEach((doc) => {
+        orders.push({ id: doc.id, ...doc.data() });
+      });
+      return { success: true, data: orders };
+    } catch (error) {
+      console.error('Error getting all orders:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Update order status
+  updateOrderStatus: async (orderId, status) => {
+    try {
+      await updateDoc(doc(db, COLLECTIONS.ORDERS, orderId), {
+        status,
+        updatedAt: Timestamp.now()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Delete order
+  deleteOrder: async (orderId) => {
+    try {
+      await deleteDoc(doc(db, COLLECTIONS.ORDERS, orderId));
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};
+
+// Review operations
+export const reviewService = {
+  // Create review
+  createReview: async (reviewData) => {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.REVIEWS), {
+        ...reviewData,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Error creating review:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Get all reviews
+  getAllReviews: async () => {
+    try {
+      const q = query(collection(db, COLLECTIONS.REVIEWS), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const reviews = [];
+      querySnapshot.forEach((doc) => {
+        reviews.push({ id: doc.id, ...doc.data() });
+      });
+      return { success: true, data: reviews };
+    } catch (error) {
+      console.error('Error getting reviews:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Get approved reviews
+  getApprovedReviews: async () => {
+    try {
+      // First try with compound query (requires index)
+      try {
+        const q = query(
+          collection(db, COLLECTIONS.REVIEWS),
+          where('approved', '==', true),
+          orderBy('createdAt', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        const reviews = [];
+        querySnapshot.forEach((doc) => {
+          reviews.push({ id: doc.id, ...doc.data() });
+        });
+        return { success: true, data: reviews };
+      } catch (indexError) {
+        // If index doesn't exist, fall back to getting all and filtering
+        console.warn('Index not ready, falling back to client-side filtering');
+        const q = query(collection(db, COLLECTIONS.REVIEWS), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const reviews = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.approved === true) {
+            reviews.push({ id: doc.id, ...data });
+          }
+        });
+        return { success: true, data: reviews };
+      }
+    } catch (error) {
+      console.error('Error getting approved reviews:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Approve review
+  approveReview: async (reviewId) => {
+    try {
+      await updateDoc(doc(db, COLLECTIONS.REVIEWS, reviewId), {
+        approved: true,
+        updatedAt: Timestamp.now()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error approving review:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Delete review
+  deleteReview: async (reviewId) => {
+    try {
+      await deleteDoc(doc(db, COLLECTIONS.REVIEWS, reviewId));
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};
+
+// Product operations
+export const productService = {
+  // Get product data
+  getProduct: async () => {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.PRODUCTS, 'main'));
+      if (docSnap.exists()) {
+        return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
+      } else {
+        // Return default product data if not found
+        return {
+          success: true,
+          data: {
+            name: 'Ramzaan',
+            price: 1499,
+            stock: 50,
+            description: 'Experience timeless elegance in every drop',
+            notes: 'Oud, Amber, Musk'
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Error getting product:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Update product
+  updateProduct: async (productData) => {
+    try {
+      await setDoc(doc(db, COLLECTIONS.PRODUCTS, 'main'), {
+        ...productData,
+        updatedAt: Timestamp.now()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating product:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};
+
+// Cart operations (per user)
+export const cartService = {
+  // Get user cart
+  getUserCart: async (userId) => {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.CARTS, userId));
+      if (docSnap.exists()) {
+        return { success: true, data: docSnap.data().items || [] };
+      } else {
+        return { success: true, data: [] };
+      }
+    } catch (error) {
+      console.error('Error getting cart:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Update user cart
+  updateUserCart: async (userId, items) => {
+    try {
+      await setDoc(doc(db, COLLECTIONS.CARTS, userId), {
+        items,
+        updatedAt: Timestamp.now()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating cart:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Clear user cart
+  clearUserCart: async (userId) => {
+    try {
+      await deleteDoc(doc(db, COLLECTIONS.CARTS, userId));
+      return { success: true };
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};

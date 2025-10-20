@@ -1,0 +1,267 @@
+import { useState } from 'react';
+import { ShoppingCart, Heart, Share2, ZoomIn, Minus, Plus, Check, Sparkles } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
+import { useCart } from '../context/CartContext';
+import './ProductCard.css';
+
+const ProductCard = ({ product, onBuyNow }) => {
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState(1);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    showNotification('Added to cart!');
+  };
+
+  const handleBuyNow = () => {
+    addToCart(product, quantity);
+    if (onBuyNow) {
+      onBuyNow();
+    } else {
+      window.location.href = '/checkout';
+    }
+  };
+
+  const handleWishlist = () => {
+    setIsWishlisted(!isWishlisted);
+    showNotification(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: product.description,
+          url: window.location.href,
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          copyToClipboard();
+        }
+      }
+    } else {
+      copyToClipboard();
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showNotification('Link copied to clipboard!');
+  };
+
+  const showNotification = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const incrementQuantity = () => {
+    setQuantity(prev => prev + 1);
+  };
+
+  const decrementQuantity = () => {
+    setQuantity(prev => Math.max(1, prev - 1));
+  };
+
+  return (
+    <div className="enhanced-product-card">
+      {/* Badge */}
+      {product.badge && (
+        <div className="product-badge">
+          <Sparkles size={14} />
+          <span>{product.badge}</span>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="product-quick-actions">
+        <button 
+          className={`action-btn ${isWishlisted ? 'active' : ''}`}
+          onClick={handleWishlist}
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
+        </button>
+        <button 
+          className="action-btn"
+          onClick={handleShare}
+          aria-label="Share product"
+        >
+          <Share2 size={20} />
+        </button>
+        <button 
+          className="action-btn"
+          onClick={() => setIsImageZoomed(!isImageZoomed)}
+          aria-label="Zoom image"
+        >
+          <ZoomIn size={20} />
+        </button>
+      </div>
+
+      <div className={`product-card-grid ${isImageZoomed ? 'image-zoomed' : ''}`}>
+        {/* Image Section */}
+        <div className="product-image-section">
+          <div className="product-image-container">
+            <OptimizedImage
+              src={product.image}
+              fallback={product.imageFallback}
+              alt={product.name}
+              className="product-main-image"
+              aspectRatio="1/1"
+              objectFit="contain"
+              showSkeleton={true}
+            />
+            <div className="image-glow"></div>
+          </div>
+        </div>
+
+        {/* Details Section */}
+        <div className="product-details-section">
+          <div className="product-header">
+            <h3 className="product-title">{product.name}</h3>
+            <div className="product-rating">
+              <span className="rating-value">★★★★★</span>
+              <span className="rating-count">(250+ reviews)</span>
+            </div>
+          </div>
+
+          <p className="product-description">{product.description}</p>
+
+          {/* Scent Notes */}
+          <div className="product-scent-notes">
+            <h4 className="notes-title">
+              <Sparkles size={16} />
+              Signature Notes
+            </h4>
+            <div className="notes-grid">
+              {product.notes.map((note, index) => (
+                <div key={index} className="note-item">
+                  <span className="note-dot"></span>
+                  <span className="note-text">{note}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="product-features">
+            <div className="feature-item">
+              <Check size={16} />
+              <span>Long-lasting formula</span>
+            </div>
+            <div className="feature-item">
+              <Check size={16} />
+              <span>Premium natural ingredients</span>
+            </div>
+            <div className="feature-item">
+              <Check size={16} />
+              <span>Made in India</span>
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="product-pricing">
+            <div className="price-info">
+              <span className="price-label">Price</span>
+              <div className="price-main">
+                <span className="currency">₹</span>
+                <span className="price-amount">{product.price.toLocaleString()}</span>
+              </div>
+              <span className="price-note">Inclusive of GST + Free Delivery</span>
+            </div>
+          </div>
+
+          {/* Quantity Selector */}
+          <div className="product-quantity">
+            <label htmlFor="quantity-input" className="quantity-label">
+              Quantity
+            </label>
+            <div className="quantity-selector-enhanced">
+              <button 
+                className="qty-btn"
+                onClick={decrementQuantity}
+                disabled={quantity <= 1}
+                aria-label="Decrease quantity"
+              >
+                <Minus size={16} />
+              </button>
+              <input
+                id="quantity-input"
+                type="number"
+                className="qty-input"
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                min="1"
+                aria-label="Product quantity"
+              />
+              <button 
+                className="qty-btn"
+                onClick={incrementQuantity}
+                aria-label="Increase quantity"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="product-actions-enhanced">
+            <button 
+              className="btn-add-to-cart"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart size={20} />
+              <span>Add to Cart</span>
+            </button>
+            <button 
+              className="btn-buy-now"
+              onClick={handleBuyNow}
+            >
+              <span>Buy Now</span>
+              <Sparkles size={18} />
+            </button>
+          </div>
+
+          {/* Guarantee */}
+          <div className="product-guarantee">
+            <span className="guarantee-icon">✅</span>
+            <div className="guarantee-text">
+              <strong>100% Authentic Guarantee</strong>
+              <p>Free shipping on orders over ₹999 • COD Available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="toast-notification">
+          <Check size={18} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Image Zoom Modal */}
+      {isImageZoomed && (
+        <div className="image-zoom-modal" onClick={() => setIsImageZoomed(false)}>
+          <button className="zoom-close" aria-label="Close zoom">×</button>
+          <OptimizedImage
+            src={product.image}
+            fallback={product.imageFallback}
+            alt={product.name}
+            className="zoomed-image"
+            objectFit="contain"
+            showSkeleton={true}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProductCard;

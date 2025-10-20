@@ -1,0 +1,239 @@
+/* Optimized Image Container */
+.optimized-image-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: inherit;
+}
+
+/* Actual Image */
+.optimized-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+/* Skeleton Loader */
+.image-skeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Skeleton Shimmer Animation */
+.skeleton-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Skeleton Icon */
+.skeleton-icon {
+  color: var(--text-gray-dark);
+  opacity: 0.3;
+  animation: pulse 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+.skeleton-icon svg {
+  stroke-width: 1.5;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Error State */
+.image-error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 68, 68, 0.05);
+  border: 2px dashed rgba(255, 68, 68, 0.3);
+  border-radius: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-gray);
+  z-index: 1;
+}
+
+.image-error svg {
+  color: #ff4444;
+  stroke-width: 2;
+  opacity: 0.7;
+}
+
+.image-error p {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Debug Info (Development Only) */
+.image-debug-info {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #4caf50;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity var(--transition-base);
+}
+
+.optimized-image-container:hover .image-debug-info {
+  opacity: 1;
+}
+
+/* Loading State Modifier */
+.optimized-image-container[data-loading="true"] {
+  min-height: 200px; /* Prevent layout shift */
+}
+
+/* Error State Modifier */
+.optimized-image-container[data-error="true"] .optimized-image {
+  display: none;
+}
+
+/* Aspect Ratio Helpers */
+.optimized-image-container[style*="aspect-ratio"] {
+  height: auto;
+}
+
+/* Responsive Image Optimization */
+@media (max-width: 768px) {
+  .optimized-image-container[data-loading="true"] {
+    min-height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .optimized-image-container[data-loading="true"] {
+    min-height: 120px;
+  }
+  
+  .skeleton-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .image-error svg {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .image-error p {
+    font-size: 12px;
+  }
+}
+
+/* Print Optimization */
+@media print {
+  .image-skeleton,
+  .image-error,
+  .image-debug-info {
+    display: none !important;
+  }
+  
+  .optimized-image {
+    opacity: 1 !important;
+  }
+}
+
+/* High Resolution Display Optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .optimized-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+  }
+  
+  .skeleton-icon {
+    animation: none;
+    opacity: 0.5;
+  }
+  
+  .optimized-image {
+    transition: none;
+  }
+}
+
+/* Focus State for Accessibility */
+.optimized-image-container:focus-within {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 2px;
+}
+
+/* Image Loaded Animation */
+@keyframes imageReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.optimized-image-container[data-loading="false"] .optimized-image {
+  animation: imageReveal 0.5s ease-out;
+}

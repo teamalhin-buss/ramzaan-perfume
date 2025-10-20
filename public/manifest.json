@@ -1,0 +1,26 @@
+{
+  "name": "ALH Perfumes - Ramzaan",
+  "short_name": "ALH Perfumes",
+  "description": "Experience luxury with Ramzaan perfume - timeless elegance in every drop",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FFFFFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle", "beauty"],
+  "screenshots": []
+}
