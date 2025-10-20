@@ -205,7 +205,15 @@ const HomePage = () => {
                 </div>
                 <h3>Share Your Experience</h3>
                 <p>Help others discover this fragrance by writing a review</p>
-                <button className="write-review-card-btn">
+                <div className="write-review-benefits">
+                  <span className="benefit-tag">⭐ Rate & Review</span>
+                  <span className="benefit-tag">💝 Help Others</span>
+                  <span className="benefit-tag">🎯 Build Community</span>
+                </div>
+                <button className="write-review-card-btn" onClick={(e) => {
+                  e.stopPropagation();
+                  setShowReviewForm(true);
+                }}>
                   <Star size={16} />
                   <span>Write a Review</span>
                 </button>

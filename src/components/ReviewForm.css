@@ -196,14 +196,37 @@
 .textarea-footer {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 8px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.char-count-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .char-count {
   font-size: 11px;
   color: #666666;
   font-weight: 300;
+  transition: color var(--transition-base);
+}
+
+.char-count.warning {
+  color: #ff6b6b;
+  font-weight: 500;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.char-warning {
+  font-size: 10px;
+  color: #ff6b6b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .near-limit .char-count {
@@ -214,10 +237,17 @@
 .writing-tips {
   font-size: 11px;
   color: #888888;
+  text-align: right;
 }
 
 .writing-tips small {
   font-style: italic;
+  display: block;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 /* Form Actions */

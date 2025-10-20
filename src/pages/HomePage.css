@@ -496,14 +496,33 @@
 .write-review-card {
   cursor: pointer;
   border-style: dashed !important;
+  border-color: var(--border-medium) !important;
   background: transparent;
   transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.write-review-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.write-review-card:hover::before {
+  left: 100%;
 }
 
 .write-review-card:hover {
   background: var(--bg-secondary);
   border-color: var(--white) !important;
   transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .write-review-content {
@@ -515,16 +534,20 @@
   height: 100%;
   justify-content: center;
   padding: 20px 0;
+  position: relative;
+  z-index: 1;
 }
 
 .write-review-icon {
   color: var(--gray-600);
   transition: all var(--transition-base);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .write-review-card:hover .write-review-icon {
   color: var(--white);
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(5deg);
+  filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.3));
 }
 
 .write-review-content h3 {
@@ -534,6 +557,12 @@
   font-weight: 300;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  transition: color var(--transition-base);
+}
+
+.write-review-card:hover .write-review-content h3 {
+  color: var(--white);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .write-review-content p {
@@ -542,14 +571,48 @@
   font-weight: 300;
   margin: 0;
   line-height: 1.5;
-  max-width: 200px;
+  max-width: 220px;
+  transition: color var(--transition-base);
+}
+
+.write-review-card:hover .write-review-content p {
+  color: var(--gray-300);
+}
+
+.write-review-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.benefit-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--gray-300);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-base);
+}
+
+.write-review-card:hover .benefit-tag {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: var(--white);
+  transform: translateY(-1px);
 }
 
 .write-review-card-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
+  padding: 12px 24px;
   background: var(--white);
   color: var(--black);
   border: 1px solid var(--white);
@@ -561,12 +624,34 @@
   cursor: pointer;
   transition: all var(--transition-base);
   margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.write-review-card-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+  transition: left 0.4s ease;
+}
+
+.write-review-card-btn:hover::before {
+  left: 100%;
 }
 
 .write-review-card-btn:hover {
   background: transparent;
   color: var(--white);
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.write-review-card-btn:active {
+  transform: translateY(0);
 }
 
 /* About Section - Minimal B&W */

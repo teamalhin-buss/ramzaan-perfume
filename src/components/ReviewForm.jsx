@@ -95,6 +95,7 @@ const ReviewForm = ({ onClose, onSubmit }) => {
               placeholder="How should we call you?"
               required
               maxLength={50}
+              autoComplete="name"
             />
           </div>
 
@@ -146,9 +147,18 @@ const ReviewForm = ({ onClose, onSubmit }) => {
               required
               maxLength={500}
               className={reviewText.length > 450 ? 'near-limit' : ''}
+              autoComplete="off"
+              spellCheck="true"
             ></textarea>
             <div className="textarea-footer">
-              <span className="char-count">{reviewText.length}/500</span>
+              <div className="char-count-container">
+                <span className={`char-count ${reviewText.length > 450 ? 'warning' : ''}`}>
+                  {reviewText.length}/500
+                </span>
+                {reviewText.length > 450 && (
+                  <span className="char-warning">⚠️ Approaching limit</span>
+                )}
+              </div>
               <div className="writing-tips">
                 <small>💡 Tip: Be specific about scent, longevity, and occasions</small>
               </div>
