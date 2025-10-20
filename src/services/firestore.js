@@ -258,7 +258,14 @@ export const reviewService = {
   // Approve review
   approveReview: async (reviewId) => {
     try {
+      // First check if the review exists
       const docRef = doc(db, COLLECTIONS.REVIEWS, reviewId);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) {
+        console.warn('Review not found for approval:', reviewId);
+        return { success: false, error: 'Review not found' };
+      }
+
       await updateDoc(docRef, {
         approved: true,
         updatedAt: Timestamp.now()
@@ -267,10 +274,6 @@ export const reviewService = {
       return { success: true };
     } catch (error) {
       console.error('Error approving review:', error);
-      // Handle case where document doesn't exist
-      if (error.message && error.message.includes('No document to update')) {
-        return { success: false, error: 'Review not found or already deleted' };
-      }
       return { success: false, error: error.message };
     }
   },
