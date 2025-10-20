@@ -66,6 +66,23 @@
   letter-spacing: 0.1em;
 }
 
+.error-message {
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 0;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.error-message p {
+  color: #ef4444;
+  font-size: 13px;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -125,13 +142,19 @@
   transition: all var(--transition-base);
 }
 
-.auth-button:hover {
+.auth-button:hover:not(:disabled) {
   background: var(--gray-100);
   transform: translateY(-2px);
 }
 
-.auth-button:active {
+.auth-button:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .auth-switch {

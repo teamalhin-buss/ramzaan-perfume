@@ -16,47 +16,60 @@ const AccountPage = () => {
     email: '',
     password: '',
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Get user-specific orders from Firestore
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
     const loadUserOrders = async () => {
       if (user) {
-        setLoading(true);
+        setOrdersLoading(true);
         const result = await orderService.getUserOrders(user.id);
         if (result.success) {
           setOrders(result.data);
         }
-        setLoading(false);
+        setOrdersLoading(false);
       } else {
         setOrders([]);
-        setLoading(false);
+        setOrdersLoading(false);
       }
     };
 
     loadUserOrders();
   }, [user]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (isLoginMode) {
-      const result = login(formData.email, formData.password);
-      if (result.success) {
-        alert('Login successful!');
-        if (result.user.role === 'admin') {
-          navigate('/admin');
+    setError('');
+    setLoading(true);
+
+    try {
+      if (isLoginMode) {
+        const result = await login(formData.email, formData.password);
+        if (result.success) {
+          setError('');
+          if (result.user?.role === 'admin') {
+            navigate('/admin');
+          }
+        } else {
+          setError(result.error || 'Login failed. Please check your credentials.');
         }
       } else {
-        alert('Invalid credentials');
+        const result = await signup(formData.email, formData.password, formData.name);
+        if (result.success) {
+          setError('');
+          setIsLoginMode(true); // Switch to login mode after successful signup
+        } else {
+          setError(result.error || 'Account creation failed. Please try again.');
+        }
       }
-    } else {
-      const result = signup(formData.email, formData.password, formData.name);
-      if (result.success) {
-        alert('Account created successfully!');
-      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,6 +98,12 @@ const AccountPage = () => {
             <p className="auth-subtitle">
               {isLoginMode ? 'Login to access your account' : 'Join us today'}
             </p>
+
+            {error && (
+              <div className="error-message">
+                <p>{error}</p>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="auth-form">
               {!isLoginMode && (
@@ -134,8 +153,8 @@ const AccountPage = () => {
                 />
               </div>
 
-              <button type="submit" className="auth-button">
-                {isLoginMode ? 'Login' : 'Create Account'}
+              <button type="submit" className="auth-button" disabled={loading}>
+                {loading ? 'Please wait...' : (isLoginMode ? 'Login' : 'Create Account')}
               </button>
             </form>
 
@@ -243,7 +262,7 @@ const AccountPage = () => {
                 )}
               </div>
               
-              {loading ? (
+              {ordersLoading ? (
                 <div className="loading-orders">
                   <p>Loading orders...</p>
                 </div>
