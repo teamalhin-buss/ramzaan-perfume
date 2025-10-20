@@ -24,7 +24,10 @@ import {
   Calendar,
   MapPin,
   Phone,
-  Mail
+  Mail,
+  User,
+  Shield,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AdminPanel.css';
