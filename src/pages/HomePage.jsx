@@ -178,42 +178,40 @@ const HomePage = () => {
             </button>
           </div>
 
-          {reviews.length > 0 ? (
-            <div className="reviews-grid">
-              {reviews.map((review) => (
-                <div key={review.id} className="review-card">
-                  <div className="review-rating">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} size={16} fill="currentColor" />
-                    ))}
-                  </div>
-                  <p className="review-text">"{review.text}"</p>
-                  <div className="review-author">
-                    <div className="author-avatar">{review.name.charAt(0)}</div>
-                    <div>
-                      <div className="author-name">{review.name}</div>
-                      <div className="review-date">{review.date}</div>
-                    </div>
+          <div className="reviews-grid">
+            {reviews.map((review) => (
+              <div key={review.id} className="review-card">
+                <div className="review-rating">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <Star key={i} size={16} fill="currentColor" />
+                  ))}
+                </div>
+                <p className="review-text">"{review.text}"</p>
+                <div className="review-author">
+                  <div className="author-avatar">{review.name.charAt(0)}</div>
+                  <div>
+                    <div className="author-name">{review.name}</div>
+                    <div className="review-date">{review.date}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-reviews-section">
-              <div className="no-reviews-content">
-                <Star size={48} />
-                <h3>No reviews yet</h3>
-                <p>Be the first to share your experience with Ramzaan fragrance!</p>
-                <button
-                  className="write-first-review-btn"
-                  onClick={() => setShowReviewForm(true)}
-                >
-                  <Sparkles size={16} />
-                  <span>Write the First Review</span>
+              </div>
+            ))}
+
+            {/* Always show the write review card */}
+            <div className="review-card write-review-card" onClick={() => setShowReviewForm(true)}>
+              <div className="write-review-content">
+                <div className="write-review-icon">
+                  <Sparkles size={48} />
+                </div>
+                <h3>Share Your Experience</h3>
+                <p>Help others discover this fragrance by writing a review</p>
+                <button className="write-review-card-btn">
+                  <Star size={16} />
+                  <span>Write a Review</span>
                 </button>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </section>
 
