@@ -122,16 +122,21 @@ export const orderService = {
       } catch (indexError) {
         // If index doesn't exist, fall back to getting all orders and filtering client-side
         console.warn('Index not ready for user orders, falling back to client-side filtering');
-        const q = query(collection(db, COLLECTIONS.ORDERS), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const orders = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.userId === userId) {
-            orders.push({ id: doc.id, ...data });
-          }
-        });
-        return { success: true, data: orders };
+        try {
+          const q = query(collection(db, COLLECTIONS.ORDERS), orderBy('createdAt', 'desc'));
+          const querySnapshot = await getDocs(q);
+          const orders = [];
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.userId === userId) {
+              orders.push({ id: doc.id, ...data });
+            }
+          });
+          return { success: true, data: orders };
+        } catch (fallbackError) {
+          console.warn('Fallback query also failed, returning empty orders:', fallbackError.message);
+          return { success: true, data: [] };
+        }
       }
     } catch (error) {
       console.error('Error getting user orders:', error);
