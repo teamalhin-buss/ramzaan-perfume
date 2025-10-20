@@ -3,6 +3,7 @@ import { Star, Award, Users, ArrowRight, Check, Sparkles } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
+import ReviewForm from '../components/ReviewForm';
 import { ASSETS } from '../config/assets';
 import { reviewService, productService } from '../services/firestore';
 import './HomePage.css';
@@ -20,6 +21,7 @@ const HomePage = () => {
   });
 
   const [reviews, setReviews] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -47,6 +49,17 @@ const HomePage = () => {
 
   const handleBuyNow = () => {
     window.location.href = '/checkout';
+  };
+
+  const handleReviewSubmit = (newReview) => {
+    // Refresh reviews after submission
+    const loadReviews = async () => {
+      const reviewsResult = await reviewService.getApprovedReviews();
+      if (reviewsResult.success) {
+        setReviews(reviewsResult.data);
+      }
+    };
+    loadReviews();
   };
 
   return (
@@ -156,8 +169,15 @@ const HomePage = () => {
           <div className="section-header">
             <h2 className="section-title">Customer Reviews</h2>
             <p className="section-subtitle">Trusted across India</p>
+            <button
+              className="write-review-btn"
+              onClick={() => setShowReviewForm(true)}
+            >
+              <Star size={16} />
+              <span>Write a Review</span>
+            </button>
           </div>
-          
+
           {reviews.length > 0 ? (
             <div className="reviews-grid">
               {reviews.map((review) => (
@@ -179,8 +199,19 @@ const HomePage = () => {
               ))}
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--gray-400)' }}>
-              <p>No reviews yet. Be the first to share your experience!</p>
+            <div className="no-reviews-section">
+              <div className="no-reviews-content">
+                <Star size={48} />
+                <h3>No reviews yet</h3>
+                <p>Be the first to share your experience with Ramzaan fragrance!</p>
+                <button
+                  className="write-first-review-btn"
+                  onClick={() => setShowReviewForm(true)}
+                >
+                  <Sparkles size={16} />
+                  <span>Write the First Review</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -211,6 +242,14 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Review Form Modal */}
+      {showReviewForm && (
+        <ReviewForm
+          onClose={() => setShowReviewForm(false)}
+          onSubmit={handleReviewSubmit}
+        />
+      )}
 
       <Footer />
     </div>
