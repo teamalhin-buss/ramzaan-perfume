@@ -74,7 +74,11 @@ const CheckoutPage = () => {
         const savedOrder = { ...order, id: orderResult.id };
 
         clearCart();
+<<<<<<< HEAD
         navigate('/order-confirmation', { state: { order: savedOrder } });
+=======
+        navigate('/order-confirmation', { state: { order } });
+>>>>>>> 53bc6da8609ed42ed57c4d554d86894f4c5fb65b
       },
       prefill: {
         name: formData.name,
