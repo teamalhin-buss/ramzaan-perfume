@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { ASSETS } from '../config/assets';
 import './CheckoutPage.css';
 
 const CheckoutPage = () => {

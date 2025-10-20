@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import './ReviewForm.css';
 
 const ReviewForm = ({ onClose, onSubmit }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState('');

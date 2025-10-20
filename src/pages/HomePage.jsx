@@ -20,7 +20,6 @@ const HomePage = () => {
   });
 
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
@@ -41,8 +40,6 @@ const HomePage = () => {
       if (reviewsResult.success) {
         setReviews(reviewsResult.data);
       }
-
-      setLoading(false);
     };
 
     loadData();

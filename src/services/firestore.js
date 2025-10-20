@@ -11,8 +11,6 @@ import {
   query,
   where,
   orderBy,
-  limit,
-  onSnapshot,
   Timestamp
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -216,7 +214,7 @@ export const reviewService = {
           reviews.push({ id: doc.id, ...doc.data() });
         });
         return { success: true, data: reviews };
-      } catch (indexError) {
+      } catch {
         // If index doesn't exist, fall back to getting all and filtering
         console.warn('Index not ready, falling back to client-side filtering');
         const q = query(collection(db, COLLECTIONS.REVIEWS), orderBy('createdAt', 'desc'));

@@ -149,7 +149,7 @@ const OptimizedImage = ({
       />
 
       {/* Debug Info (only in development) */}
-      {process.env.NODE_ENV === 'development' && naturalSize && (
+      {import.meta.env.DEV && naturalSize && (
         <div className="image-debug-info" title={`Natural size: ${naturalSize.width}x${naturalSize.height}`}>
           {naturalSize.width}×{naturalSize.height}
         </div>
