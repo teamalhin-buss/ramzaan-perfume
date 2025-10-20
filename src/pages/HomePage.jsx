@@ -23,11 +23,15 @@ const HomePage = () => {
   const [reviews, setReviews] = useState([]);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [visibleSections, setVisibleSections] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(true);
 
   const sectionRefs = useRef({});
 
   useEffect(() => {
     const loadData = async () => {
+      // Simulate loading time for the loading screen
+      await new Promise(resolve => setTimeout(resolve, 2500));
+
       // Load product data from Firestore
       const productResult = await productService.getProduct();
       if (productResult.success) {
@@ -45,6 +49,9 @@ const HomePage = () => {
       if (reviewsResult.success) {
         setReviews(reviewsResult.data);
       }
+
+      // Hide loading screen after data is loaded
+      setIsLoading(false);
     };
 
     loadData();
@@ -100,7 +107,45 @@ const HomePage = () => {
 
   return (
     <div className="home-page">
-      <Header />
+      {/* Loading Screen */}
+      {isLoading && (
+        <div className="loading-screen">
+          <div className="loading-content">
+            <div className="perfume-bottle">
+              <div className="bottle-silhouette">
+                <div className="bottle-neck"></div>
+                <div className="bottle-body">
+                  <div className="bottle-label"></div>
+                </div>
+                <div className="bottle-cap"></div>
+              </div>
+              <div className="mist-particles">
+                <div className="mist-particle particle-1"></div>
+                <div className="mist-particle particle-2"></div>
+                <div className="mist-particle particle-3"></div>
+                <div className="mist-particle particle-4"></div>
+                <div className="mist-particle particle-5"></div>
+                <div className="mist-particle particle-6"></div>
+              </div>
+              <div className="droplets">
+                <div className="droplet droplet-1"></div>
+                <div className="droplet droplet-2"></div>
+                <div className="droplet droplet-3"></div>
+              </div>
+            </div>
+            <div className="loading-text">
+              <h1 className="brand-name">Ramzaan</h1>
+              <p className="tagline">Timeless elegance in every drop</p>
+              <div className="loading-progress">
+                <div className="progress-bar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={`main-content ${!isLoading ? 'loaded' : ''}`}>
+        <Header />
 
       {/* Hero Section */}
       <section
@@ -315,7 +360,8 @@ const HomePage = () => {
         />
       )}
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 };

@@ -917,10 +917,393 @@ html {
   }
 }
 
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #0a0a0a 0%,
+    #1a1a2e 25%,
+    #16213e 50%,
+    #0f3460 75%,
+    #1a1a2e 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
+
+.loading-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-content {
+  text-align: center;
+  color: var(--white);
+  max-width: 400px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.perfume-bottle {
+  position: relative;
+  margin: 0 auto 40px;
+  width: 120px;
+  height: 200px;
+}
+
+.bottle-silhouette {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+}
+
+.bottle-neck {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 40px;
+  background: linear-gradient(180deg, #e8e8e8 0%, #d4d4d4 100%);
+  border-radius: 10px 10px 0 0;
+  animation: bottleGlow 3s ease-in-out infinite alternate;
+}
+
+.bottle-body {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 140px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 50%, #e8e8e8 100%);
+  border-radius: 30px 30px 8px 8px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  animation: bottleShine 4s ease-in-out infinite;
+}
+
+.bottle-label {
+  position: absolute;
+  top: 30px;
+  left: 8px;
+  right: 8px;
+  height: 80px;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+  border-radius: 20px;
+  opacity: 0.9;
+}
+
+.bottle-cap {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 16px;
+  background: linear-gradient(180deg, #8b4513 0%, #654321 100%);
+  border-radius: 8px 8px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mist-particles {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 60px;
+}
+
+.mist-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: mistFloat 3s ease-in-out infinite;
+}
+
+.mist-particle.particle-1 {
+  top: 10px;
+  left: 20px;
+  animation-delay: 0s;
+}
+
+.mist-particle.particle-2 {
+  top: 5px;
+  left: 40px;
+  animation-delay: 0.5s;
+}
+
+.mist-particle.particle-3 {
+  top: 15px;
+  left: 60px;
+  animation-delay: 1s;
+}
+
+.mist-particle.particle-4 {
+  top: 8px;
+  left: 80px;
+  animation-delay: 1.5s;
+}
+
+.mist-particle.particle-5 {
+  top: 20px;
+  left: 30px;
+  animation-delay: 2s;
+}
+
+.mist-particle.particle-6 {
+  top: 3px;
+  left: 70px;
+  animation-delay: 2.5s;
+}
+
+.droplets {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 40px;
+}
+
+.droplet {
+  position: absolute;
+  width: 6px;
+  height: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: dropletFall 2.5s ease-in-out infinite;
+}
+
+.droplet.droplet-1 {
+  left: 15px;
+  animation-delay: 0s;
+}
+
+.droplet.droplet-2 {
+  left: 35px;
+  animation-delay: 0.8s;
+}
+
+.droplet.droplet-3 {
+  left: 55px;
+  animation-delay: 1.6s;
+}
+
+.loading-text {
+  animation: textFadeIn 1.5s ease-out 0.5s both;
+}
+
+.brand-name {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 50%, #ffffff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brandGlow 3s ease-in-out infinite alternate;
+}
+
+.tagline {
+  font-size: clamp(0.875rem, 3vw, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+
+.loading-progress {
+  width: 200px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 1px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffffff 0%, #e8e8e8 50%, #ffffff 100%);
+  border-radius: 1px;
+  animation: progressFill 2.5s ease-out;
+}
+
+.main-content {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 1s ease-out 0.5s;
+}
+
+.main-content.loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Loading Screen Animations */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes bottleGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+}
+
+@keyframes bottleShine {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes mistFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-15px) scale(1.2);
+    opacity: 0.9;
+  }
+}
+
+@keyframes dropletFall {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(15px) scale(0.8);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(30px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes textFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes brandGlow {
+  0% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+  }
+  100% {
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+  }
+}
+
+@keyframes progressFill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
 /* Mobile Responsive - Minimal Adjustments */
 @media (max-width: 1024px) {
   .hero-title {
     font-size: clamp(3rem, 8vw, 5rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .perfume-bottle {
+    width: 100px;
+    height: 170px;
+  }
+
+  .bottle-body {
+    width: 50px;
+    height: 120px;
+  }
+
+  .bottle-neck {
+    width: 16px;
+    height: 32px;
+  }
+
+  .bottle-cap {
+    width: 24px;
+    height: 12px;
+  }
+
+  .loading-progress {
+    width: 150px;
+  }
+
+  .brand-name {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .perfume-bottle {
+    width: 80px;
+    height: 140px;
+  }
+
+  .bottle-body {
+    width: 40px;
+    height: 100px;
+  }
+
+  .bottle-neck {
+    width: 12px;
+    height: 24px;
+  }
+
+  .bottle-cap {
+    width: 20px;
+    height: 10px;
+  }
+
+  .loading-progress {
+    width: 120px;
+  }
+
+  .brand-name {
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
   }
 }
 
