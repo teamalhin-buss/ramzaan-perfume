@@ -165,10 +165,24 @@ export const orderService = {
   // Update order status
   updateOrderStatus: async (orderId, status) => {
     try {
-      await updateDoc(doc(db, COLLECTIONS.ORDERS, orderId), {
+      console.log('Attempting to update order document:', orderId, 'with status:', status);
+
+      // First check if the document exists
+      const docRef = doc(db, COLLECTIONS.ORDERS, orderId);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        console.error('Order document does not exist:', orderId);
+        return { success: false, error: `No document to update: ${orderId}` };
+      }
+
+      console.log('Order document exists, updating status...');
+      await updateDoc(docRef, {
         status,
         updatedAt: Timestamp.now()
       });
+
+      console.log('Order status updated successfully');
       return { success: true };
     } catch (error) {
       console.error('Error updating order status:', error);
