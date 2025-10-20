@@ -974,6 +974,219 @@
   font-weight: 300;
 }
 
+/* User Management */
+.users-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.user-card {
+  padding: 32px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  transition: all var(--transition-base);
+}
+
+.user-card:hover {
+  border-color: var(--border-medium);
+  transform: translateY(-2px);
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 24px;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+.user-info h4 {
+  font-size: 1.125rem;
+  margin-bottom: 4px;
+  color: var(--white);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.user-email {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gray-400);
+  font-size: 12px;
+  font-weight: 300;
+  margin-bottom: 8px;
+}
+
+.user-role {
+  margin-top: 4px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 0;
+  border: 1px solid;
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.role-badge.admin {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+.role-badge.user {
+  background: transparent;
+  color: var(--gray-400);
+  border-color: var(--border-medium);
+}
+
+.user-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.promote-btn,
+.demote-btn {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--white);
+  cursor: pointer;
+  border-radius: 0;
+  transition: all var(--transition-base);
+}
+
+.promote-btn:hover {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+.demote-btn:hover {
+  background: var(--gray-600);
+  border-color: var(--gray-600);
+}
+
+.user-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.user-stats .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  text-align: center;
+  justify-content: center;
+}
+
+.user-stats .stat-item svg {
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.user-stats .stat-item span {
+  font-size: 12px;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 300;
+}
+
+.user-recent-activity {
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+}
+
+.user-recent-activity h5 {
+  font-size: 12px;
+  color: var(--white);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-item {
+  display: grid;
+  grid-template-columns: 60px 80px 80px auto 60px;
+  gap: 12px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  font-size: 11px;
+  color: var(--gray-400);
+  align-items: center;
+}
+
+.activity-type {
+  color: var(--white);
+  font-weight: 400;
+}
+
+.activity-id {
+  font-weight: 400;
+}
+
+.activity-amount {
+  color: var(--white);
+  font-weight: 300;
+}
+
+.activity-status {
+  padding: 2px 6px;
+  border: 1px solid;
+  border-radius: 0;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.activity-date {
+  text-align: right;
+  font-size: 10px;
+}
+
 /* Customer Management */
 .customers-list {
   display: grid;
@@ -1205,6 +1418,7 @@
 
 /* Mobile Responsive */
 @media (max-width: 1024px) {
+  .users-list,
   .customers-list {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
@@ -1225,7 +1439,18 @@
     width: 150px;
   }
 
+  .users-list,
   .customers-list {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .user-stats {
     grid-template-columns: 1fr;
   }
 

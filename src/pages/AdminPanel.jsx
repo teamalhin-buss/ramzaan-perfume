@@ -180,6 +180,21 @@ const AdminPanel = () => {
     window.location.reload();
   };
 
+  const handleRoleChange = async (userId, newRole) => {
+    if (window.confirm(`Are you sure you want to ${newRole === 'admin' ? 'promote' : 'demote'} this user?`)) {
+      const result = await userService.updateUser(userId, { role: newRole });
+      if (result.success) {
+        // Update local state
+        setUsers(users.map(user =>
+          user.id === userId ? { ...user, role: newRole } : user
+        ));
+        alert(`User ${newRole === 'admin' ? 'promoted to admin' : 'demoted to user'} successfully!`);
+      } else {
+        alert('Failed to update user role: ' + result.error);
+      }
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/account');
@@ -220,6 +235,13 @@ const AdminPanel = () => {
             Customers
           </button>
           <button
+            className={activeTab === 'users' ? 'active' : ''}
+            onClick={() => setActiveTab('users')}
+          >
+            <User size={20} />
+            Users
+          </button>
+          <button
             className={activeTab === 'reviews' ? 'active' : ''}
             onClick={() => setActiveTab('reviews')}
           >
@@ -249,6 +271,7 @@ const AdminPanel = () => {
               {activeTab === 'dashboard' && 'Dashboard'}
               {activeTab === 'orders' && 'Order Management'}
               {activeTab === 'customers' && 'Customer Management'}
+              {activeTab === 'users' && 'User Management'}
               {activeTab === 'reviews' && 'Review Moderation'}
               {activeTab === 'product' && 'Product Settings'}
             </h1>
@@ -552,6 +575,138 @@ const AdminPanel = () => {
                       <ShoppingCart size={64} />
                       <h3>No orders found</h3>
                       <p>{searchTerm || statusFilter !== 'all' ? 'Try adjusting your search or filters' : 'No orders have been placed yet'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Users Tab */}
+          {activeTab === 'users' && (
+            <div className="users-management">
+              <div className="section-header">
+                <h3>User Management</h3>
+                <p>Manage all registered users and their roles</p>
+              </div>
+
+              {loading ? (
+                <div className="loading-state">
+                  <RefreshCw size={32} className="spinning" />
+                  <p>Loading users...</p>
+                </div>
+              ) : (
+                <div className="users-list">
+                  {users.map((user) => {
+                    const userOrders = orders.filter(order => order.userId === user.id);
+                    const totalSpent = userOrders.reduce((sum, order) => sum + order.total, 0);
+                    const lastOrder = userOrders.length > 0 ?
+                      userOrders.sort((a, b) => new Date(b.createdAt?.toDate?.() || b.date) - new Date(a.createdAt?.toDate?.() || a.date))[0] : null;
+
+                    return (
+                      <div key={user.id} className="user-card glass-card">
+                        <div className="user-header">
+                          <div className="user-avatar">
+                            {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                          </div>
+                          <div className="user-info">
+                            <h4>{user.name || 'Unnamed User'}</h4>
+                            <p className="user-email">
+                              <Mail size={14} />
+                              {user.email}
+                            </p>
+                            <div className="user-role">
+                              <span className={`role-badge ${user.role || 'user'}`}>
+                                {user.role === 'admin' ? 'Admin' : 'User'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="user-actions">
+                            {user.role !== 'admin' && (
+                              <button
+                                className="promote-btn"
+                                onClick={() => handleRoleChange(user.id, 'admin')}
+                                title="Promote to Admin"
+                              >
+                                <Shield size={16} />
+                              </button>
+                            )}
+                            {user.role === 'admin' && user.email !== 'admin@alh.com' && (
+                              <button
+                                className="demote-btn"
+                                onClick={() => handleRoleChange(user.id, 'user')}
+                                title="Demote to User"
+                              >
+                                <User size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="user-stats">
+                          <div className="stat-item">
+                            <ShoppingCart size={16} />
+                            <span>{userOrders.length} Orders</span>
+                          </div>
+                          <div className="stat-item">
+                            <DollarSign size={16} />
+                            <span>₹{totalSpent} Spent</span>
+                          </div>
+                          <div className="stat-item">
+                            <Calendar size={16} />
+                            <span>
+                              {user.createdAt?.toDate?.()?.toLocaleDateString('en-IN', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric'
+                              }) || 'Unknown'}
+                            </span>
+                          </div>
+                          <div className="stat-item">
+                            <Clock size={16} />
+                            <span>
+                              {lastOrder ?
+                                new Date(lastOrder.createdAt?.toDate?.() || lastOrder.date).toLocaleDateString('en-IN', {
+                                  day: '2-digit',
+                                  month: 'short'
+                                }) : 'Never'
+                              }
+                            </span>
+                          </div>
+                        </div>
+
+                        {userOrders.length > 0 && (
+                          <div className="user-recent-activity">
+                            <h5>Recent Activity:</h5>
+                            <div className="activity-list">
+                              {userOrders.slice(0, 3).map((order) => (
+                                <div key={order.id} className="activity-item">
+                                  <span className="activity-type">Order</span>
+                                  <span className="activity-id">#{order.id}</span>
+                                  <span className="activity-amount">₹{order.total}</span>
+                                  <span className={`activity-status ${order.status}`}>
+                                    {order.status}
+                                  </span>
+                                  <span className="activity-date">
+                                    {new Date(order.createdAt?.toDate?.() || order.date).toLocaleDateString('en-IN', {
+                                      day: '2-digit',
+                                      month: 'short'
+                                    })}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {users.length === 0 && (
+                    <div className="no-data">
+                      <Users size={64} />
+                      <h3>No users found</h3>
+                      <p>No users have registered yet</p>
                     </div>
                   )}
                 </div>
