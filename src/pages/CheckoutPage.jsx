@@ -71,8 +71,7 @@ const CheckoutPage = () => {
         }
 
         clearCart();
-        alert('✅ Payment successful! Your order has been placed.\n\nOrder ID: ' + order.id);
-        navigate('/account');
+        navigate('/order-confirmation', { state: { order } });
       },
       prefill: {
         name: formData.name,

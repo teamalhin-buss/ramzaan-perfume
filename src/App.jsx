@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import AccountPage from './pages/AccountPage';
 import AdminPanel from './pages/AdminPanel';
 import CheckoutPage from './pages/CheckoutPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route path="/account" element={<AccountPage />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           </Routes>
         </CartProvider>
       </AuthProvider>

@@ -91,12 +91,14 @@ export const orderService = {
   // Create order
   createOrder: async (orderData) => {
     try {
-      const docRef = await addDoc(collection(db, COLLECTIONS.ORDERS), {
+      // Use the custom order ID as the Firestore document ID
+      const orderId = orderData.id;
+      await setDoc(doc(db, COLLECTIONS.ORDERS, orderId), {
         ...orderData,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       });
-      return { success: true, id: docRef.id };
+      return { success: true, id: orderId };
     } catch (error) {
       console.error('Error creating order:', error);
       return { success: false, error: error.message };
