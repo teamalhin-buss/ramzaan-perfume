@@ -134,18 +134,32 @@ const AdminPanel = () => {
       if (result.success) {
         const updatedReviews = reviews.filter(review => review.id !== reviewId);
         setReviews(updatedReviews);
+        alert('Review deleted successfully!');
       } else {
         alert('Failed to delete review: ' + result.error);
+        // Refresh the reviews list in case of stale data
+        const reviewsResult = await reviewService.getAllReviews();
+        if (reviewsResult.success) {
+          setReviews(reviewsResult.data);
+        }
       }
     } else if (action === 'approve') {
+      console.log('Attempting to approve review:', reviewId);
       const result = await reviewService.approveReview(reviewId);
       if (result.success) {
         const updatedReviews = reviews.map(review =>
           review.id === reviewId ? { ...review, approved: true } : review
         );
         setReviews(updatedReviews);
+        alert('Review approved successfully!');
       } else {
+        console.error('Failed to approve review:', result.error);
         alert('Failed to approve review: ' + result.error);
+        // Refresh the reviews list in case the review no longer exists
+        const reviewsResult = await reviewService.getAllReviews();
+        if (reviewsResult.success) {
+          setReviews(reviewsResult.data);
+        }
       }
     }
   };
