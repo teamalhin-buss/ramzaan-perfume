@@ -1,9 +1,65 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow all operations for development/testing - REPLACE WITH SECURE RULES FOR PRODUCTION
-    match /{document=**} {
-      allow read, write: if true;
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read/write their own profile
+      allow read, write: if isOwner(userId);
+      // Admins can read/write all users
+      allow read, write: if isAdmin();
+    }
+
+    // Orders collection
+    match /orders/{orderId} {
+      // Users can create orders
+      allow create: if isAuthenticated();
+      // Users can read their own orders
+      allow read: if isOwner(resource.data.userId);
+      // Admins can read/write all orders
+      allow read, write: if isAdmin();
+    }
+
+    // Reviews collection
+    match /reviews/{reviewId} {
+      // Authenticated users can create reviews
+      allow create: if isAuthenticated();
+      // Anyone can read approved reviews
+      allow read: if resource.data.approved == true;
+      // Admins can read/write all reviews
+      allow read, write: if isAdmin();
+      // Allow read for all authenticated users to see reviews in admin panel
+      allow read: if isAuthenticated();
+    }
+
+    // Products collection
+    match /products/{productId} {
+      // Anyone can read products
+      allow read: if true;
+      // Only admins can write products
+      allow write: if isAdmin();
+    }
+
+    // Carts collection
+    match /carts/{userId} {
+      // Users can read/write their own cart
+      allow read, write: if isOwner(userId);
+      // Admins can read all carts
+      allow read: if isAdmin();
     }
   }
 }
