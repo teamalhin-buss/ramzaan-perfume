@@ -130,7 +130,7 @@
   font-size: 14px;
   font-weight: 300;
   background: #ffffff;
-  color: #000000;
+  color: #000000 !important;
   transition: all 0.2s ease;
   line-height: 1.5;
 }
@@ -141,6 +141,7 @@
   border-color: #000000;
   background: #ffffff;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  color: #000000 !important;
 }
 
 .review-form textarea {
@@ -150,6 +151,7 @@
   line-height: 1.6;
   font-size: 15px;
   padding: 18px;
+  color: #000000 !important;
 }
 
 .review-form textarea.near-limit {
