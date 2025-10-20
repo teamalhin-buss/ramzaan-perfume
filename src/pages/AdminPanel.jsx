@@ -105,13 +105,16 @@ const AdminPanel = () => {
   };
 
   const handleOrderStatusChange = async (orderId, newStatus) => {
+    console.log('Attempting to update order:', orderId, 'to status:', newStatus);
     const result = await orderService.updateOrderStatus(orderId, newStatus);
     if (result.success) {
       const updatedOrders = orders.map(order =>
         order.id === orderId ? { ...order, status: newStatus } : order
       );
       setOrders(updatedOrders);
+      alert('Order status updated successfully!');
     } else {
+      console.error('Failed to update order status:', result.error);
       alert('Failed to update order status: ' + result.error);
     }
   };
