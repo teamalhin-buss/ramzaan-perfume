@@ -70,9 +70,11 @@ const CheckoutPage = () => {
           return;
         }
 
+        // Update the order object with the actual Firestore document ID
+        const savedOrder = { ...order, id: orderResult.id };
+
         clearCart();
-        alert('✅ Payment successful! Your order has been placed.\n\nOrder ID: ' + order.id);
-        navigate('/account');
+        navigate('/order-confirmation', { state: { order: savedOrder } });
       },
       prefill: {
         name: formData.name,
