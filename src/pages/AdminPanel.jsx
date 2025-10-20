@@ -1,18 +1,30 @@
 import { orderService, reviewService, productService, userService } from '../services/firestore';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Package, 
-  Users, 
-  DollarSign, 
-  Star, 
+import {
+  Package,
+  Users,
+  DollarSign,
+  Star,
   Settings,
   LogOut,
   Edit,
   Trash2,
   Check,
   X,
-  BarChart
+  BarChart,
+  TrendingUp,
+  ShoppingCart,
+  Eye,
+  AlertCircle,
+  RefreshCw,
+  Download,
+  Search,
+  Filter,
+  Calendar,
+  MapPin,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AdminPanel.css';
@@ -23,6 +35,7 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [users, setUsers] = useState([]);
   const [productData, setProductData] = useState({
     name: 'Ramzaan',
     price: 1499,
@@ -30,6 +43,9 @@ const AdminPanel = () => {
     description: 'Experience timeless elegance in every drop',
     notes: 'Oud, Amber, Musk',
   });
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     if (!isAdmin) {
@@ -40,22 +56,35 @@ const AdminPanel = () => {
 
     // Load data from Firestore
     const loadData = async () => {
-      // Load orders
-      const ordersResult = await orderService.getAllOrders();
-      if (ordersResult.success) {
-        setOrders(ordersResult.data);
-      }
+      setLoading(true);
+      try {
+        // Load orders
+        const ordersResult = await orderService.getAllOrders();
+        if (ordersResult.success) {
+          setOrders(ordersResult.data);
+        }
 
-      // Load reviews
-      const reviewsResult = await reviewService.getAllReviews();
-      if (reviewsResult.success) {
-        setReviews(reviewsResult.data);
-      }
+        // Load reviews
+        const reviewsResult = await reviewService.getAllReviews();
+        if (reviewsResult.success) {
+          setReviews(reviewsResult.data);
+        }
 
-      // Load product data
-      const productResult = await productService.getProduct();
-      if (productResult.success) {
-        setProductData(productResult.data);
+        // Load users
+        const usersResult = await userService.getAllUsers();
+        if (usersResult.success) {
+          setUsers(usersResult.data);
+        }
+
+        // Load product data
+        const productResult = await productService.getProduct();
+        if (productResult.success) {
+          setProductData(productResult.data);
+        }
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -122,9 +151,33 @@ const AdminPanel = () => {
     return orders.reduce((sum, order) => sum + order.total, 0);
   };
 
-  const getCustomerCount = async () => {
-    const result = await userService.getAllUsers();
-    return result.success ? result.data.length : 0;
+  const getCustomerCount = () => {
+    return users.length;
+  };
+
+  const getFilteredOrders = () => {
+    return orders.filter(order => {
+      const matchesSearch = searchTerm === '' ||
+        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.shippingDetails?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.shippingDetails?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  };
+
+  const getFilteredReviews = () => {
+    return reviews.filter(review => {
+      return searchTerm === '' ||
+        review.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        review.text.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  };
+
+  const refreshData = () => {
+    window.location.reload();
   };
 
   const handleLogout = () => {
@@ -153,18 +206,18 @@ const AdminPanel = () => {
             Dashboard
           </button>
           <button
-            className={activeTab === 'product' ? 'active' : ''}
-            onClick={() => setActiveTab('product')}
-          >
-            <Package size={20} />
-            Product Settings
-          </button>
-          <button
             className={activeTab === 'orders' ? 'active' : ''}
             onClick={() => setActiveTab('orders')}
           >
-            <Settings size={20} />
+            <ShoppingCart size={20} />
             Orders
+          </button>
+          <button
+            className={activeTab === 'customers' ? 'active' : ''}
+            onClick={() => setActiveTab('customers')}
+          >
+            <Users size={20} />
+            Customers
           </button>
           <button
             className={activeTab === 'reviews' ? 'active' : ''}
@@ -172,6 +225,13 @@ const AdminPanel = () => {
           >
             <Star size={20} />
             Reviews
+          </button>
+          <button
+            className={activeTab === 'product' ? 'active' : ''}
+            onClick={() => setActiveTab('product')}
+          >
+            <Package size={20} />
+            Product
           </button>
         </nav>
 
@@ -184,12 +244,44 @@ const AdminPanel = () => {
       {/* Main Content */}
       <main className="admin-main">
         <header className="admin-header">
-          <h1>
-            {activeTab === 'dashboard' && 'Dashboard'}
-            {activeTab === 'product' && 'Product Settings'}
-            {activeTab === 'orders' && 'Order Management'}
-            {activeTab === 'reviews' && 'Review Moderation'}
-          </h1>
+          <div className="header-left">
+            <h1>
+              {activeTab === 'dashboard' && 'Dashboard'}
+              {activeTab === 'orders' && 'Order Management'}
+              {activeTab === 'customers' && 'Customer Management'}
+              {activeTab === 'reviews' && 'Review Moderation'}
+              {activeTab === 'product' && 'Product Settings'}
+            </h1>
+            {(activeTab === 'orders' || activeTab === 'reviews' || activeTab === 'customers') && (
+              <div className="header-actions">
+                <div className="search-box">
+                  <Search size={16} />
+                  <input
+                    type="text"
+                    placeholder={`Search ${activeTab}...`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                {activeTab === 'orders' && (
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                  </select>
+                )}
+                <button onClick={refreshData} className="refresh-btn">
+                  <RefreshCw size={16} />
+                </button>
+              </div>
+            )}
+          </div>
           <div className="admin-user">
             <span>Welcome, {user?.name}</span>
           </div>
@@ -201,11 +293,15 @@ const AdminPanel = () => {
             <div className="dashboard-grid">
               <div className="stat-card glass-card">
                 <div className="stat-icon">
-                  <Package size={28} />
+                  <ShoppingCart size={28} />
                 </div>
                 <div className="stat-info">
                   <h3>{orders.length}</h3>
                   <p>Total Orders</p>
+                </div>
+                <div className="stat-trend">
+                  <TrendingUp size={14} />
+                  <span>+12%</span>
                 </div>
               </div>
 
@@ -217,6 +313,10 @@ const AdminPanel = () => {
                   <h3>₹{getTotalRevenue()}</h3>
                   <p>Total Revenue</p>
                 </div>
+                <div className="stat-trend positive">
+                  <TrendingUp size={14} />
+                  <span>+8%</span>
+                </div>
               </div>
 
               <div className="stat-card glass-card">
@@ -227,6 +327,10 @@ const AdminPanel = () => {
                   <h3>{getCustomerCount()}</h3>
                   <p>Customers</p>
                 </div>
+                <div className="stat-trend">
+                  <TrendingUp size={14} />
+                  <span>+5%</span>
+                </div>
               </div>
 
               <div className="stat-card glass-card">
@@ -234,25 +338,65 @@ const AdminPanel = () => {
                   <Star size={28} />
                 </div>
                 <div className="stat-info">
-                  <h3>{reviews.length}</h3>
-                  <p>Reviews</p>
+                  <h3>{reviews.filter(r => r.approved).length}</h3>
+                  <p>Approved Reviews</p>
+                </div>
+                <div className="stat-trend">
+                  <TrendingUp size={14} />
+                  <span>+15%</span>
                 </div>
               </div>
 
               {/* Recent Orders */}
               <div className="recent-orders glass-card">
-                <h3>Recent Orders</h3>
+                <div className="card-header">
+                  <h3>Recent Orders</h3>
+                  <button onClick={() => setActiveTab('orders')} className="view-all-btn">
+                    <Eye size={14} />
+                    View All
+                  </button>
+                </div>
                 <div className="orders-table">
                   {orders.slice(0, 5).map((order) => (
                     <div key={order.id} className="order-row">
-                      <span className="order-id">#{order.id}</span>
-                      <span className="order-date">{order.date}</span>
-                      <span className={`order-status ${order.status}`}>
-                        {order.status}
-                      </span>
+                      <div className="order-info">
+                        <span className="order-id">#{order.id}</span>
+                        <span className="order-customer">{order.shippingDetails?.name}</span>
+                      </div>
+                      <div className="order-meta">
+                        <span className="order-date">{order.date}</span>
+                        <span className={`order-status ${order.status}`}>
+                          {order.status}
+                        </span>
+                      </div>
                       <span className="order-amount">₹{order.total}</span>
                     </div>
                   ))}
+                  {orders.length === 0 && (
+                    <div className="no-data">
+                      <Package size={48} />
+                      <p>No orders yet</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="quick-actions glass-card">
+                <h3>Quick Actions</h3>
+                <div className="action-buttons">
+                  <button onClick={() => setActiveTab('product')} className="action-btn">
+                    <Package size={16} />
+                    Update Product
+                  </button>
+                  <button onClick={() => setActiveTab('reviews')} className="action-btn">
+                    <Star size={16} />
+                    Moderate Reviews
+                  </button>
+                  <button onClick={() => setActiveTab('customers')} className="action-btn">
+                    <Users size={16} />
+                    View Customers
+                  </button>
                 </div>
               </div>
             </div>
@@ -320,93 +464,260 @@ const AdminPanel = () => {
           {/* Orders Tab */}
           {activeTab === 'orders' && (
             <div className="orders-management">
-              <div className="orders-list-admin">
-                {orders.map((order) => (
-                  <div key={order.id} className="order-card-admin glass-card">
-                    <div className="order-header-admin">
-                      <div>
-                        <h4>Order #{order.id}</h4>
-                        <p className="order-date">{order.date}</p>
-                      </div>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDeleteOrder(order.id)}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-
-                    <div className="order-items-admin">
-                      {order.items.map((item, index) => (
-                        <p key={index}>{item.name} x {item.quantity}</p>
-                      ))}
-                    </div>
-
-                    <div className="order-shipping">
-                      <p><strong>Customer:</strong> {order.shippingDetails?.name}</p>
-                      <p><strong>Email:</strong> {order.shippingDetails?.email}</p>
-                      <p><strong>Phone:</strong> {order.shippingDetails?.phone}</p>
-                      <p><strong>Address:</strong> {order.shippingDetails?.address}, {order.shippingDetails?.city}</p>
-                    </div>
-
-                    <div className="order-footer-admin">
-                      <span className="order-total">₹{order.total}</span>
-                      <select
-                        value={order.status}
-                        onChange={(e) => handleOrderStatusChange(order.id, e.target.value)}
-                        className="status-select"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                      </select>
-                    </div>
-                  </div>
-                ))}
+              <div className="section-header">
+                <h3>Order Management</h3>
+                <p>Manage and track all customer orders</p>
               </div>
+
+              {loading ? (
+                <div className="loading-state">
+                  <RefreshCw size={32} className="spinning" />
+                  <p>Loading orders...</p>
+                </div>
+              ) : (
+                <div className="orders-list-admin">
+                  {getFilteredOrders().map((order) => (
+                    <div key={order.id} className="order-card-admin glass-card">
+                      <div className="order-header-admin">
+                        <div className="order-basic-info">
+                          <h4>Order #{order.id}</h4>
+                          <div className="order-meta">
+                            <span className="order-date">
+                              <Calendar size={14} />
+                              {order.date}
+                            </span>
+                            <span className={`order-status ${order.status}`}>
+                              {order.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="order-actions">
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteOrder(order.id)}
+                            title="Delete Order"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="order-content">
+                        <div className="order-items-admin">
+                          <h5>Items Ordered:</h5>
+                          {order.items.map((item, index) => (
+                            <div key={index} className="order-item-row">
+                              <span className="item-name">{item.name}</span>
+                              <span className="item-quantity">x{item.quantity}</span>
+                              <span className="item-price">₹{item.price * item.quantity}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="order-customer-info">
+                          <h5>Customer Details:</h5>
+                          <div className="customer-details">
+                            <p><User size={14} /> {order.shippingDetails?.name}</p>
+                            <p><Mail size={14} /> {order.shippingDetails?.email}</p>
+                            <p><Phone size={14} /> {order.shippingDetails?.phone}</p>
+                            <p><MapPin size={14} /> {order.shippingDetails?.address}, {order.shippingDetails?.city}, {order.shippingDetails?.state} {order.shippingDetails?.pincode}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="order-footer-admin">
+                        <div className="order-total-section">
+                          <span className="order-total-label">Total Amount:</span>
+                          <span className="order-total">₹{order.total}</span>
+                        </div>
+                        <div className="order-status-update">
+                          <label>Update Status:</label>
+                          <select
+                            value={order.status}
+                            onChange={(e) => handleOrderStatusChange(order.id, e.target.value)}
+                            className="status-select"
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {getFilteredOrders().length === 0 && (
+                    <div className="no-data">
+                      <ShoppingCart size={64} />
+                      <h3>No orders found</h3>
+                      <p>{searchTerm || statusFilter !== 'all' ? 'Try adjusting your search or filters' : 'No orders have been placed yet'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Customers Tab */}
+          {activeTab === 'customers' && (
+            <div className="customers-management">
+              <div className="section-header">
+                <h3>Customer Management</h3>
+                <p>View and manage registered customers</p>
+              </div>
+
+              {loading ? (
+                <div className="loading-state">
+                  <RefreshCw size={32} className="spinning" />
+                  <p>Loading customers...</p>
+                </div>
+              ) : (
+                <div className="customers-list">
+                  {getFilteredReviews().map((customer) => {
+                    const customerOrders = orders.filter(order => order.userId === customer.id);
+                    const totalSpent = customerOrders.reduce((sum, order) => sum + order.total, 0);
+
+                    return (
+                      <div key={customer.id} className="customer-card glass-card">
+                        <div className="customer-header">
+                          <div className="customer-avatar">
+                            {customer.name?.charAt(0)?.toUpperCase() || 'U'}
+                          </div>
+                          <div className="customer-info">
+                            <h4>{customer.name || 'Unknown User'}</h4>
+                            <p className="customer-email">
+                              <Mail size={14} />
+                              {customer.email}
+                            </p>
+                            <p className="customer-joined">
+                              <Calendar size={14} />
+                              Joined {customer.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="customer-stats">
+                          <div className="stat-item">
+                            <ShoppingCart size={16} />
+                            <span>{customerOrders.length} Orders</span>
+                          </div>
+                          <div className="stat-item">
+                            <DollarSign size={16} />
+                            <span>₹{totalSpent} Spent</span>
+                          </div>
+                          <div className="stat-item">
+                            <Star size={16} />
+                            <span>{customerOrders.length > 0 ? 'Active' : 'New'}</span>
+                          </div>
+                        </div>
+
+                        {customerOrders.length > 0 && (
+                          <div className="customer-recent-orders">
+                            <h5>Recent Orders:</h5>
+                            <div className="recent-orders-list">
+                              {customerOrders.slice(0, 3).map((order) => (
+                                <div key={order.id} className="mini-order">
+                                  <span>#{order.id}</span>
+                                  <span>{order.date}</span>
+                                  <span>₹{order.total}</span>
+                                  <span className={`status-badge ${order.status}`}>
+                                    {order.status}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {getFilteredReviews().length === 0 && (
+                    <div className="no-data">
+                      <Users size={64} />
+                      <h3>No customers found</h3>
+                      <p>{searchTerm ? 'Try adjusting your search' : 'No customers have registered yet'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
           {/* Reviews Tab */}
           {activeTab === 'reviews' && (
             <div className="reviews-management">
-              <div className="reviews-list-admin">
-                {reviews.map((review) => (
-                  <div key={review.id} className="review-card-admin glass-card">
-                    <div className="review-header-admin">
-                      <div>
-                        <h4>{review.name}</h4>
-                        <div className="star-rating">
-                          {[...Array(review.rating)].map((_, i) => (
-                            <Star key={i} size={16} fill="currentColor" />
-                          ))}
+              <div className="section-header">
+                <h3>Review Moderation</h3>
+                <p>Approve or reject customer reviews</p>
+              </div>
+
+              {loading ? (
+                <div className="loading-state">
+                  <RefreshCw size={32} className="spinning" />
+                  <p>Loading reviews...</p>
+                </div>
+              ) : (
+                <div className="reviews-list-admin">
+                  {getFilteredReviews().map((review) => (
+                    <div key={review.id} className="review-card-admin glass-card">
+                      <div className="review-header-admin">
+                        <div className="review-info">
+                          <h4>{review.name}</h4>
+                          <div className="review-meta">
+                            <div className="star-rating">
+                              {[...Array(review.rating)].map((_, i) => (
+                                <Star key={i} size={16} fill="currentColor" />
+                              ))}
+                            </div>
+                            <span className="review-date">
+                              <Calendar size={14} />
+                              {review.createdAt?.toDate?.()?.toLocaleDateString() || 'Recent'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="review-actions">
+                          {!review.approved && (
+                            <button
+                              className="approve-btn"
+                              onClick={() => handleReviewAction(review.id, 'approve')}
+                              title="Approve Review"
+                            >
+                              <Check size={16} />
+                              Approve
+                            </button>
+                          )}
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleReviewAction(review.id, 'delete')}
+                            title="Delete Review"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </div>
-                      <div className="review-actions">
-                        {!review.approved && (
-                          <button
-                            className="approve-btn"
-                            onClick={() => handleReviewAction(review.id, 'approve')}
-                          >
-                            <Check size={18} />
-                          </button>
+                      <div className="review-content">
+                        <p className="review-text-admin">"{review.text}"</p>
+                        {review.approved && (
+                          <span className="approved-badge">
+                            <Check size={12} />
+                            Approved
+                          </span>
                         )}
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleReviewAction(review.id, 'delete')}
-                        >
-                          <Trash2 size={18} />
-                        </button>
                       </div>
                     </div>
-                    <p className="review-text-admin">{review.text}</p>
-                    {review.approved && (
-                      <span className="approved-badge">Approved</span>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  ))}
+
+                  {getFilteredReviews().length === 0 && (
+                    <div className="no-data">
+                      <Star size={64} />
+                      <h3>No reviews found</h3>
+                      <p>{searchTerm ? 'Try adjusting your search' : 'No reviews have been submitted yet'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
