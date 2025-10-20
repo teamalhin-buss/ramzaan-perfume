@@ -29,7 +29,6 @@ const ReviewForm = ({ onClose, onSubmit }) => {
 
     try {
       const review = {
-        id: 'REV' + Date.now(),
         userId: user?.id || 'guest',
         name: name.trim(),
         rating,
@@ -50,7 +49,7 @@ const ReviewForm = ({ onClose, onSubmit }) => {
       }
 
       if (onSubmit) {
-        onSubmit(review);
+        onSubmit({ ...review, id: result.id });
       }
 
       // Success message with better UX
