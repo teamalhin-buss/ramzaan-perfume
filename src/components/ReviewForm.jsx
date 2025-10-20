@@ -142,8 +142,12 @@ const ReviewForm = ({ onClose, onSubmit }) => {
             <textarea
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
-              placeholder="Tell us about your experience... What did you love? How does it make you feel? Any special occasions?"
-              rows="6"
+              placeholder="Tell us about your experience with Ramzaan fragrance...
+
+What did you love about the scent? How does it make you feel? Does it last all day? Any special occasions you've worn it?
+
+Share your honest thoughts - your review helps others discover this fragrance! ✨"
+              rows="8"
               required
               maxLength={500}
               className={reviewText.length > 450 ? 'near-limit' : ''}
