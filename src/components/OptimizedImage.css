@@ -237,3 +237,38 @@
 .optimized-image-container[data-loading="false"] .optimized-image {
   animation: imageReveal 0.5s ease-out;
 }
+
+/* Enhanced Loading Animation */
+@keyframes enhancedShimmer {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.skeleton-shimmer {
+  animation: enhancedShimmer 2s ease-in-out infinite;
+}
+
+/* Pulse Animation for Loading Icon */
+@keyframes enhancedPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.skeleton-icon {
+  animation: enhancedPulse 2s ease-in-out infinite;
+}
