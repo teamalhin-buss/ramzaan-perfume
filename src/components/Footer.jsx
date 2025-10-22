@@ -1,4 +1,5 @@
 import { Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const Footer = () => {
@@ -31,7 +32,7 @@ const Footer = () => {
               <li><a onClick={() => scrollToSection('home')}>Home</a></li>
               <li><a onClick={() => scrollToSection('about')}>About</a></li>
               <li><a onClick={() => scrollToSection('reviews')}>Reviews</a></li>
-              <li><a href="#">Terms & Conditions</a></li>
+              <li><Link to="/terms">Terms & Conditions</Link></li>
               <li><a href="#">Privacy Policy</a></li>
             </ul>
           </div>
