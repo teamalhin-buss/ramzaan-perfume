@@ -1,7 +1,7 @@
 import { orderService } from '../services/firestore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Package, LogOut, Shield, Calendar, MapPin, CreditCard } from 'lucide-react';
+import { User, Mail, Lock, Package, LogOut, Shield, Calendar, MapPin, CreditCard, Clock, CheckCircle, Truck, XCircle, RefreshCw, Eye, ShoppingBag, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +22,8 @@ const AccountPage = () => {
   // Get user-specific orders from Firestore
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 5;
 
   useEffect(() => {
     const loadUserOrders = async () => {
@@ -40,6 +42,52 @@ const AccountPage = () => {
 
     loadUserOrders();
   }, [user]);
+
+  // Memoized pagination calculations
+  const paginatedOrders = useMemo(() => {
+    const startIndex = (currentPage - 1) * ordersPerPage;
+    const endIndex = startIndex + ordersPerPage;
+    return orders.slice(startIndex, endIndex);
+  }, [orders, currentPage, ordersPerPage]);
+
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+  // Reset to first page when orders change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [orders]);
+
+  // Order status configuration
+  const getOrderStatusConfig = (status) => {
+    const configs = {
+      pending: { icon: Clock, color: 'var(--gray-500)', bgColor: 'transparent', textColor: 'var(--gray-300)' },
+      processing: { icon: RefreshCw, color: 'var(--border-medium)', bgColor: 'transparent', textColor: 'var(--white)' },
+      shipped: { icon: Truck, color: 'var(--white)', bgColor: 'transparent', textColor: 'var(--white)' },
+      delivered: { icon: CheckCircle, color: 'var(--white)', bgColor: 'transparent', textColor: 'var(--white)' },
+      cancelled: { icon: XCircle, color: '#ef4444', bgColor: 'transparent', textColor: '#ef4444' }
+    };
+    return configs[status] || configs.pending;
+  };
+
+  const formatDate = (timestamp) => {
+    if (!timestamp) return 'N/A';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  const handleReorder = (order) => {
+    // Navigate to product page or add to cart
+    navigate('/', { state: { reorderItems: order.items } });
+  };
+
+  const handleViewOrder = (orderId) => {
+    // Could navigate to order details page
+    console.log('View order:', orderId);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -251,66 +299,128 @@ const AccountPage = () => {
             </div>
 
             {/* Order History */}
-            <div className="orders-card">
-              <div className="card-header">
-                <h3>
-                  <Package size={24} />
-                  Order History
-                </h3>
-                {orders.length > 0 && (
-                  <span className="order-count">{orders.length} {orders.length === 1 ? 'order' : 'orders'}</span>
-                )}
-              </div>
-              
-              {ordersLoading ? (
-                <div className="loading-orders">
-                  <p>Loading orders...</p>
-                </div>
-              ) : orders.length === 0 ? (
-                <div className="no-orders">
-                  <Package size={64} strokeWidth={1} />
-                  <p>No orders yet</p>
-                  <span className="no-orders-hint">Start shopping to see your orders here</span>
-                  <button 
-                    className="shop-button"
-                    onClick={() => navigate('/')}
-                  >
-                    Start Shopping
-                  </button>
-                </div>
-              ) : (
-                <div className="orders-list">
-                  {orders.map((order) => (
-                    <div key={order.id} className="order-item">
-                      <div className="order-header">
-                        <div className="order-info">
-                          <span className="order-id">#{order.id}</span>
-                          <span className="order-date">
-                            <Calendar size={14} />
-                            {order.date}
-                          </span>
-                        </div>
-                        <span className={`order-status ${order.status}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                      <div className="order-items">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="order-item-row">
-                            <span>{item.name}</span>
-                            <span className="item-quantity">x{item.quantity}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="order-footer">
-                        <span className="order-total-label">Total</span>
-                        <span className="order-total">₹{order.total}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+           <div className="orders-card">
+             <div className="card-header">
+               <h3>
+                 <Package size={24} />
+                 Order History
+               </h3>
+               {orders.length > 0 && (
+                 <span className="order-count">{orders.length} {orders.length === 1 ? 'order' : 'orders'}</span>
+               )}
+             </div>
+
+             {ordersLoading ? (
+               <div className="loading-orders">
+                 <div className="skeleton-loader">
+                   <div className="skeleton-item"></div>
+                   <div className="skeleton-item"></div>
+                   <div className="skeleton-item"></div>
+                 </div>
+               </div>
+             ) : orders.length === 0 ? (
+               <div className="no-orders">
+                 <Package size={64} strokeWidth={1} />
+                 <p>No orders yet</p>
+                 <span className="no-orders-hint">Start shopping to see your orders here</span>
+                 <button
+                   className="shop-button"
+                   onClick={() => navigate('/')}
+                 >
+                   Start Shopping
+                 </button>
+               </div>
+             ) : (
+               <>
+                 <div className="orders-list">
+                   {paginatedOrders.map((order) => {
+                     const statusConfig = getOrderStatusConfig(order.status);
+                     const StatusIcon = statusConfig.icon;
+                     return (
+                       <div key={order.id} className="order-item">
+                         <div className="order-header">
+                           <div className="order-info">
+                             <span className="order-id">#{order.id}</span>
+                             <span className="order-date">
+                               <Calendar size={14} />
+                               {formatDate(order.createdAt)}
+                             </span>
+                           </div>
+                           <div className={`order-status ${order.status}`}>
+                             <StatusIcon size={12} />
+                             {order.status}
+                           </div>
+                         </div>
+                         <div className="order-items">
+                           {order.items.map((item, index) => (
+                             <div key={index} className="order-item-row">
+                               <div className="item-details">
+                                 <span className="item-name">{item.name}</span>
+                                 <span className="item-price">₹{item.price}</span>
+                               </div>
+                               <span className="item-quantity">x{item.quantity}</span>
+                             </div>
+                           ))}
+                         </div>
+                         <div className="order-footer">
+                           <div className="order-actions">
+                             <button
+                               className="action-button view-button"
+                               onClick={() => handleViewOrder(order.id)}
+                               aria-label={`View order ${order.id}`}
+                             >
+                               <Eye size={14} />
+                               View
+                             </button>
+                             <button
+                               className="action-button reorder-button"
+                               onClick={() => handleReorder(order)}
+                               aria-label={`Reorder items from order ${order.id}`}
+                             >
+                               <ShoppingBag size={14} />
+                               Reorder
+                             </button>
+                           </div>
+                           <div className="order-total-section">
+                             <span className="order-total-label">Total</span>
+                             <span className="order-total">₹{order.total}</span>
+                           </div>
+                         </div>
+                       </div>
+                     );
+                   })}
+                 </div>
+
+                 {totalPages > 1 && (
+                   <div className="pagination">
+                     <button
+                       className="pagination-button"
+                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                       disabled={currentPage === 1}
+                       aria-label="Previous page"
+                     >
+                       <ChevronLeft size={16} />
+                     </button>
+
+                     <div className="pagination-info">
+                       <span className="pagination-text">
+                         Page {currentPage} of {totalPages}
+                       </span>
+                     </div>
+
+                     <button
+                       className="pagination-button"
+                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                       disabled={currentPage === totalPages}
+                       aria-label="Next page"
+                     >
+                       <ChevronRight size={16} />
+                     </button>
+                   </div>
+                 )}
+               </>
+             )}
+           </div>
           </div>
         </div>
       </div>
