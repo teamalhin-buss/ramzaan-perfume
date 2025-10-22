@@ -33,7 +33,7 @@ const Footer = () => {
               <li><a onClick={() => scrollToSection('about')}>About</a></li>
               <li><a onClick={() => scrollToSection('reviews')}>Reviews</a></li>
               <li><Link to="/terms">Terms & Conditions</Link></li>
-              <li><a href="#">Privacy Policy</a></li>
+              <li><Link to="/privacy">Privacy Policy</Link></li>
             </ul>
           </div>
 
