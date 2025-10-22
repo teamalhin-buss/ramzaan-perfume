@@ -43,7 +43,9 @@ const CheckoutPage = () => {
       image: ASSETS.product.main,
       handler: async function (response) {
         // Payment successful
+        const orderId = 'ORD' + Date.now();
         const orderData = {
+          id: orderId,
           userId: user?.id || 'guest',
           userName: formData.name,
           userEmail: formData.email,
@@ -61,7 +63,7 @@ const CheckoutPage = () => {
           shippingDetails: formData,
         };
 
-        // Save order to Firestore (will get auto-generated ID)
+        // Save order to Firestore
         const orderResult = await orderService.createOrder(orderData);
         if (!orderResult.success) {
           console.error('Failed to save order:', orderResult.error);
@@ -69,8 +71,8 @@ const CheckoutPage = () => {
           return;
         }
 
-        // Create order object with the actual Firestore document ID
-        const savedOrder = { ...orderData, id: orderResult.id };
+        // Order saved successfully
+        const savedOrder = orderData;
 
         clearCart();
         navigate('/order-confirmation', { state: { order: savedOrder } });

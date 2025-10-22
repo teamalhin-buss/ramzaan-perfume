@@ -64,6 +64,7 @@ const AdminPanel = () => {
         // Load orders
         const ordersResult = await orderService.getAllOrders();
         if (ordersResult.success) {
+          console.log('Loaded orders:', ordersResult.data.map(o => ({ id: o.id, status: o.status })));
           setOrders(ordersResult.data);
         }
 
