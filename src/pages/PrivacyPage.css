@@ -1,0 +1,156 @@
+/* Privacy Policy Page */
+.privacy-page {
+  min-height: 100vh;
+  background: var(--black);
+  padding-top: clamp(70px, 10vw, 80px);
+}
+
+.privacy-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+
+.privacy-intro {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  padding: 30px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.privacy-intro p {
+  color: var(--gray-400);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.privacy-intro strong {
+  color: var(--white);
+}
+
+.privacy-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  padding: 30px;
+  margin-bottom: 30px;
+  transition: all var(--transition-base);
+}
+
+.privacy-section:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-tertiary);
+}
+
+.privacy-section h2 {
+  color: var(--white);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.privacy-section h3 {
+  color: var(--white);
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 25px 0 15px 0;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.privacy-section p {
+  color: var(--gray-400);
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+.privacy-section p:last-child {
+  margin-bottom: 0;
+}
+
+.privacy-section ul {
+  color: var(--gray-400);
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.privacy-section li {
+  margin-bottom: 8px;
+}
+
+.privacy-section li:last-child {
+  margin-bottom: 0;
+}
+
+.privacy-section strong {
+  color: var(--white);
+  font-weight: 500;
+}
+
+.privacy-section a {
+  color: var(--white);
+  text-decoration: underline;
+  transition: color var(--transition-base);
+}
+
+.privacy-section a:hover {
+  color: var(--gray-300);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .privacy-content {
+    padding: 40px 20px;
+  }
+
+  .privacy-intro,
+  .privacy-section {
+    padding: 20px;
+  }
+
+  .privacy-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .privacy-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .privacy-intro p {
+    font-size: 15px;
+  }
+
+  .privacy-section p,
+  .privacy-section ul {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-content {
+    padding: 30px 15px;
+  }
+
+  .privacy-intro,
+  .privacy-section {
+    padding: 16px;
+  }
+
+  .privacy-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .privacy-section h3 {
+    font-size: 1rem;
+  }
+}

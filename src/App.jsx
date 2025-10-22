@@ -7,6 +7,7 @@ import AdminPanel from './pages/AdminPanel';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
             <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
           </Routes>
         </CartProvider>
       </AuthProvider>
