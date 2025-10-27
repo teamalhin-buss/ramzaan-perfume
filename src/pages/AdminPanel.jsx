@@ -30,7 +30,9 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Info
+  Info,
+  Menu,
+  X as CloseIcon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AdminPanel.css';
@@ -57,6 +59,7 @@ const AdminPanel = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -373,8 +376,13 @@ const AdminPanel = () => {
         </div>
       )}
 
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="admin-logo">
           <h2>ALH Admin</h2>
         </div>
@@ -441,6 +449,15 @@ const AdminPanel = () => {
       <main className="admin-main">
         <header className="admin-header">
           <div className="header-left">
+            {/* Mobile Menu Button */}
+            <button
+              className="mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              {mobileMenuOpen ? <CloseIcon size={24} /> : <Menu size={24} />}
+            </button>
+
             <h1>
               {activeTab === 'dashboard' && 'Dashboard'}
               {activeTab === 'orders' && 'Order Management'}
