@@ -675,11 +675,22 @@ const AccountPage = () => {
                                <div className="expanded-items">
                                  {order.items.map((item, index) => (
                                    <div key={index} className="expanded-item">
-                                     <div className="item-info">
-                                       <span className="item-name">{item.name}</span>
-                                       <span className="item-quantity">x{item.quantity}</span>
+                                     <div className="item-image">
+                                       <img
+                                         src={item.image || '/images/perfume-bottle.png'}
+                                         alt={item.name}
+                                         onError={(e) => {
+                                           e.target.src = '/images/perfume-bottle.png';
+                                         }}
+                                       />
                                      </div>
-                                     <span className="item-price">₹{item.price}</span>
+                                     <div className="item-details">
+                                       <div className="item-info">
+                                         <span className="item-name">{item.name}</span>
+                                         <span className="item-quantity">x{item.quantity}</span>
+                                       </div>
+                                       <span className="item-price">₹{item.price}</span>
+                                     </div>
                                    </div>
                                  ))}
                                </div>
