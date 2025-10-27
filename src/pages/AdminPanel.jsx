@@ -27,7 +27,10 @@ import {
   Mail,
   User,
   Shield,
-  Clock
+  Clock,
+  CheckCircle,
+  XCircle,
+  Info
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AdminPanel.css';
@@ -49,6 +52,11 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [toast, setToast] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -93,7 +101,17 @@ const AdminPanel = () => {
     };
 
     loadData();
-  }, [isAdmin, navigate]);
+
+    // Set up auto-refresh if enabled
+    let interval;
+    if (autoRefresh) {
+      interval = setInterval(loadData, 30000); // Refresh every 30 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isAdmin, navigate, autoRefresh]);
 
   const handleProductUpdate = async (e) => {
     e.preventDefault();
@@ -181,7 +199,10 @@ const AdminPanel = () => {
       const matchesSearch = searchTerm === '' ||
         order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.shippingDetails?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.shippingDetails?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+        order.shippingDetails?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.shippingDetails?.phone?.includes(searchTerm) ||
+        order.shippingDetails?.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.shippingDetails?.city?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
 
@@ -193,7 +214,8 @@ const AdminPanel = () => {
     return reviews.filter(review => {
       return searchTerm === '' ||
         review.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.text.toLowerCase().includes(searchTerm.toLowerCase());
+        review.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        review.rating.toString().includes(searchTerm);
     });
   };
 
@@ -221,12 +243,136 @@ const AdminPanel = () => {
     navigate('/account');
   };
 
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleOrderSelection = (orderId) => {
+    setSelectedOrders(prev =>
+      prev.includes(orderId)
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  const handleBulkOrderStatusUpdate = async (newStatus) => {
+    if (selectedOrders.length === 0) {
+      showToast('Please select orders to update', 'warning');
+      return;
+    }
+
+    try {
+      for (const orderId of selectedOrders) {
+        await orderService.updateOrderStatus(orderId, newStatus);
+      }
+
+      const updatedOrders = orders.map(order =>
+        selectedOrders.includes(order.id) ? { ...order, status: newStatus } : order
+      );
+      setOrders(updatedOrders);
+      setSelectedOrders([]);
+      showToast(`Updated ${selectedOrders.length} orders to ${newStatus}`, 'success');
+    } catch (error) {
+      showToast('Failed to update orders', 'error');
+    }
+  };
+
+  const handleBulkOrderDelete = async () => {
+    if (selectedOrders.length === 0) {
+      showToast('Please select orders to delete', 'warning');
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to delete ${selectedOrders.length} orders?`)) {
+      return;
+    }
+
+    try {
+      for (const orderId of selectedOrders) {
+        await orderService.deleteOrder(orderId);
+      }
+
+      const updatedOrders = orders.filter(order => !selectedOrders.includes(order.id));
+      setOrders(updatedOrders);
+      setSelectedOrders([]);
+      showToast(`Deleted ${selectedOrders.length} orders`, 'success');
+    } catch (error) {
+      showToast('Failed to delete orders', 'error');
+    }
+  };
+
+  const exportToCSV = (data, filename) => {
+    const headers = Object.keys(data[0] || {});
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row =>
+        headers.map(header => {
+          const value = row[header];
+          return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    showToast('Data exported successfully', 'success');
+  };
+
+  const exportOrders = () => {
+    const exportData = orders.map(order => ({
+      'Order ID': order.id,
+      'Customer Name': order.shippingDetails?.name || '',
+      'Email': order.shippingDetails?.email || '',
+      'Phone': order.shippingDetails?.phone || '',
+      'Address': `${order.shippingDetails?.address || ''}, ${order.shippingDetails?.city || ''}, ${order.shippingDetails?.state || ''} ${order.shippingDetails?.pincode || ''}`,
+      'Total': order.total,
+      'Status': order.status,
+      'Date': order.date
+    }));
+    exportToCSV(exportData, 'orders.csv');
+  };
+
+  const exportReviews = () => {
+    const exportData = reviews.map(review => ({
+      'Name': review.name,
+      'Rating': review.rating,
+      'Review': review.text,
+      'Approved': review.approved ? 'Yes' : 'No',
+      'Date': review.createdAt?.toDate?.()?.toLocaleDateString() || 'Recent'
+    }));
+    exportToCSV(exportData, 'reviews.csv');
+  };
+
+  const getPaginatedData = (data) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return data.slice(startIndex, startIndex + itemsPerPage);
+  };
+
+  const getTotalPages = (data) => Math.ceil(data.length / itemsPerPage);
+
   if (!isAdmin) {
     return null;
   }
 
   return (
     <div className="admin-panel">
+      {/* Toast Notifications */}
+      {toast && (
+        <div className={`toast toast-${toast.type}`}>
+          {toast.type === 'success' && <CheckCircle size={20} />}
+          {toast.type === 'error' && <XCircle size={20} />}
+          {toast.type === 'warning' && <AlertCircle size={20} />}
+          {toast.type === 'info' && <Info size={20} />}
+          <span>{toast.message}</span>
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="admin-logo">
@@ -276,6 +422,13 @@ const AdminPanel = () => {
             <Package size={20} />
             Product
           </button>
+          <button
+            className={activeTab === 'analytics' ? 'active' : ''}
+            onClick={() => setActiveTab('analytics')}
+          >
+            <BarChart size={20} />
+            Analytics
+          </button>
         </nav>
 
         <button className="admin-logout" onClick={handleLogout}>
@@ -295,6 +448,7 @@ const AdminPanel = () => {
               {activeTab === 'users' && 'User Management'}
               {activeTab === 'reviews' && 'Review Moderation'}
               {activeTab === 'product' && 'Product Settings'}
+              {activeTab === 'analytics' && 'Analytics & Insights'}
             </h1>
             {(activeTab === 'orders' || activeTab === 'reviews' || activeTab === 'customers') && (
               <div className="header-actions">
@@ -302,26 +456,86 @@ const AdminPanel = () => {
                   <Search size={16} />
                   <input
                     type="text"
-                    placeholder={`Search ${activeTab}...`}
+                    placeholder={`Search ${activeTab} by name, email, phone, address...`}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="clear-search"
+                      title="Clear search"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
                 {activeTab === 'orders' && (
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="filter-select"
-                  >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                  </select>
+                  <>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="pending">Pending</option>
+                      <option value="processing">Processing</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                    </select>
+                    <button
+                      onClick={() => setSelectedOrders(orders.map(o => o.id))}
+                      className="select-all-btn"
+                      title="Select all orders"
+                    >
+                      Select All
+                    </button>
+                    {selectedOrders.length > 0 && (
+                      <>
+                        <button
+                          onClick={() => setSelectedOrders([])}
+                          className="clear-selection-btn"
+                          title="Clear selection"
+                        >
+                          Clear ({selectedOrders.length})
+                        </button>
+                        <div className="bulk-actions">
+                          <button
+                            onClick={() => handleBulkOrderStatusUpdate('processing')}
+                            className="bulk-btn"
+                          >
+                            Process ({selectedOrders.length})
+                          </button>
+                          <button
+                            onClick={() => handleBulkOrderStatusUpdate('shipped')}
+                            className="bulk-btn"
+                          >
+                            Ship ({selectedOrders.length})
+                          </button>
+                          <button
+                            onClick={() => handleBulkOrderDelete()}
+                            className="bulk-btn delete"
+                          >
+                            Delete ({selectedOrders.length})
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </>
                 )}
-                <button onClick={refreshData} className="refresh-btn">
+                {(activeTab === 'orders' || activeTab === 'reviews') && (
+                  <button onClick={activeTab === 'orders' ? exportOrders : exportReviews} className="export-btn">
+                    <Download size={16} />
+                    Export
+                  </button>
+                )}
+                <button
+                  onClick={() => setAutoRefresh(!autoRefresh)}
+                  className={`refresh-btn ${autoRefresh ? 'active' : ''}`}
+                  title={autoRefresh ? 'Disable auto-refresh' : 'Enable auto-refresh (30s)'}
+                >
                   <RefreshCw size={16} />
+                  {autoRefresh && <span className="auto-indicator">AUTO</span>}
                 </button>
               </div>
             )}
@@ -332,6 +546,130 @@ const AdminPanel = () => {
         </header>
 
         <div className="admin-content">
+          {/* Analytics Tab */}
+          {activeTab === 'analytics' && (
+            <div className="analytics-dashboard">
+              <div className="analytics-header">
+                <h3>Business Analytics</h3>
+                <p>Detailed insights into your business performance</p>
+              </div>
+
+              <div className="analytics-metrics">
+                <div className="metric-card glass-card">
+                  <div className="metric-header">
+                    <DollarSign size={24} />
+                    <span>Revenue Analytics</span>
+                  </div>
+                  <div className="metric-content">
+                    <div className="metric-value">₹{getTotalRevenue()}</div>
+                    <div className="metric-label">Total Revenue</div>
+                    <div className="metric-breakdown">
+                      <div className="breakdown-item">
+                        <span>Avg Order Value</span>
+                        <span>₹{orders.length > 0 ? Math.round(getTotalRevenue() / orders.length) : 0}</span>
+                      </div>
+                      <div className="breakdown-item">
+                        <span>Orders</span>
+                        <span>{orders.length}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="metric-card glass-card">
+                  <div className="metric-header">
+                    <Users size={24} />
+                    <span>Customer Analytics</span>
+                  </div>
+                  <div className="metric-content">
+                    <div className="metric-value">{users.length}</div>
+                    <div className="metric-label">Total Customers</div>
+                    <div className="metric-breakdown">
+                      <div className="breakdown-item">
+                        <span>Conversion Rate</span>
+                        <span>{users.length > 0 ? Math.round((orders.length / users.length) * 100) : 0}%</span>
+                      </div>
+                      <div className="breakdown-item">
+                        <span>Active (30d)</span>
+                        <span>{users.filter(u => u.createdAt?.toDate?.() > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="metric-card glass-card">
+                  <div className="metric-header">
+                    <Star size={24} />
+                    <span>Review Analytics</span>
+                  </div>
+                  <div className="metric-content">
+                    <div className="metric-value">{reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : 0}</div>
+                    <div className="metric-label">Average Rating</div>
+                    <div className="metric-breakdown">
+                      <div className="breakdown-item">
+                        <span>Total Reviews</span>
+                        <span>{reviews.length}</span>
+                      </div>
+                      <div className="breakdown-item">
+                        <span>Approved</span>
+                        <span>{reviews.filter(r => r.approved).length}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="analytics-charts">
+                <div className="chart-card glass-card">
+                  <h4>Order Status Distribution</h4>
+                  <div className="status-distribution">
+                    {['pending', 'processing', 'shipped', 'delivered'].map(status => {
+                      const count = orders.filter(o => o.status === status).length;
+                      const percentage = orders.length > 0 ? Math.round((count / orders.length) * 100) : 0;
+                      return (
+                        <div key={status} className="status-bar">
+                          <div className="status-label">
+                            <span className={`status-dot ${status}`}></span>
+                            <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                          </div>
+                          <div className="status-progress">
+                            <div
+                              className="status-fill"
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                          <span className="status-count">{count} ({percentage}%)</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="chart-card glass-card">
+                  <h4>Recent Activity</h4>
+                  <div className="activity-timeline">
+                    {orders.slice(0, 5).map((order, index) => (
+                      <div key={order.id} className="activity-item">
+                        <div className="activity-icon">
+                          <ShoppingCart size={16} />
+                        </div>
+                        <div className="activity-content">
+                          <div className="activity-title">Order #{order.id}</div>
+                          <div className="activity-meta">
+                            {order.shippingDetails?.name} • ₹{order.total} • {order.date}
+                          </div>
+                        </div>
+                        <span className={`activity-status ${order.status}`}>
+                          {order.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
             <div className="dashboard-grid">
@@ -422,6 +760,38 @@ const AdminPanel = () => {
                       <p>No orders yet</p>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Analytics Overview */}
+              <div className="analytics-overview glass-card">
+                <div className="card-header">
+                  <h3>Analytics Overview</h3>
+                  <button onClick={() => setActiveTab('analytics')} className="view-all-btn">
+                    <BarChart size={14} />
+                    View Details
+                  </button>
+                </div>
+                <div className="analytics-grid">
+                  <div className="analytics-item">
+                    <div className="analytics-label">Avg Order Value</div>
+                    <div className="analytics-value">₹{orders.length > 0 ? Math.round(getTotalRevenue() / orders.length) : 0}</div>
+                  </div>
+                  <div className="analytics-item">
+                    <div className="analytics-label">Conversion Rate</div>
+                    <div className="analytics-value">{users.length > 0 ? Math.round((orders.length / users.length) * 100) : 0}%</div>
+                  </div>
+                  <div className="analytics-item">
+                    <div className="analytics-label">Review Rating</div>
+                    <div className="analytics-value">
+                      {reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : 0}
+                      <Star size={12} fill="currentColor" style={{ marginLeft: '4px' }} />
+                    </div>
+                  </div>
+                  <div className="analytics-item">
+                    <div className="analytics-label">Active Users</div>
+                    <div className="analytics-value">{users.filter(u => u.createdAt?.toDate?.() > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}</div>
+                  </div>
                 </div>
               </div>
 
@@ -520,11 +890,18 @@ const AdminPanel = () => {
                 </div>
               ) : (
                 <div className="orders-list-admin">
-                  {getFilteredOrders().map((order) => (
+                  {getPaginatedData(getFilteredOrders()).map((order) => (
                     <div key={order.id} className="order-card-admin glass-card">
                       <div className="order-header-admin">
                         <div className="order-basic-info">
-                          <h4>Order #{order.id}</h4>
+                          <div className="order-select">
+                            <input
+                              type="checkbox"
+                              checked={selectedOrders.includes(order.id)}
+                              onChange={() => handleOrderSelection(order.id)}
+                            />
+                            <h4>Order #{order.id}</h4>
+                          </div>
                           <div className="order-meta">
                             <span className="order-date">
                               <Calendar size={14} />
@@ -596,6 +973,29 @@ const AdminPanel = () => {
                       <ShoppingCart size={64} />
                       <h3>No orders found</h3>
                       <p>{searchTerm || statusFilter !== 'all' ? 'Try adjusting your search or filters' : 'No orders have been placed yet'}</p>
+                    </div>
+                  )}
+
+                  {/* Pagination */}
+                  {getFilteredOrders().length > itemsPerPage && (
+                    <div className="pagination">
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="page-btn"
+                      >
+                        Previous
+                      </button>
+                      <span className="page-info">
+                        Page {currentPage} of {getTotalPages(getFilteredOrders())}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, getTotalPages(getFilteredOrders())))}
+                        disabled={currentPage === getTotalPages(getFilteredOrders())}
+                        className="page-btn"
+                      >
+                        Next
+                      </button>
                     </div>
                   )}
                 </div>
@@ -836,7 +1236,7 @@ const AdminPanel = () => {
                 </div>
               ) : (
                 <div className="reviews-list-admin">
-                  {getFilteredReviews().map((review) => (
+                  {getPaginatedData(getFilteredReviews()).map((review) => (
                     <div key={review.id} className="review-card-admin glass-card">
                       <div className="review-header-admin">
                         <div className="review-info">
@@ -890,6 +1290,29 @@ const AdminPanel = () => {
                       <Star size={64} />
                       <h3>No reviews found</h3>
                       <p>{searchTerm ? 'Try adjusting your search' : 'No reviews have been submitted yet'}</p>
+                    </div>
+                  )}
+
+                  {/* Pagination */}
+                  {getFilteredReviews().length > itemsPerPage && (
+                    <div className="pagination">
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="page-btn"
+                      >
+                        Previous
+                      </button>
+                      <span className="page-info">
+                        Page {currentPage} of {getTotalPages(getFilteredReviews())}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, getTotalPages(getFilteredReviews())))}
+                        disabled={currentPage === getTotalPages(getFilteredReviews())}
+                        className="page-btn"
+                      >
+                        Next
+                      </button>
                     </div>
                   )}
                 </div>
