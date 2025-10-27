@@ -133,6 +133,86 @@ const AccountPage = () => {
     return configs[status] || configs.pending;
   };
 
+  // Order tracking timeline data
+  const getOrderTracking = (order) => {
+    const baseDate = order.createdAt?.toDate?.() || new Date(order.createdAt);
+    const trackingSteps = [
+      {
+        status: 'Order Placed',
+        icon: CheckCircle,
+        date: baseDate,
+        completed: true,
+        description: 'Your order has been confirmed'
+      }
+    ];
+
+    switch (order.status) {
+      case 'processing':
+        trackingSteps.push({
+          status: 'Processing',
+          icon: RefreshCw,
+          date: new Date(baseDate.getTime() + 2 * 60 * 60 * 1000), // 2 hours later
+          completed: true,
+          description: 'Your order is being prepared'
+        });
+        break;
+      case 'shipped':
+        trackingSteps.push(
+          {
+            status: 'Processing',
+            icon: RefreshCw,
+            date: new Date(baseDate.getTime() + 2 * 60 * 60 * 1000),
+            completed: true,
+            description: 'Your order is being prepared'
+          },
+          {
+            status: 'Shipped',
+            icon: Truck,
+            date: new Date(baseDate.getTime() + 24 * 60 * 60 * 1000), // 1 day later
+            completed: true,
+            description: 'Your order has been shipped'
+          }
+        );
+        break;
+      case 'delivered':
+        trackingSteps.push(
+          {
+            status: 'Processing',
+            icon: RefreshCw,
+            date: new Date(baseDate.getTime() + 2 * 60 * 60 * 1000),
+            completed: true,
+            description: 'Your order is being prepared'
+          },
+          {
+            status: 'Shipped',
+            icon: Truck,
+            date: new Date(baseDate.getTime() + 24 * 60 * 60 * 1000),
+            completed: true,
+            description: 'Your order has been shipped'
+          },
+          {
+            status: 'Delivered',
+            icon: CheckCircle,
+            date: new Date(baseDate.getTime() + 3 * 24 * 60 * 60 * 1000), // 3 days later
+            completed: true,
+            description: 'Your order has been delivered successfully'
+          }
+        );
+        break;
+      case 'cancelled':
+        trackingSteps.push({
+          status: 'Cancelled',
+          icon: XCircle,
+          date: new Date(baseDate.getTime() + 1 * 60 * 60 * 1000), // 1 hour later
+          completed: true,
+          description: 'Your order has been cancelled'
+        });
+        break;
+    }
+
+    return trackingSteps;
+  };
+
   const formatDate = (timestamp) => {
     if (!timestamp) return 'N/A';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -560,16 +640,49 @@ const AccountPage = () => {
 
                          {isExpanded && (
                            <div className="order-expanded-details">
-                             <div className="expanded-items">
-                               {order.items.map((item, index) => (
-                                 <div key={index} className="expanded-item">
-                                   <div className="item-info">
-                                     <span className="item-name">{item.name}</span>
-                                     <span className="item-quantity">x{item.quantity}</span>
+                             {/* Order Tracking Timeline */}
+                             <div className="order-tracking">
+                               <h4>Order Tracking</h4>
+                               <div className="tracking-timeline">
+                                 {getOrderTracking(order).map((step, index) => {
+                                   const StepIcon = step.icon;
+                                   return (
+                                     <div key={index} className={`tracking-step ${step.completed ? 'completed' : 'pending'}`}>
+                                       <div className="tracking-icon">
+                                         <StepIcon size={16} />
+                                       </div>
+                                       <div className="tracking-content">
+                                         <div className="tracking-status">{step.status}</div>
+                                         <div className="tracking-date">
+                                           {step.date.toLocaleDateString('en-IN', {
+                                             day: 'numeric',
+                                             month: 'short',
+                                             hour: '2-digit',
+                                             minute: '2-digit'
+                                           })}
+                                         </div>
+                                         <div className="tracking-description">{step.description}</div>
+                                       </div>
+                                     </div>
+                                   );
+                                 })}
+                               </div>
+                             </div>
+
+                             {/* Order Items */}
+                             <div className="order-items-section">
+                               <h4>Order Items</h4>
+                               <div className="expanded-items">
+                                 {order.items.map((item, index) => (
+                                   <div key={index} className="expanded-item">
+                                     <div className="item-info">
+                                       <span className="item-name">{item.name}</span>
+                                       <span className="item-quantity">x{item.quantity}</span>
+                                     </div>
+                                     <span className="item-price">₹{item.price}</span>
                                    </div>
-                                   <span className="item-price">₹{item.price}</span>
-                                 </div>
-                               ))}
+                                 ))}
+                               </div>
                              </div>
                            </div>
                          )}

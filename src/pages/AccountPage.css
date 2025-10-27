@@ -1200,6 +1200,112 @@
   background: rgba(255, 255, 255, 0.02);
   border-radius: 0;
   border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.order-tracking,
+.order-items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-tracking h4,
+.order-items-section h4 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tracking-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.tracking-timeline::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--border-medium), transparent);
+}
+
+.tracking-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  padding-left: 4px;
+}
+
+.tracking-step.completed .tracking-icon {
+  background: var(--white);
+  color: var(--black);
+}
+
+.tracking-step.pending .tracking-icon {
+  background: var(--bg-tertiary);
+  color: var(--gray-400);
+}
+
+.tracking-step.completed .tracking-content .tracking-status {
+  color: var(--white);
+}
+
+.tracking-step.pending .tracking-content .tracking-status {
+  color: var(--gray-400);
+}
+
+.tracking-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-light);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  transition: all var(--transition-base);
+}
+
+.tracking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  padding-top: 2px;
+}
+
+.tracking-status {
+  font-size: 14px;
+  font-weight: 500;
+  transition: color var(--transition-base);
+}
+
+.tracking-date {
+  font-size: 12px;
+  color: var(--gray-400);
+  font-weight: 300;
+}
+
+.tracking-description {
+  font-size: 12px;
+  color: var(--gray-500);
+  font-weight: 300;
+  line-height: 1.4;
 }
 
 .expanded-items {
@@ -1728,6 +1834,47 @@
 
   .order-expanded-details {
     padding: 12px;
+    gap: 16px;
+  }
+
+  .order-tracking,
+  .order-items-section {
+    gap: 8px;
+  }
+
+  .tracking-timeline {
+    gap: 12px;
+  }
+
+  .tracking-timeline::before {
+    left: 17px;
+    top: 20px;
+    bottom: 20px;
+  }
+
+  .tracking-step {
+    gap: 8px;
+  }
+
+  .tracking-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .tracking-content {
+    gap: 2px;
+  }
+
+  .tracking-status {
+    font-size: 13px;
+  }
+
+  .tracking-date {
+    font-size: 11px;
+  }
+
+  .tracking-description {
+    font-size: 11px;
   }
 
   .expanded-items {
