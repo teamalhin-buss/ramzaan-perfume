@@ -516,128 +516,85 @@ const AccountPage = () => {
                </div>
              ) : (
                <>
-                 {/* Orders Table */}
-                 <div className="orders-table-container">
-                   <table className="orders-table" role="table" aria-label="Order history">
-                     <thead>
-                       <tr>
-                         <th>
-                           <button
-                             className="sort-button"
-                             onClick={() => handleSort('date')}
-                             aria-label={`Sort by date ${sortBy === 'date' && sortOrder === 'asc' ? 'descending' : 'ascending'}`}
-                           >
-                             Order Details
-                             {sortBy === 'date' && (
-                               sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />
-                             )}
-                           </button>
-                         </th>
-                         <th>
-                           <button
-                             className="sort-button"
-                             onClick={() => handleSort('status')}
-                             aria-label={`Sort by status ${sortBy === 'status' && sortOrder === 'asc' ? 'descending' : 'ascending'}`}
-                           >
-                             Status
-                             {sortBy === 'status' && (
-                               sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />
-                             )}
-                           </button>
-                         </th>
-                         <th>
-                           <button
-                             className="sort-button"
-                             onClick={() => handleSort('total')}
-                             aria-label={`Sort by total ${sortBy === 'total' && sortOrder === 'asc' ? 'descending' : 'ascending'}`}
-                           >
-                             Total
-                             {sortBy === 'total' && (
-                               sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />
-                             )}
-                           </button>
-                         </th>
-                         <th>Actions</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-                       {paginatedOrders.map((order) => {
-                         const statusConfig = getOrderStatusConfig(order.status);
-                         const StatusIcon = statusConfig.icon;
-                         const isExpanded = expandedOrder === order.id;
+                 {/* Orders Cards */}
+                 <div className="orders-cards-container">
+                   {paginatedOrders.map((order) => {
+                     const statusConfig = getOrderStatusConfig(order.status);
+                     const StatusIcon = statusConfig.icon;
+                     const isExpanded = expandedOrder === order.id;
 
-                         return (
-                           <tr key={order.id} className={`order-row ${isExpanded ? 'expanded' : ''}`}>
-                             <td className="order-details-cell">
-                               <div className="order-summary">
-                                 <div className="order-id">#{order.id}</div>
-                                 <div className="order-date">
-                                   <Calendar size={14} />
-                                   {formatDate(order.createdAt)}
-                                 </div>
-                                 <div className="order-items-count">
-                                   {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
-                                 </div>
-                                 <button
-                                   className="expand-button"
-                                   onClick={() => toggleOrderExpansion(order.id)}
-                                   aria-expanded={isExpanded}
-                                   aria-label={`${isExpanded ? 'Collapse' : 'Expand'} order details`}
-                                 >
-                                   {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                 </button>
+                     return (
+                       <div key={order.id} className={`order-card ${isExpanded ? 'expanded' : ''}`}>
+                         <div className="order-card-header">
+                           <div className="order-card-main">
+                             <div className="order-card-info">
+                               <div className="order-id">#{order.id}</div>
+                               <div className="order-date">
+                                 <Calendar size={14} />
+                                 {formatDate(order.createdAt)}
                                </div>
-
-                               {isExpanded && (
-                                 <div className="order-expanded-details">
-                                   <div className="expanded-items">
-                                     {order.items.map((item, index) => (
-                                       <div key={index} className="expanded-item">
-                                         <div className="item-info">
-                                           <span className="item-name">{item.name}</span>
-                                           <span className="item-quantity">x{item.quantity}</span>
-                                         </div>
-                                         <span className="item-price">₹{item.price}</span>
-                                       </div>
-                                     ))}
-                                   </div>
-                                 </div>
-                               )}
-                             </td>
-                             <td>
+                               <div className="order-items-count">
+                                 {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
+                               </div>
+                             </div>
+                             <div className="order-card-status">
                                <div className={`order-status ${order.status}`}>
                                  <StatusIcon size={14} />
                                  <span>{order.status}</span>
                                </div>
-                             </td>
-                             <td className="order-total-cell">
-                               <span className="order-total">₹{order.total}</span>
-                             </td>
-                             <td>
-                               <div className="order-actions">
-                                 <button
-                                   className="action-button view-button"
-                                   onClick={() => handleViewOrder(order.id)}
-                                   aria-label={`View order ${order.id}`}
-                                 >
-                                   <Eye size={14} />
-                                   View
-                                 </button>
-                                 <button
-                                   className="action-button reorder-button"
-                                   onClick={() => handleReorder(order)}
-                                   aria-label={`Reorder items from order ${order.id}`}
-                                 >
-                                   <ShoppingBag size={14} />
-                                   Reorder
-                                 </button>
-                               </div>
-                             </td>
-                           </tr>
-                         );
-                       })}
-                     </tbody>
-                   </table>
+                             </div>
+                           </div>
+                           <button
+                             className="expand-button"
+                             onClick={() => toggleOrderExpansion(order.id)}
+                             aria-expanded={isExpanded}
+                             aria-label={`${isExpanded ? 'Collapse' : 'Expand'} order details`}
+                           >
+                             {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                           </button>
+                         </div>
+
+                         <div className="order-card-total">
+                           <span className="order-total">₹{order.total}</span>
+                         </div>
+
+                         {isExpanded && (
+                           <div className="order-expanded-details">
+                             <div className="expanded-items">
+                               {order.items.map((item, index) => (
+                                 <div key={index} className="expanded-item">
+                                   <div className="item-info">
+                                     <span className="item-name">{item.name}</span>
+                                     <span className="item-quantity">x{item.quantity}</span>
+                                   </div>
+                                   <span className="item-price">₹{item.price}</span>
+                                 </div>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+
+                         <div className="order-card-actions">
+                           <button
+                             className="action-button view-button"
+                             onClick={() => handleViewOrder(order.id)}
+                             aria-label={`View order ${order.id}`}
+                           >
+                             <Eye size={14} />
+                             View
+                           </button>
+                           <button
+                             className="action-button reorder-button"
+                             onClick={() => handleReorder(order)}
+                             aria-label={`Reorder items from order ${order.id}`}
+                           >
+                             <ShoppingBag size={14} />
+                             Reorder
+                           </button>
+                         </div>
+                       </div>
+                     );
+                   })}
                  </div>
 
                  {/* Enhanced Pagination */}
