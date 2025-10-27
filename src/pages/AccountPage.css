@@ -3,6 +3,7 @@
   min-height: 100vh;
   background: var(--black);
   padding-top: clamp(70px, 10vw, 80px);
+  overflow-x: hidden;
 }
 
 /* Auth Container */
@@ -210,6 +211,7 @@
 /* Profile Page */
 .profile-container {
   padding: 80px 0 120px;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -231,6 +233,7 @@
   grid-template-columns: min(400px, 100%) 1fr;
   gap: clamp(20px, 4vw, 30px);
   margin-top: clamp(32px, 5vw, 40px);
+  overflow-x: hidden;
 }
 
 @media (max-width: 1024px) {
@@ -407,6 +410,7 @@
   border: 1px solid var(--border-light);
   background: var(--bg-secondary);
   transition: all var(--transition-base);
+  overflow-x: hidden;
 }
 
 .orders-card:hover {
@@ -1023,12 +1027,14 @@
   border-radius: 0;
   border: 1px solid var(--border-light);
   background: var(--bg-secondary);
+  max-width: 100%;
 }
 
 .orders-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  min-width: 600px;
 }
 
 .orders-table th {
@@ -1090,7 +1096,7 @@
 }
 
 .order-details-cell {
-  min-width: 300px;
+  min-width: 250px;
 }
 
 .order-summary {
@@ -1352,6 +1358,19 @@
 
   .pagination-text {
     font-size: 11px;
+  }
+
+  .orders-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .orders-table {
+    min-width: 600px;
+  }
+
+  .order-details-cell {
+    min-width: 200px;
   }
 }
 
