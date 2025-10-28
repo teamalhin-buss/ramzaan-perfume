@@ -407,6 +407,18 @@ const AccountPage = () => {
     setFormData(prev => ({ ...prev, email: '', password: '' }));
   };
 
+  const handleMethodChange = (method) => {
+    setAuthMethod(method);
+    setOtpStep('phone');
+    setOtpSent(false);
+    setError('');
+    if (method === 'email') {
+      setFormData(prev => ({ ...prev, phone: '', otp: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, email: '', password: '' }));
+    }
+  };
+
   // Timer effect for resend OTP
   useEffect(() => {
     let interval;
@@ -471,14 +483,14 @@ const AccountPage = () => {
                   <button
                     type="button"
                     className={`method-button ${authMethod === 'email' ? 'active' : ''}`}
-                    onClick={switchToEmail}
+                    onClick={() => handleMethodChange('email')}
                   >
                     Email
                   </button>
                   <button
                     type="button"
                     className={`method-button ${authMethod === 'phone' ? 'active' : ''}`}
-                    onClick={switchToPhone}
+                    onClick={() => handleMethodChange('phone')}
                   >
                     Phone
                   </button>
@@ -653,7 +665,13 @@ const AccountPage = () => {
                   setOtpStep('phone');
                   setOtpSent(false);
                   setError('');
-                  setFormData(prev => ({ ...prev, phone: '', otp: '' }));
+                  setFormData(prev => ({
+                    name: '',
+                    email: '',
+                    password: '',
+                    phone: '',
+                    otp: ''
+                  }));
                 }}>
                   {isLoginMode ? 'Sign Up' : 'Login'}
                 </button>
