@@ -158,6 +158,46 @@
   transform: none;
 }
 
+.google-auth-button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  font-size: 13px;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.google-auth-button:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
+}
+
+.google-auth-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.google-auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.google-auth-button svg {
+  flex-shrink: 0;
+}
+
 .auth-switch {
   margin-top: 25px;
   padding-top: 25px;
@@ -182,6 +222,65 @@
 
 .auth-switch button:hover {
   letter-spacing: 0.05em;
+}
+
+.auth-method-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.method-button {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  color: var(--gray-400);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.method-button:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-medium);
+  color: var(--white);
+}
+
+.method-button.active {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+.otp-actions {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.resend-otp {
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.resend-otp:hover:not(:disabled) {
+  color: var(--white);
+}
+
+.resend-otp:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .admin-hint {

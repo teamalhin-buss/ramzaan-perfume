@@ -4,7 +4,11 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  updateProfile as updateFirebaseProfile
+  updateProfile as updateFirebaseProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  RecaptchaVerifier,
+  signInWithPhoneNumber
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { userService } from '../services/firestore';
@@ -23,6 +27,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState(null);
+  const [confirmationResult, setConfirmationResult] = useState(null);
 
   // Listen to auth state changes
   useEffect(() => {
@@ -106,6 +112,61 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      // User data will be set by the auth state listener
+      return { success: true };
+    } catch (error) {
+      console.error('Google login error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const setupRecaptcha = () => {
+    if (!recaptchaVerifier) {
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: (response) => {
+          console.log('reCAPTCHA solved');
+        },
+        'expired-callback': () => {
+          console.log('reCAPTCHA expired');
+        }
+      });
+      setRecaptchaVerifier(verifier);
+      return verifier;
+    }
+    return recaptchaVerifier;
+  };
+
+  const sendOTP = async (phoneNumber) => {
+    try {
+      const verifier = setupRecaptcha();
+      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, verifier);
+      setConfirmationResult(confirmation);
+      return { success: true };
+    } catch (error) {
+      console.error('OTP send error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const verifyOTP = async (otp) => {
+    try {
+      if (!confirmationResult) {
+        return { success: false, error: 'No OTP request found. Please request OTP first.' };
+      }
+      const result = await confirmationResult.confirm(otp);
+      // User data will be set by the auth state listener
+      return { success: true };
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const updateProfile = async (updates) => {
     try {
       if (user) {
@@ -141,6 +202,9 @@ export const AuthProvider = ({ children }) => {
         login,
         signup,
         logout,
+        loginWithGoogle,
+        sendOTP,
+        verifyOTP,
         updateProfile,
         isAuthenticated: !!user,
       }}
