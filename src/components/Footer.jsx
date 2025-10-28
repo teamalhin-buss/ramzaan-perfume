@@ -2,7 +2,7 @@ import { Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
 
-const Footer = () => {
+const Footer = ({ onSecretClick }) => {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -68,7 +68,7 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="footer-bottom">
+        <div className="footer-bottom" onClick={onSecretClick}>
           <p>&copy; 2025 Ramzaan. Made in India. All Rights Reserved.</p>
         </div>
       </div>

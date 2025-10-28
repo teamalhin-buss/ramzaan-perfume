@@ -1,7 +1,7 @@
 import { orderService } from '../services/firestore';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, MapPin, User, Mail, Phone, CheckCircle, Truck, Shield, Lock, Info, Eye, EyeOff } from 'lucide-react';
+import { CreditCard, MapPin, User, Mail, Phone, CheckCircle, Truck, Shield, Lock, Info, Eye, EyeOff, Home, Building } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
@@ -36,8 +36,11 @@ const CheckoutPage = () => {
   const [errors, setErrors] = useState({});
   const [showDataPrivacy, setShowDataPrivacy] = useState(false);
   const [fieldHelp, setFieldHelp] = useState({});
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
 
-  // Load form data from localStorage on component mount with recovery
+  // Load form data and addresses from localStorage on component mount with recovery
   useEffect(() => {
     const loadSavedData = () => {
       const savedFormData = localStorage.getItem('checkoutFormData');
@@ -89,7 +92,22 @@ const CheckoutPage = () => {
       }
     };
 
+    // Load saved addresses
+    const loadSavedAddresses = () => {
+      if (user?.id) {
+        try {
+          const addresses = localStorage.getItem(`addresses_${user.id}`);
+          if (addresses) {
+            setSavedAddresses(JSON.parse(addresses));
+          }
+        } catch (error) {
+          console.error('Error loading saved addresses:', error);
+        }
+      }
+    };
+
     loadSavedData();
+    loadSavedAddresses();
   }, [user]);
 
   // Auto-save form data to localStorage whenever it changes
@@ -241,6 +259,28 @@ const CheckoutPage = () => {
         event_category: 'checkout',
         event_label: name,
         value: 1
+      });
+    }
+  };
+
+  const handleSelectAddress = (address) => {
+    setFormData({
+      name: address.name,
+      email: formData.email, // Keep existing email
+      phone: address.phone,
+      address: `${address.addressLine1}${address.addressLine2 ? `, ${address.addressLine2}` : ''}`,
+      city: address.city,
+      district: address.district, // Use district directly
+      pincode: address.pincode,
+    });
+    setSelectedAddressId(address.id);
+    setShowAddressSelector(false);
+
+    // Track address selection
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'address_selected', {
+        event_category: 'checkout',
+        event_label: address.type
       });
     }
   };
@@ -493,6 +533,61 @@ const CheckoutPage = () => {
               {currentStep === 0 && (
                 <div className="checkout-form glass-card">
                   <h3>Shipping Details</h3>
+
+                  {/* Saved Addresses Section */}
+                  {savedAddresses.length > 0 && (
+                    <div className="saved-addresses-section">
+                      <div className="section-header">
+                        <h4>Select Delivery Address</h4>
+                        <button
+                          type="button"
+                          className="toggle-address-selector"
+                          onClick={() => setShowAddressSelector(!showAddressSelector)}
+                        >
+                          {showAddressSelector ? 'Hide' : 'Show'} Saved Addresses
+                        </button>
+                      </div>
+
+                      {showAddressSelector && (
+                        <div className="saved-addresses-list">
+                          {savedAddresses.map((address) => (
+                            <div
+                              key={address.id}
+                              className={`saved-address-card ${selectedAddressId === address.id ? 'selected' : ''}`}
+                              onClick={() => handleSelectAddress(address)}
+                            >
+                              <div className="address-type-indicator">
+                                {address.type === 'home' ? <Home size={16} /> : <Building size={16} />}
+                                <span>{address.type === 'home' ? 'Home' : 'Work'}</span>
+                                {address.isDefault && <span className="default-indicator">Default</span>}
+                              </div>
+                              <div className="address-details">
+                                <p className="address-name">{address.name}</p>
+                                <p className="address-phone">{address.phone}</p>
+                                <p className="address-full">
+                                  {address.addressLine1}
+                                  {address.addressLine2 && `, ${address.addressLine2}`}
+                                </p>
+                                <p className="address-location">
+                                  {address.city}, {address.district} - {address.pincode}
+                                </p>
+                              </div>
+                              {selectedAddressId === address.id && (
+                                <div className="selection-indicator">
+                                  <CheckCircle size={20} />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="address-divider">
+                        <span>or enter new address</span>
+                      </div>
+                    </div>
+                  )}
+
                   <form>
                     <div className="form-row">
                       <div className="form-group">

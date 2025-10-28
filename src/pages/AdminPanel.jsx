@@ -32,9 +32,12 @@ import {
   XCircle,
   Info,
   Menu,
-  X as CloseIcon
+  X as CloseIcon,
+  Plus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { createUserWithEmailAndPassword, updateProfile as updateFirebaseProfile } from 'firebase/auth';
+import { auth } from '../config/firebase';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
@@ -60,6 +63,8 @@ const AdminPanel = () => {
   const [itemsPerPage] = useState(10);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showAddAdminForm, setShowAddAdminForm] = useState(false);
+  const [newAdminData, setNewAdminData] = useState({ name: '', email: '', password: '' });
 
   useEffect(() => {
     if (!isAdmin) {
@@ -244,6 +249,45 @@ const AdminPanel = () => {
   const handleLogout = () => {
     logout();
     navigate('/account');
+  };
+
+  const handleAddAdmin = async (e) => {
+    e.preventDefault();
+    if (!newAdminData.name || !newAdminData.email || !newAdminData.password) {
+      showToast('Please fill in all fields', 'warning');
+      return;
+    }
+
+    try {
+      const result = await userService.createUser(null, {
+        name: newAdminData.name,
+        email: newAdminData.email,
+        role: 'admin'
+      });
+
+      if (result.success) {
+        // Create Firebase Auth account
+        const authResult = await createUserWithEmailAndPassword(auth, newAdminData.email, newAdminData.password);
+        if (authResult.user) {
+          await updateFirebaseProfile(authResult.user, { displayName: newAdminData.name });
+        }
+
+        setNewAdminData({ name: '', email: '', password: '' });
+        setShowAddAdminForm(false);
+        showToast('Admin created successfully', 'success');
+
+        // Refresh users list
+        const usersResult = await userService.getAllUsers();
+        if (usersResult.success) {
+          setUsers(usersResult.data);
+        }
+      } else {
+        showToast('Failed to create admin: ' + result.error, 'error');
+      }
+    } catch (error) {
+      console.error('Error creating admin:', error);
+      showToast('Failed to create admin: ' + error.message, 'error');
+    }
   };
 
   const showToast = (message, type = 'success') => {
@@ -1024,9 +1068,74 @@ const AdminPanel = () => {
           {activeTab === 'users' && (
             <div className="users-management">
               <div className="section-header">
-                <h3>User Management</h3>
-                <p>Manage all registered users and their roles</p>
+                <div className="header-with-action">
+                  <div>
+                    <h3>User Management</h3>
+                    <p>Manage all registered users and their roles</p>
+                  </div>
+                  <button
+                    className="add-admin-btn"
+                    onClick={() => setShowAddAdminForm(!showAddAdminForm)}
+                  >
+                    <Plus size={16} />
+                    Add New Admin
+                  </button>
+                </div>
               </div>
+
+              {showAddAdminForm && (
+                <div className="add-admin-form glass-card">
+                  <h4>Create New Admin</h4>
+                  <form onSubmit={handleAddAdmin}>
+                    <div className="form-group">
+                      <label>Full Name</label>
+                      <input
+                        type="text"
+                        value={newAdminData.name}
+                        onChange={(e) => setNewAdminData({ ...newAdminData, name: e.target.value })}
+                        placeholder="Enter admin's full name"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Email Address</label>
+                      <input
+                        type="email"
+                        value={newAdminData.email}
+                        onChange={(e) => setNewAdminData({ ...newAdminData, email: e.target.value })}
+                        placeholder="Enter admin's email"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        value={newAdminData.password}
+                        onChange={(e) => setNewAdminData({ ...newAdminData, password: e.target.value })}
+                        placeholder="Enter password"
+                        required
+                      />
+                    </div>
+                    <div className="form-actions">
+                      <button type="submit" className="submit-btn">
+                        <Shield size={16} />
+                        Create Admin
+                      </button>
+                      <button
+                        type="button"
+                        className="cancel-btn"
+                        onClick={() => {
+                          setShowAddAdminForm(false);
+                          setNewAdminData({ name: '', email: '', password: '' });
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
 
               {loading ? (
                 <div className="loading-state">

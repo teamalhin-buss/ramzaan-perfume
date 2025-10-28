@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import CartDropdown from './CartDropdown';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ onLogoClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -53,7 +53,7 @@ const Header = () => {
       <div className="container">
         <div className="header-content">
           {/* Logo */}
-          <Link to="/" className="logo">
+          <Link to="/" className="logo" onClick={onLogoClick}>
             <h1>ALH.</h1>
           </Link>
 

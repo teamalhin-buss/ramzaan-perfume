@@ -4,7 +4,7 @@ import OptimizedImage from './OptimizedImage';
 import { useCart } from '../context/CartContext';
 import './ProductCard.css';
 
-const ProductCard = ({ product, onBuyNow }) => {
+const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -12,13 +12,57 @@ const ProductCard = ({ product, onBuyNow }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [isImageZoomed, setIsImageZoomed] = useState(false);
 
-  const handleAddToCart = () => {
-    addToCart(product, quantity);
-    showNotification('Added to cart!');
+  // Enhanced mouse following effect for product card
+  const handleMouseMove = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+
+    // 3D tilt effect
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const tiltX = (y - centerY) / centerY * -10;
+    const tiltY = (x - centerX) / centerX * 10;
+
+    card.style.setProperty('--tilt-x', `${tiltX}deg`);
+    card.style.setProperty('--tilt-y', `${tiltY}deg`);
   };
 
-  const handleBuyNow = () => {
+  // Perfume spray effect on button click
+  const createSprayEffect = (buttonElement) => {
+    const rect = buttonElement.getBoundingClientRect();
+    const particles = [];
+
+    for (let i = 0; i < 8; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'spray-particle';
+      particle.style.left = rect.left + rect.width / 2 + 'px';
+      particle.style.top = rect.top + rect.height / 2 + 'px';
+      particle.style.setProperty('--random-x', Math.random() * 2 - 1);
+      document.body.appendChild(particle);
+      particles.push(particle);
+
+      setTimeout(() => {
+        if (particle.parentNode) {
+          particle.parentNode.removeChild(particle);
+        }
+      }, 1500);
+    }
+  };
+
+  const handleAddToCart = (e) => {
     addToCart(product, quantity);
+    showNotification('Added to cart!');
+    createSprayEffect(e.currentTarget);
+  };
+
+  const handleBuyNow = (e) => {
+    addToCart(product, quantity);
+    createSprayEffect(e.currentTarget);
     if (onBuyNow) {
       onBuyNow();
     } else {
@@ -69,7 +113,7 @@ const ProductCard = ({ product, onBuyNow }) => {
   };
 
   return (
-    <div className="enhanced-product-card">
+    <div className="enhanced-product-card" onMouseMove={handleMouseMove}>
       {/* Badge */}
       {product.badge && (
         <div className="product-badge">
@@ -115,6 +159,8 @@ const ProductCard = ({ product, onBuyNow }) => {
               aspectRatio="1/1"
               objectFit="contain"
               showSkeleton={true}
+              onClick={onBottleClick}
+              style={{ cursor: 'pointer' }}
             />
             <div className="image-glow"></div>
           </div>
@@ -125,8 +171,12 @@ const ProductCard = ({ product, onBuyNow }) => {
           <div className="product-header">
             <h3 className="product-title">{product.name}</h3>
             <div className="product-rating">
-              <span className="rating-value">★★★★★</span>
-              <span className="rating-count">(250+ reviews)</span>
+              <span className="rating-value">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className={i < Math.floor(product.averageRating || 5) ? 'filled' : ''}>★</span>
+                ))}
+              </span>
+              <span className="rating-count">({product.totalReviews || 0} reviews)</span>
             </div>
           </div>
 
