@@ -267,8 +267,33 @@
 
 .auth-method-selector {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  justify-content: center;
+  margin-top: 20px;
+}
+
+.auth-method-back {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: 0;
+  color: var(--gray-400);
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: all var(--transition-base);
+}
+
+.back-button:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-medium);
+  color: var(--white);
 }
 
 .method-button {

@@ -11,7 +11,7 @@ const AccountPage = () => {
   const navigate = useNavigate();
   const { user, login, signup, logout, loginWithGoogle, sendOTP, verifyOTP, isAuthenticated } = useAuth();
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [authMethod, setAuthMethod] = useState('email'); // 'email' or 'phone'
+  const [authMethod, setAuthMethod] = useState(null); // 'email' or 'phone' or null
   const [otpStep, setOtpStep] = useState('phone'); // 'phone' or 'verify'
   const [formData, setFormData] = useState({
     name: '',
@@ -478,23 +478,50 @@ const AccountPage = () => {
                   <span>or</span>
                 </div>
 
-                {/* Auth Method Selector */}
-                <div className="auth-method-selector">
-                  <button
-                    type="button"
-                    className={`method-button ${authMethod === 'email' ? 'active' : ''}`}
-                    onClick={() => handleMethodChange('email')}
-                  >
-                    Email
-                  </button>
-                  <button
-                    type="button"
-                    className={`method-button ${authMethod === 'phone' ? 'active' : ''}`}
-                    onClick={() => handleMethodChange('phone')}
-                  >
-                    Phone
-                  </button>
-                </div>
+                {/* Auth Method Selector - Only show if no method selected */}
+                {!authMethod && (
+                  <div className="auth-method-selector">
+                    <button
+                      type="button"
+                      className="method-button"
+                      onClick={() => handleMethodChange('email')}
+                    >
+                      Continue with Email
+                    </button>
+                    <button
+                      type="button"
+                      className="method-button"
+                      onClick={() => handleMethodChange('phone')}
+                    >
+                      Continue with Phone
+                    </button>
+                  </div>
+                )}
+
+                {/* Back to methods button - Show when method is selected */}
+                {authMethod && (
+                  <div className="auth-method-back">
+                    <button
+                      type="button"
+                      className="back-button"
+                      onClick={() => {
+                        setAuthMethod(null);
+                        setOtpStep('phone');
+                        setOtpSent(false);
+                        setError('');
+                        setFormData(prev => ({
+                          name: '',
+                          email: '',
+                          password: '',
+                          phone: '',
+                          otp: ''
+                        }));
+                      }}
+                    >
+                      ← Back to options
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -522,7 +549,7 @@ const AccountPage = () => {
                 </div>
               )}
 
-              {/* Email/Phone Authentication */}
+              {/* Email/Phone Authentication - Only show when method is selected */}
               {isLoginMode && authMethod === 'email' && (
                 <>
                   <div className="form-group">
@@ -557,7 +584,7 @@ const AccountPage = () => {
                 </>
               )}
 
-              {/* Phone OTP Authentication */}
+              {/* Phone OTP Authentication - Only show when method is selected */}
               {isLoginMode && authMethod === 'phone' && (
                 <>
                   {otpStep === 'phone' && (
@@ -661,7 +688,7 @@ const AccountPage = () => {
                 {isLoginMode ? "Don't have an account? " : 'Already have an account? '}
                 <button onClick={() => {
                   setIsLoginMode(!isLoginMode);
-                  setAuthMethod('email');
+                  setAuthMethod(null);
                   setOtpStep('phone');
                   setOtpSent(false);
                   setError('');
