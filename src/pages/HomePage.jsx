@@ -667,9 +667,12 @@ const HomePage = () => {
                 className="write-review-btn"
                 onClick={() => {
                   setShowReviewForm(true);
-                  // Scroll to reviews section after a brief delay to allow modal to render
+                  // Scroll to bottom of page where the form modal appears
                   setTimeout(() => {
-                    scrollToSection('reviews');
+                    window.scrollTo({
+                      top: document.body.scrollHeight,
+                      behavior: 'smooth'
+                    });
                   }, 100);
                 }}
               >
@@ -742,9 +745,12 @@ const HomePage = () => {
                 <button className="write-review-card-btn" onClick={(e) => {
                   e.stopPropagation();
                   setShowReviewForm(true);
-                  // Scroll to reviews section after a brief delay to allow modal to render
+                  // Scroll to bottom of page where the form modal appears
                   setTimeout(() => {
-                    scrollToSection('reviews');
+                    window.scrollTo({
+                      top: document.body.scrollHeight,
+                      behavior: 'smooth'
+                    });
                   }, 100);
                 }}>
                   <Star size={16} />
