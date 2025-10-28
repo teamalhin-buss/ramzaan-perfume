@@ -414,6 +414,58 @@
   transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+/* Review Controls */
+.review-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gray-400);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.control-group svg {
+  width: 16px;
+  height: 16px;
+}
+
+.filter-select,
+.sort-select {
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  border-radius: 0;
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 400;
+  padding: 8px 12px;
+  min-width: 120px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.filter-select:hover,
+.sort-select:hover {
+  border-color: var(--white);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filter-select:focus,
+.sort-select:focus {
+  outline: none;
+  border-color: var(--white);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
 .reviews-section.animate-in {
   opacity: 1;
   transform: translateY(0);
@@ -572,6 +624,75 @@
   font-size: 12px;
   color: var(--gray-500);
   margin-top: 2px;
+}
+
+/* Verified Badge */
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  color: var(--white);
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  font-size: 10px;
+  font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+/* Helpfulness Voting */
+.review-helpfulness {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+.helpfulness-text {
+  font-size: 11px;
+  color: var(--gray-500);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.helpfulness-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  border-radius: 0;
+  color: var(--gray-400);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.helpfulness-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--white);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.helpfulness-btn.voted {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: #4CAF50;
+  color: #4CAF50;
+}
+
+.helpfulness-btn.voted:hover {
+  background: rgba(76, 175, 80, 0.2);
 }
 
 /* Write Review Card */
@@ -734,6 +855,55 @@
 
 .write-review-card-btn:active {
   transform: translateY(0);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+  padding: 20px 0;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  border-radius: 0;
+  color: var(--gray-400);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--white);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.pagination-btn.active {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+  font-weight: 600;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* About Section - Minimal B&W */
