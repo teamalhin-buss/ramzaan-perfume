@@ -665,7 +665,13 @@ const HomePage = () => {
 
               <button
                 className="write-review-btn"
-                onClick={() => setShowReviewForm(true)}
+                onClick={() => {
+                  setShowReviewForm(true);
+                  // Scroll to reviews section after a brief delay to allow modal to render
+                  setTimeout(() => {
+                    scrollToSection('reviews');
+                  }, 100);
+                }}
               >
                 <Star size={16} />
                 <span>Write a Review</span>
@@ -736,6 +742,10 @@ const HomePage = () => {
                 <button className="write-review-card-btn" onClick={(e) => {
                   e.stopPropagation();
                   setShowReviewForm(true);
+                  // Scroll to reviews section after a brief delay to allow modal to render
+                  setTimeout(() => {
+                    scrollToSection('reviews');
+                  }, 100);
                 }}>
                   <Star size={16} />
                   <span>Write a Review</span>
