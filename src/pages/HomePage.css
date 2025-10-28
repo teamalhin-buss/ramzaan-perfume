@@ -354,6 +354,8 @@
   margin-bottom: 12px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  z-index: 2;
+  position: relative;
 }
 
 .feature-card p {
@@ -362,6 +364,8 @@
   font-weight: 300;
   line-height: 1.7;
   letter-spacing: 0.02em;
+  z-index: 2;
+  position: relative;
 }
 
 /* Product Section - Minimal B&W */
