@@ -147,8 +147,8 @@
 
 .cart-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: clamp(-1px, -0.1vw, -2px);
+  right: clamp(-1px, -0.1vw, -2px);
   background: var(--white);
   color: var(--black);
   border-radius: 0;
@@ -393,7 +393,7 @@
 /* Mobile Responsive */
 @media (max-width: 1024px) {
   .nav-links {
-    gap: 24px;
+    gap: clamp(20px, 3vw, 24px);
   }
 }
 
@@ -412,7 +412,7 @@
   }
 
   .account-button {
-    padding: 10px;
+    padding: clamp(8px, 1.5vw, 10px);
     min-width: 44px;
   }
 

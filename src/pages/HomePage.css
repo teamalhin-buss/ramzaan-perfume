@@ -171,7 +171,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: clamp(12px, 3vw, 16px);
   margin-bottom: 80px;
 }
 
@@ -245,7 +245,7 @@
   background: transparent;
   border-top: 1px solid var(--border-light);
   border-bottom: 1px solid var(--border-light);
-  max-width: 700px;
+  max-width: min(700px, 90vw);
   margin: 0 auto;
 }
 
@@ -1717,8 +1717,8 @@ html {
 .perfume-bottle {
   position: relative;
   margin: 0 auto 40px;
-  width: 120px;
-  height: 200px;
+  width: clamp(80px, 25vw, 120px);
+  height: clamp(140px, 42vh, 200px);
 }
 
 .bottle-silhouette {
@@ -3015,6 +3015,40 @@ html {
 
   .stat-label {
     font-size: 10px;
+  }
+}
+
+/* Tablet breakpoint for better experience */
+@media (max-width: 640px) {
+  .ingredients-grid,
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+
+  .ingredient-card,
+  .feature-card {
+    padding: 22px;
+  }
+
+  .hero-section {
+    padding: 120px 0 80px;
+  }
+
+  .hero-title {
+    font-size: clamp(4rem, 10vw, 6rem);
+  }
+
+  .hero-subtitle {
+    margin-bottom: 40px;
+  }
+
+  .product-section {
+    margin-top: -60px;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 6vw, 3rem);
   }
 }
 
