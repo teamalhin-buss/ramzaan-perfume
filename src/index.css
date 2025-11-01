@@ -7,23 +7,57 @@
 
 :root {
   font-family: 'Poppins', sans-serif;
-  line-height: 1.6;
-  font-weight: 400;
+  line-height: 1.7;
+  font-weight: var(--font-weight-normal);
   color-scheme: dark;
-  color: rgba(255, 255, 255, 0.95);
-  background-color: #000000;
+  color: var(--primary-text);
+  background-color: var(--primary-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* Color scheme variables */
+  --primary-bg: #000000;
+  --primary-text: rgba(255, 255, 255, 0.95);
+  --gold-accent: #C9B037;
+  --warm-beige: #E6D7C3;
+  --amber: #FF8C00;
+
+  /* Typography variables */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.02em;
+
+  --text-shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --text-shadow-elegant: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  /* Shadow variables for depth */
+  --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-strong: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --shadow-layered: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.15);
+
+  /* Spacing system - 8px grid */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  --spacing-2xl: 64px;
 }
 
 /* Remove default link styles */
 a {
   color: inherit;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 a:hover {
@@ -38,14 +72,29 @@ body {
   position: relative;
 }
 
-/* Remove default button styles */
+/* Modernized button styles */
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
-  background: none;
-  padding: 0;
-  transition: all 0.3s ease;
+  background: rgba(201, 176, 55, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+  box-shadow: var(--shadow-subtle);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  color: var(--primary-text);
+  will-change: transform;
+}
+
+button:hover {
+  background: var(--gold-accent);
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-subtle);
 }
 
 /* Image optimization */
@@ -69,8 +118,464 @@ p, h1, h2, h3, h4, h5, h6 {
   overflow-wrap: break-word;
 }
 
+/* Typography hierarchy */
+h1 {
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  text-shadow: var(--text-shadow-elegant);
+}
+
+h2 {
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-tight);
+  text-shadow: var(--text-shadow-subtle);
+}
+
+h3 {
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-normal);
+  text-shadow: var(--text-shadow-subtle);
+}
+
+h4, h5, h6 {
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+p {
+  font-weight: var(--font-weight-light);
+  letter-spacing: var(--letter-spacing-wide);
+  text-shadow: var(--text-shadow-subtle);
+}
+
 /* Root element */
 #root {
   width: 100%;
   min-height: 100vh;
+}
+
+/* Standardized section padding */
+.section-padding {
+  padding: clamp(80px, 12vw, 120px);
+}
+
+/* Consistent container max-widths */
+.container-lg {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.container-md {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.container-sm {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Modernized card layouts with aspect ratios, rounded corners, and shadows */
+.card {
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  box-shadow: var(--shadow-layered);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  will-change: transform;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-strong);
+  transform: translateY(-4px);
+}
+
+.card-square {
+  aspect-ratio: 1/1;
+  border-radius: 8px;
+  box-shadow: var(--shadow-layered);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  will-change: transform;
+}
+
+.card-square:hover {
+  box-shadow: var(--shadow-strong);
+  transform: translateY(-4px);
+}
+
+.card-wide {
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  box-shadow: var(--shadow-layered);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  will-change: transform;
+}
+
+.card-wide:hover {
+  box-shadow: var(--shadow-strong);
+  transform: translateY(-4px);
+}
+
+/* Glassmorphism overlay effect */
+.glass-overlay {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Mobile Navigation Slide-out Menu */
+.mobile-nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 9998;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.mobile-nav-overlay.open {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-nav-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.mobile-nav-link {
+  color: var(--white);
+  text-decoration: none;
+  font-size: clamp(18px, 5vw, 24px);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: color 0.3s ease, border-bottom-color 0.3s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-link:hover {
+  color: var(--gold-accent);
+  border-bottom-color: var(--gold-accent);
+}
+
+.mobile-nav-close {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--white);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.mobile-nav-close:hover {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+/* Touch-friendly button sizing */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Enhanced mobile typography scaling */
+@media (max-width: 768px) {
+  h1 {
+    font-size: clamp(2rem, 8vw, 3rem);
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 6vw, 2.25rem);
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+    line-height: 1.3;
+  }
+
+  p {
+    font-size: clamp(0.875rem, 4vw, 1rem);
+    line-height: 1.6;
+  }
+
+  button {
+    min-height: 44px;
+    padding: 12px 24px;
+    font-size: clamp(14px, 4vw, 16px);
+  }
+}
+
+/* Swipe gesture support for image galleries */
+.swipe-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+}
+
+.swipe-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.swipe-item.active {
+  position: relative;
+  transform: translateX(0);
+}
+
+.swipe-item.prev {
+  transform: translateX(-100%);
+}
+
+.swipe-item.next {
+  transform: translateX(100%);
+}
+
+.swipe-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.swipe-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+.swipe-indicator.active {
+  background: var(--white);
+  transform: scale(1.2);
+}
+
+/* Touch feedback animations */
+.touch-feedback {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+  will-change: transform, opacity;
+}
+
+.touch-feedback:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Improved focus states for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--gold-accent);
+  outline-offset: 2px;
+}
+
+/* Performance-optimized animations */
+
+/* Particle effects - simplified for performance */
+@keyframes subtleFloat {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-10px) translateX(5px); }
+}
+
+@keyframes gentleGlow {
+  0%, 100% { opacity: 0.6; filter: blur(1px); }
+  50% { opacity: 1; filter: blur(0px); }
+}
+
+@keyframes smoothFade {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes elegantSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes refinedPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* GPU-accelerated transforms */
+.particle-light {
+  animation: subtleFloat 8s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.particle-medium {
+  animation: gentleGlow 6s ease-in-out infinite;
+  will-change: opacity, filter;
+  transform: translateZ(0);
+}
+
+.fade-in-element {
+  animation: smoothFade 0.8s ease-out forwards;
+  will-change: opacity, transform;
+  transform: translateZ(0);
+}
+
+.slide-in-element {
+  animation: elegantSlide 0.6s ease-out forwards;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.pulse-element {
+  animation: refinedPulse 2s ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Enhanced button animations with GPU acceleration */
+button {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  will-change: transform, background-color, box-shadow;
+  transform: translateZ(0);
+}
+
+button:hover {
+  transform: translateY(-2px) translateZ(0);
+}
+
+button:active {
+  transform: translateY(0) translateZ(0);
+}
+
+/* Optimized card hover effects */
+.card, .card-square, .card-wide {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+.card:hover, .card-square:hover, .card-wide:hover {
+  transform: translateY(-4px) translateZ(0);
+}
+
+/* Mobile navigation with hardware acceleration */
+.mobile-nav-overlay {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+  will-change: transform, opacity;
+  transform: translateX(100%) translateZ(0);
+}
+
+.mobile-nav-overlay.open {
+  transform: translateX(0) translateZ(0);
+}
+
+/* Swipe animations optimized */
+.swipe-item {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.swipe-indicator {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  will-change: transform, background-color;
+  transform: translateZ(0);
+}
+
+.swipe-indicator.active {
+  transform: scale(1.2) translateZ(0);
+}
+
+/* Touch feedback with performance */
+.touch-feedback {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.touch-feedback:active {
+  transform: scale(0.95) translateZ(0);
+}
+
+/* Reduced motion preferences support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile-first responsive utilities */
+@media (max-width: 480px) {
+  .touch-target {
+    min-width: 48px;
+    min-height: 48px;
+    min-height: 48px;
+  }
+
+  .mobile-nav-link {
+    font-size: 20px;
+    padding: 20px 0;
+  }
 }

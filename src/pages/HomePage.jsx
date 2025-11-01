@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Star, Award, Users, ArrowRight, Check, Sparkles, Filter, SortDesc } from 'lucide-react';
+import { Star, Award, Users, ArrowRight, Check, Sparkles, Filter, SortDesc, Leaf, Clock, Package, Droplets, Flower, Citrus, Heart } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
@@ -33,6 +33,56 @@ const HomePage = () => {
   const [reviewVotes, setReviewVotes] = useState({});
 
   const sectionRefs = useRef({});
+
+  // Ingredients data
+  const ingredients = [
+    {
+      id: 'citrus',
+      name: 'Citrus Notes',
+      description: 'Bright and refreshing top notes',
+      icon: Citrus,
+      benefits: ['Energizing', 'Fresh', 'Uplifting']
+    },
+    {
+      id: 'floral',
+      name: 'Floral Essence',
+      description: 'Delicate and sophisticated heart',
+      icon: Flower,
+      benefits: ['Elegant', 'Romantic', 'Timeless']
+    },
+    {
+      id: 'woody',
+      name: 'Woody Base',
+      description: 'Rich and grounding foundation',
+      icon: Leaf,
+      benefits: ['Sophisticated', 'Enduring', 'Luxurious']
+    },
+    {
+      id: 'amber',
+      name: 'Amber Accord',
+      description: 'Warm and mysterious depth',
+      icon: Droplets,
+      benefits: ['Warm', 'Seductive', 'Captivating']
+    }
+  ];
+
+  // Features data
+  const features = [
+    {
+      id: 'longevity',
+      title: 'Exceptional Longevity',
+      description: 'Lasts up to 8-10 hours on skin',
+      icon: Clock,
+      benefits: ['Long-lasting', 'Intense', 'Memorable']
+    },
+    {
+      id: 'versatile',
+      title: 'Versatile Wear',
+      description: 'Perfect for day or night, any occasion',
+      icon: Heart,
+      benefits: ['Adaptable', 'Sophisticated', 'Confident']
+    }
+  ];
 
   useEffect(() => {
     const loadData = async () => {
@@ -86,18 +136,25 @@ const HomePage = () => {
         const sectionId = entry.target.id;
         if (entry.isIntersecting) {
           setVisibleSections(prev => new Set([...prev, sectionId]));
-          // Add staggered animation classes
+          // Add staggered animation classes with enhanced timing
           const children = entry.target.querySelectorAll('.animate-slide-up-delay-1, .animate-slide-up-delay-2, .animate-slide-up-delay-3, .animate-slide-up-delay-4');
           children.forEach((child, index) => {
             setTimeout(() => {
               child.classList.add('animate-triggered');
-            }, index * 150);
+              // Add premium particle effects for ingredient cards
+              if (child.classList.contains('ingredient-card')) {
+                const particles = child.querySelectorAll('.particle');
+                particles.forEach((particle, pIndex) => {
+                  setTimeout(() => particle.classList.add('animate-particle'), pIndex * 200);
+                });
+              }
+            }, index * 200); // Increased delay for more luxurious feel
           });
         }
       });
     }, observerOptions);
 
-    // Observe all sections
+    // Observe all sections including new ones
     Object.values(sectionRefs.current).forEach((ref) => {
       if (ref) observer.observe(ref);
     });
@@ -126,7 +183,7 @@ const HomePage = () => {
   // Enhanced mouse following effect for interactive elements
   useEffect(() => {
     const handleMouseMove = (e) => {
-      const cards = document.querySelectorAll('.feature-card, .review-card, .enhanced-product-card');
+      const cards = document.querySelectorAll('.feature-card, .review-card, .enhanced-product-card, .ingredient-card, .packaging-mockup');
       cards.forEach(card => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -134,6 +191,13 @@ const HomePage = () => {
 
         card.style.setProperty('--mouse-x', `${x}px`);
         card.style.setProperty('--mouse-y', `${y}px`);
+
+        // Add premium hover effects for ingredient cards
+        if (card.classList.contains('ingredient-card')) {
+          const distance = Math.sqrt(x * x + y * y);
+          const intensity = Math.max(0, 1 - distance / 200);
+          card.style.setProperty('--hover-intensity', intensity);
+        }
       });
     };
 
@@ -493,20 +557,22 @@ const HomePage = () => {
               </p>
 
               <div className="hero-cta-group animate-fade-in-delay-2">
-                <button
-                  className="hero-cta-primary"
-                  onClick={() => scrollToSection('product')}
-                >
-                  <span>Discover</span>
-                  <ArrowRight size={20} />
-                </button>
-                <button
-                  className="hero-cta-secondary"
-                  onClick={() => scrollToSection('about')}
-                >
-                  Learn More
-                </button>
-              </div>
+                 <button
+                   className="hero-cta-primary"
+                   onClick={() => scrollToSection('product')}
+                   aria-label="Discover the signature fragrance"
+                 >
+                   <span>Discover</span>
+                   <ArrowRight size={20} />
+                 </button>
+                 <button
+                   className="hero-cta-secondary"
+                   onClick={() => scrollToSection('about')}
+                   aria-label="Learn more about Ramzaan"
+                 >
+                   Learn More
+                 </button>
+               </div>
             </div>
 
             {/* Minimal Stats */}
@@ -561,38 +627,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section
-        className={`features-section ${visibleSections.has('features') ? 'animate-in' : ''}`}
-        id="features"
-        ref={(el) => sectionRefs.current.features = el}
-      >
-        <div className="container">
-          <div className="features-grid">
-            <div className="feature-card animate-slide-up-delay-1">
-              <div className="feature-icon">
-                <Check size={24} />
-              </div>
-              <h3>Premium Quality</h3>
-              <p>100% natural ingredients</p>
-            </div>
-            <div className="feature-card animate-slide-up-delay-2">
-              <div className="feature-icon">
-                <Check size={24} />
-              </div>
-              <h3>Long-Lasting</h3>
-              <p>All-day fragrance</p>
-            </div>
-            <div className="feature-card animate-slide-up-delay-3">
-              <div className="feature-icon">
-                <Check size={24} />
-              </div>
-              <h3>Luxury Packaging</h3>
-              <p>Perfect for gifting</p>
-            </div>
-          </div>
-        </div>
-      </section>
+
+
 
       {/* Product Highlight Section */}
       <section
@@ -758,6 +794,47 @@ const HomePage = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section
+        className={`features-section ${visibleSections.has('features') ? 'animate-in' : ''}`}
+        id="features"
+        ref={(el) => sectionRefs.current.features = el}
+      >
+        <div className="container">
+          <div className="section-header animate-fade-in">
+            <h2 className="section-title">Why Choose Ramzaan</h2>
+            <p className="section-subtitle">Experience luxury in every aspect</p>
+          </div>
+
+          <div className="features-grid">
+            {features.map((feature, index) => {
+              const IconComponent = feature.icon;
+              return (
+                <div
+                  key={feature.id}
+                  className={`feature-card animate-slide-up-delay-${(index % 4) + 1}`}
+                  role="article"
+                  aria-labelledby={`feature-${feature.id}-title`}
+                >
+                  <div className="feature-icon">
+                    <IconComponent size={40} />
+                  </div>
+                  <h3 id={`feature-${feature.id}-title`} className="feature-title">
+                    {feature.title}
+                  </h3>
+                  <p className="feature-description">{feature.description}</p>
+                  <div className="feature-benefits">
+                    {feature.benefits.map((benefit, i) => (
+                      <span key={i} className="benefit-tag">{benefit}</span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

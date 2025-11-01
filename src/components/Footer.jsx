@@ -19,7 +19,7 @@ const Footer = ({ onSecretClick }) => {
             <h2 className="footer-brand">Ramzaan</h2>
             <p className="footer-tagline">Experience luxury in every drop</p>
             <div className="social-links">
-              <a href="https://www.instagram.com/alh.perfumes/" target="_blank" rel="noopener noreferrer" className="social-icon">
+              <a href="https://www.instagram.com/alhdot/" target="_blank" rel="noopener noreferrer" className="social-icon">
                 <Instagram size={20} />
               </a>
             </div>

@@ -1,8 +1,41 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ShoppingCart, Heart, Share2, ZoomIn, Minus, Plus, Check, Sparkles } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import { useCart } from '../context/CartContext';
 import './ProductCard.css';
+
+// Swipe gesture hook for image galleries
+const useSwipe = (onSwipeLeft, onSwipeRight) => {
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    touchEndX.current = 0;
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && onSwipeLeft) {
+      onSwipeLeft();
+    }
+    if (isRightSwipe && onSwipeRight) {
+      onSwipeRight();
+    }
+  };
+
+  return { onTouchStart, onTouchMove, onTouchEnd };
+};
 
 const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   const { addToCart } = useCart();
@@ -11,6 +44,26 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isImageZoomed, setIsImageZoomed] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const imageContainerRef = useRef(null);
+
+  // Mock image gallery for swipe demonstration
+  const imageGallery = [
+    product.image,
+    product.image, // Same image for second slide
+    product.image // Repeat for demo
+  ];
+
+  // Swipe gesture handlers
+  const handleSwipeLeft = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % imageGallery.length);
+  };
+
+  const handleSwipeRight = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + imageGallery.length) % imageGallery.length);
+  };
+
+  const swipeHandlers = useSwipe(handleSwipeLeft, handleSwipeRight);
 
   // Enhanced mouse following effect for product card
   const handleMouseMove = (e) => {
@@ -150,19 +203,44 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
       <div className={`product-card-grid ${isImageZoomed ? 'image-zoomed' : ''}`}>
         {/* Image Section */}
         <div className="product-image-section">
-          <div className="product-image-container">
-            <OptimizedImage
-              src={product.image}
-              fallback={product.imageFallback}
-              alt={product.name}
-              className="product-main-image"
-              aspectRatio="1/1"
-              objectFit="contain"
-              showSkeleton={true}
-              onClick={onBottleClick}
-              style={{ cursor: 'pointer' }}
-            />
+          <div
+            className="product-image-container swipe-container"
+            ref={imageContainerRef}
+            {...swipeHandlers}
+          >
+            {imageGallery.map((imageSrc, index) => (
+              <div
+                key={index}
+                className={`swipe-item ${index === currentImageIndex ? 'active' : index < currentImageIndex ? 'prev' : 'next'}`}
+              >
+                <OptimizedImage
+                  src={imageSrc}
+                  fallback={product.imageFallback}
+                  alt={`${product.name} - View ${index + 1}`}
+                  className="product-main-image"
+                  aspectRatio="1/1"
+                  objectFit="contain"
+                  showSkeleton={true}
+                  onClick={onBottleClick}
+                  style={{ cursor: 'pointer' }}
+                />
+              </div>
+            ))}
             <div className="image-glow"></div>
+
+            {/* Swipe Indicators */}
+            {imageGallery.length > 1 && (
+              <div className="swipe-indicators">
+                {imageGallery.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`swipe-indicator touch-target ${index === currentImageIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentImageIndex(index)}
+                    aria-label={`View image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -299,15 +377,38 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
       {/* Image Zoom Modal */}
       {isImageZoomed && (
         <div className="image-zoom-modal" onClick={() => setIsImageZoomed(false)}>
-          <button className="zoom-close" aria-label="Close zoom">×</button>
-          <OptimizedImage
-            src={product.image}
-            fallback={product.imageFallback}
-            alt={product.name}
-            className="zoomed-image"
-            objectFit="contain"
-            showSkeleton={true}
-          />
+          <button className="zoom-close touch-target" aria-label="Close zoom">×</button>
+          <div className="swipe-container" {...swipeHandlers}>
+            {imageGallery.map((imageSrc, index) => (
+              <div
+                key={index}
+                className={`swipe-item ${index === currentImageIndex ? 'active' : index < currentImageIndex ? 'prev' : 'next'}`}
+              >
+                <OptimizedImage
+                  src={imageSrc}
+                  fallback={product.imageFallback}
+                  alt={`${product.name} - Zoomed View ${index + 1}`}
+                  className="zoomed-image"
+                  objectFit="contain"
+                  showSkeleton={true}
+                />
+              </div>
+            ))}
+
+            {/* Zoom Modal Swipe Indicators */}
+            {imageGallery.length > 1 && (
+              <div className="swipe-indicators">
+                {imageGallery.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`swipe-indicator touch-target ${index === currentImageIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentImageIndex(index)}
+                    aria-label={`View zoomed image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
