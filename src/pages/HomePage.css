@@ -21,7 +21,7 @@
 /* Hero Section - Pure Minimal B&W with Background */
 .hero-section {
   position: relative;
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,7 +105,7 @@
 @media (max-width: 768px) {
   .hero-section {
     background-attachment: scroll;
-    min-height: 90vh;
+    min-height: 70vh;
     padding: 100px 0 60px;
   }
 
@@ -296,7 +296,7 @@
 
 /* Product Section - Minimal B&W */
 .product-section {
-  padding: clamp(100px, 14vw, 140px) 0;
+  padding: clamp(60px, 10vw, 100px) 0;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-light);
   opacity: 0;
@@ -338,7 +338,7 @@
 
 /* Reviews Section - Minimal B&W */
 .reviews-section {
-  padding: clamp(100px, 14vw, 140px) 0;
+  padding: clamp(60px, 10vw, 100px) 0;
   background: var(--black);
   border-bottom: 1px solid var(--border-light);
   opacity: 0;
@@ -840,7 +840,7 @@
 
 /* About Section - Minimal B&W */
 .about-section {
-  padding: clamp(100px, 14vw, 140px) 0;
+  padding: clamp(60px, 10vw, 100px) 0;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-light);
   opacity: 0;
@@ -2191,7 +2191,7 @@ html {
 
 /* Ingredients Section - Luxury B&W with Advanced Effects */
 .ingredients-section {
-  padding: clamp(100px, 14vw, 140px) 0;
+  padding: clamp(60px, 10vw, 100px) 0;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-light);
   opacity: 0;
@@ -2435,7 +2435,7 @@ html {
 
 /* Features Section - Luxury B&W with Advanced Effects */
 .features-section {
-  padding: clamp(100px, 14vw, 140px) 0;
+  padding: clamp(60px, 10vw, 100px) 0;
   background: var(--black);
   border-bottom: 1px solid var(--border-light);
   opacity: 0;
