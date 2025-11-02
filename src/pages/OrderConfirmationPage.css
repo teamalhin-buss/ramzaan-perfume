@@ -348,3 +348,52 @@
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .confirmation-card {
+    padding: 20px 15px;
+  }
+
+  .confirmation-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .confirmation-header p {
+    font-size: 1rem;
+  }
+
+  .order-info h3 {
+    font-size: 1.3rem;
+  }
+
+  .order-section h4 {
+    font-size: 1rem;
+  }
+
+  .item-details h5 {
+    font-size: 0.95rem;
+  }
+
+  .item-details p {
+    font-size: 0.85rem;
+  }
+
+  .item-price {
+    font-size: 0.95rem;
+  }
+
+  .order-total {
+    font-size: 1.1rem;
+  }
+
+  .shipping-info p,
+  .payment-info p {
+    font-size: 0.9rem;
+  }
+
+  .glow-button,
+  .secondary-button {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+}

@@ -2,7 +2,7 @@ import { Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
 
-const Footer = () => {
+const Footer = ({ onSecretClick }) => {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -19,7 +19,7 @@ const Footer = () => {
             <h2 className="footer-brand">Ramzaan</h2>
             <p className="footer-tagline">Experience luxury in every drop</p>
             <div className="social-links">
-              <a href="https://www.instagram.com/alh.perfumes/" target="_blank" rel="noopener noreferrer" className="social-icon">
+              <a href="https://www.instagram.com/alhdot/" target="_blank" rel="noopener noreferrer" className="social-icon">
                 <Instagram size={20} />
               </a>
             </div>
@@ -68,7 +68,7 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="footer-bottom">
+        <div className="footer-bottom" onClick={onSecretClick}>
           <p>&copy; 2025 Ramzaan. Made in India. All Rights Reserved.</p>
         </div>
       </div>

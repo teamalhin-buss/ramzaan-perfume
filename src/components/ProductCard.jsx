@@ -1,24 +1,121 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ShoppingCart, Heart, Share2, ZoomIn, Minus, Plus, Check, Sparkles } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import { useCart } from '../context/CartContext';
 import './ProductCard.css';
 
-const ProductCard = ({ product, onBuyNow }) => {
+// Swipe gesture hook for image galleries
+const useSwipe = (onSwipeLeft, onSwipeRight) => {
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    touchEndX.current = 0;
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && onSwipeLeft) {
+      onSwipeLeft();
+    }
+    if (isRightSwipe && onSwipeRight) {
+      onSwipeRight();
+    }
+  };
+
+  return { onTouchStart, onTouchMove, onTouchEnd };
+};
+
+const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isImageZoomed, setIsImageZoomed] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const imageContainerRef = useRef(null);
 
-  const handleAddToCart = () => {
-    addToCart(product, quantity);
-    showNotification('Added to cart!');
+  // Mock image gallery for swipe demonstration
+  const imageGallery = [
+    product.image,
+    product.image, // Same image for second slide
+    product.image // Repeat for demo
+  ];
+
+  // Swipe gesture handlers
+  const handleSwipeLeft = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % imageGallery.length);
   };
 
-  const handleBuyNow = () => {
+  const handleSwipeRight = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + imageGallery.length) % imageGallery.length);
+  };
+
+  const swipeHandlers = useSwipe(handleSwipeLeft, handleSwipeRight);
+
+  // Enhanced mouse following effect for product card
+  const handleMouseMove = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+
+    // 3D tilt effect
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const tiltX = (y - centerY) / centerY * -10;
+    const tiltY = (x - centerX) / centerX * 10;
+
+    card.style.setProperty('--tilt-x', `${tiltX}deg`);
+    card.style.setProperty('--tilt-y', `${tiltY}deg`);
+  };
+
+  // Perfume spray effect on button click
+  const createSprayEffect = (buttonElement) => {
+    const rect = buttonElement.getBoundingClientRect();
+    const particles = [];
+
+    for (let i = 0; i < 8; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'spray-particle';
+      particle.style.left = rect.left + rect.width / 2 + 'px';
+      particle.style.top = rect.top + rect.height / 2 + 'px';
+      particle.style.setProperty('--random-x', Math.random() * 2 - 1);
+      document.body.appendChild(particle);
+      particles.push(particle);
+
+      setTimeout(() => {
+        if (particle.parentNode) {
+          particle.parentNode.removeChild(particle);
+        }
+      }, 1500);
+    }
+  };
+
+  const handleAddToCart = (e) => {
     addToCart(product, quantity);
+    showNotification('Added to cart!');
+    createSprayEffect(e.currentTarget);
+  };
+
+  const handleBuyNow = (e) => {
+    addToCart(product, quantity);
+    createSprayEffect(e.currentTarget);
     if (onBuyNow) {
       onBuyNow();
     } else {
@@ -69,7 +166,7 @@ const ProductCard = ({ product, onBuyNow }) => {
   };
 
   return (
-    <div className="enhanced-product-card">
+    <div className="enhanced-product-card" onMouseMove={handleMouseMove}>
       {/* Badge */}
       {product.badge && (
         <div className="product-badge">
@@ -106,17 +203,44 @@ const ProductCard = ({ product, onBuyNow }) => {
       <div className={`product-card-grid ${isImageZoomed ? 'image-zoomed' : ''}`}>
         {/* Image Section */}
         <div className="product-image-section">
-          <div className="product-image-container">
-            <OptimizedImage
-              src={product.image}
-              fallback={product.imageFallback}
-              alt={product.name}
-              className="product-main-image"
-              aspectRatio="1/1"
-              objectFit="contain"
-              showSkeleton={true}
-            />
+          <div
+            className="product-image-container swipe-container"
+            ref={imageContainerRef}
+            {...swipeHandlers}
+          >
+            {imageGallery.map((imageSrc, index) => (
+              <div
+                key={index}
+                className={`swipe-item ${index === currentImageIndex ? 'active' : index < currentImageIndex ? 'prev' : 'next'}`}
+              >
+                <OptimizedImage
+                  src={imageSrc}
+                  fallback={product.imageFallback}
+                  alt={`${product.name} - View ${index + 1}`}
+                  className="product-main-image"
+                  aspectRatio="1/1"
+                  objectFit="contain"
+                  showSkeleton={true}
+                  onClick={onBottleClick}
+                  style={{ cursor: 'pointer' }}
+                />
+              </div>
+            ))}
             <div className="image-glow"></div>
+
+            {/* Swipe Indicators */}
+            {imageGallery.length > 1 && (
+              <div className="swipe-indicators">
+                {imageGallery.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`swipe-indicator touch-target ${index === currentImageIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentImageIndex(index)}
+                    aria-label={`View image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -125,8 +249,12 @@ const ProductCard = ({ product, onBuyNow }) => {
           <div className="product-header">
             <h3 className="product-title">{product.name}</h3>
             <div className="product-rating">
-              <span className="rating-value">★★★★★</span>
-              <span className="rating-count">(250+ reviews)</span>
+              <span className="rating-value">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className={i < Math.floor(product.averageRating || 5) ? 'filled' : ''}>★</span>
+                ))}
+              </span>
+              <span className="rating-count">({product.totalReviews || 0} reviews)</span>
             </div>
           </div>
 
@@ -249,15 +377,38 @@ const ProductCard = ({ product, onBuyNow }) => {
       {/* Image Zoom Modal */}
       {isImageZoomed && (
         <div className="image-zoom-modal" onClick={() => setIsImageZoomed(false)}>
-          <button className="zoom-close" aria-label="Close zoom">×</button>
-          <OptimizedImage
-            src={product.image}
-            fallback={product.imageFallback}
-            alt={product.name}
-            className="zoomed-image"
-            objectFit="contain"
-            showSkeleton={true}
-          />
+          <button className="zoom-close touch-target" aria-label="Close zoom">×</button>
+          <div className="swipe-container" {...swipeHandlers}>
+            {imageGallery.map((imageSrc, index) => (
+              <div
+                key={index}
+                className={`swipe-item ${index === currentImageIndex ? 'active' : index < currentImageIndex ? 'prev' : 'next'}`}
+              >
+                <OptimizedImage
+                  src={imageSrc}
+                  fallback={product.imageFallback}
+                  alt={`${product.name} - Zoomed View ${index + 1}`}
+                  className="zoomed-image"
+                  objectFit="contain"
+                  showSkeleton={true}
+                />
+              </div>
+            ))}
+
+            {/* Zoom Modal Swipe Indicators */}
+            {imageGallery.length > 1 && (
+              <div className="swipe-indicators">
+                {imageGallery.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`swipe-indicator touch-target ${index === currentImageIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentImageIndex(index)}
+                    aria-label={`View zoomed image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

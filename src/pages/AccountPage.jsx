@@ -59,7 +59,7 @@ const AccountPage = () => {
     addressLine1: '',
     addressLine2: '',
     city: '',
-    state: '',
+    district: '',
     pincode: '',
     isDefault: false
   });
@@ -86,21 +86,20 @@ const AccountPage = () => {
   useEffect(() => {
     const loadUserAddresses = async () => {
       if (user) {
-        // Mock address loading - replace with actual service call
-        setAddresses([
-          {
-            id: '1',
-            type: 'home',
-            name: 'John Doe',
-            phone: '+91 9876543210',
-            addressLine1: '123 Main Street',
-            addressLine2: 'Apartment 4B',
-            city: 'Mumbai',
-            state: 'Maharashtra',
-            pincode: '400001',
-            isDefault: true
+        try {
+          // Load addresses from localStorage or initialize empty array
+          const savedAddresses = localStorage.getItem(`addresses_${user.id}`);
+          if (savedAddresses) {
+            setAddresses(JSON.parse(savedAddresses));
+          } else {
+            setAddresses([]);
           }
-        ]);
+        } catch (error) {
+          console.error('Error loading addresses:', error);
+          setAddresses([]);
+        }
+      } else {
+        setAddresses([]);
       }
     };
 
@@ -599,21 +598,45 @@ const AccountPage = () => {
     setIsEditingProfile(false);
   };
 
+  const keralaDistricts = [
+    'Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod',
+    'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad',
+    'Pathanamthitta', 'Thiruvananthapuram', 'Thrissur', 'Wayanad'
+  ];
+
   const handleSaveAddress = async () => {
+    if (!user) return;
+
     try {
+      let updatedAddresses;
+
       if (editingAddress) {
         // Update existing address
-        setAddresses(prev => prev.map(addr =>
+        updatedAddresses = addresses.map(addr =>
           addr.id === editingAddress.id ? { ...addressFormData, id: editingAddress.id } : addr
-        ));
+        );
       } else {
         // Add new address
         const newAddress = {
           ...addressFormData,
           id: Date.now().toString()
         };
-        setAddresses(prev => [...prev, newAddress]);
+        updatedAddresses = [...addresses, newAddress];
       }
+
+      // If setting as default, remove default from other addresses
+      if (addressFormData.isDefault) {
+        updatedAddresses = updatedAddresses.map(addr => ({
+          ...addr,
+          isDefault: addr.id === (editingAddress?.id || Date.now().toString())
+        }));
+      }
+
+      setAddresses(updatedAddresses);
+
+      // Save to localStorage
+      localStorage.setItem(`addresses_${user.id}`, JSON.stringify(updatedAddresses));
+
       setShowAddressForm(false);
       setEditingAddress(null);
       setAddressFormData({
@@ -623,7 +646,7 @@ const AccountPage = () => {
         addressLine1: '',
         addressLine2: '',
         city: '',
-        state: '',
+        district: '',
         pincode: '',
         isDefault: false
       });
@@ -639,14 +662,30 @@ const AccountPage = () => {
   };
 
   const handleDeleteAddress = (addressId) => {
-    setAddresses(prev => prev.filter(addr => addr.id !== addressId));
+    if (!user) return;
+
+    try {
+      const updatedAddresses = addresses.filter(addr => addr.id !== addressId);
+      setAddresses(updatedAddresses);
+      localStorage.setItem(`addresses_${user.id}`, JSON.stringify(updatedAddresses));
+    } catch (error) {
+      console.error('Address delete failed:', error);
+    }
   };
 
   const handleSetDefaultAddress = (addressId) => {
-    setAddresses(prev => prev.map(addr => ({
-      ...addr,
-      isDefault: addr.id === addressId
-    })));
+    if (!user) return;
+
+    try {
+      const updatedAddresses = addresses.map(addr => ({
+        ...addr,
+        isDefault: addr.id === addressId
+      }));
+      setAddresses(updatedAddresses);
+      localStorage.setItem(`addresses_${user.id}`, JSON.stringify(updatedAddresses));
+    } catch (error) {
+      console.error('Set default address failed:', error);
+    }
   };
 
   if (!isAuthenticated) {
@@ -915,12 +954,6 @@ const AccountPage = () => {
             {/* reCAPTCHA container for invisible captcha */}
             <div id="recaptcha-container"></div>
 
-            {isLoginMode && (
-              <div className="admin-hint">
-                <Shield size={14} />
-                <p>Admin: admin@alh.com / admin123</p>
-              </div>
-            )}
           </div>
         </div>
         <Footer />
@@ -1130,7 +1163,7 @@ const AccountPage = () => {
                             {address.addressLine2 && `, ${address.addressLine2}`}
                           </p>
                           <p className="address-city">
-                            {address.city}, {address.state} - {address.pincode}
+                            {address.city}, {address.district} - {address.pincode}
                           </p>
                         </div>
                         {!address.isDefault && (
@@ -1242,15 +1275,20 @@ const AccountPage = () => {
                           />
                         </div>
                         <div className="form-group">
-                          <label>State</label>
-                          <input
-                            type="text"
-                            name="state"
-                            value={addressFormData.state}
+                          <label>District</label>
+                          <select
+                            name="district"
+                            value={addressFormData.district}
                             onChange={handleAddressFormChange}
-                            placeholder="State"
                             required
-                          />
+                          >
+                            <option value="">Select District</option>
+                            {keralaDistricts.map((district) => (
+                              <option key={district} value={district}>
+                                {district}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                       <div className="form-group">
@@ -1308,6 +1346,7 @@ const AccountPage = () => {
                 <button
                   className="quick-action-button"
                   onClick={() => navigate('/')}
+                  aria-label="Continue shopping for perfumes"
                 >
                   <ShoppingBag size={20} />
                   <span>Continue Shopping</span>
@@ -1316,6 +1355,7 @@ const AccountPage = () => {
                 <button
                   className="quick-action-button wishlist-button"
                   onClick={() => navigate('/', { state: { showWishlist: true } })}
+                  aria-label="View your wishlist"
                 >
                   <Heart size={20} />
                   <span>My Wishlist</span>
@@ -1324,7 +1364,14 @@ const AccountPage = () => {
 
                 <button
                   className="quick-action-button"
-                  onClick={() => navigate('/')}
+                  onClick={() => {
+                    // Scroll to orders section
+                    const ordersSection = document.querySelector('.orders-card');
+                    if (ordersSection) {
+                      ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  aria-label="Track your orders"
                 >
                   <Package size={20} />
                   <span>Track Orders</span>
@@ -1332,7 +1379,15 @@ const AccountPage = () => {
 
                 <button
                   className="quick-action-button"
-                  onClick={() => setIsEditingProfile(true)}
+                  onClick={() => {
+                    setIsEditingProfile(true);
+                    // Scroll to profile section
+                    const profileSection = document.querySelector('.profile-card');
+                    if (profileSection) {
+                      profileSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  aria-label="Edit account settings"
                 >
                   <Settings size={20} />
                   <span>Account Settings</span>

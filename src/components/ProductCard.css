@@ -1,4 +1,4 @@
-/* Minimal B&W Product Card */
+/* Enhanced Product Card with Advanced Animations */
 .enhanced-product-card {
   position: relative;
   background: transparent;
@@ -6,16 +6,236 @@
   border-radius: 0;
   padding: clamp(40px, 5vw, 60px);
   transition: all var(--transition-base);
-  overflow: visible;
+  overflow: hidden;
   opacity: 0;
   transform: translateY(30px);
   animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  cursor: pointer;
 }
 
 .enhanced-product-card:hover {
   border-color: var(--border-medium);
   background: var(--bg-secondary);
   transform: translateY(-4px);
+}
+
+/* Enhanced mouse following spotlight effect for product card */
+.enhanced-product-card::after {
+  content: '';
+  position: absolute;
+  top: var(--mouse-x, 0);
+  left: var(--mouse-y, 0);
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+  pointer-events: none;
+}
+
+.enhanced-product-card:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* 3D Tilt Effect */
+.enhanced-product-card {
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease;
+}
+
+.enhanced-product-card:hover {
+  transform: rotateX(var(--tilt-x, 0)) rotateY(var(--tilt-y, 0)) translateY(-4px);
+}
+
+/* Magnetic hover for action buttons */
+.action-btn {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.action-btn:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+}
+
+/* Liquid morphing effect for product image */
+.product-main-image {
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.product-main-image:hover {
+  animation: liquidMorph 6s ease-in-out infinite;
+}
+
+@keyframes liquidMorph {
+  0%, 100% {
+    border-radius: 0;
+    transform: scale(1.03);
+  }
+  25% {
+    border-radius: 20px 0 20px 0;
+    transform: scale(1.05) rotate(1deg);
+  }
+  50% {
+    border-radius: 0 20px 0 20px;
+    transform: scale(1.03) rotate(-1deg);
+  }
+  75% {
+    border-radius: 20px 20px 0 0;
+    transform: scale(1.05) rotate(0.5deg);
+  }
+}
+
+/* Holographic shimmer effect for buttons */
+.btn-buy-now {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, var(--white), var(--gray-100), var(--white));
+  background-size: 200% 200%;
+  animation: holographicShimmer 3s ease-in-out infinite;
+}
+
+@keyframes holographicShimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Crystal refraction effect for pricing section */
+.product-pricing {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-pricing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: crystalRefraction 4s ease-in-out infinite;
+}
+
+@keyframes crystalRefraction {
+  0%, 100% { left: -100%; }
+  50% { left: 100%; }
+}
+
+/* Neon glow pulse for quantity selector */
+.quantity-selector-enhanced:focus-within {
+  animation: neonPulse 2s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6), 0 0 25px rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Aurora background effect for scent notes */
+.product-scent-notes {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-scent-notes::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(-45deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.08)
+  );
+  background-size: 400% 400%;
+  animation: auroraFlow 8s ease infinite;
+  pointer-events: none;
+}
+
+@keyframes auroraFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Breathing animation for guarantee badge */
+.product-guarantee {
+  animation: gentleBreathe 4s ease-in-out infinite;
+}
+
+@keyframes gentleBreathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+/* Magnetic attraction for note items */
+.note-item {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.note-item:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Quantum particle effect for image container */
+.product-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  animation: quantumParticles 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes quantumParticles {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translate(5px, -5px) scale(1.1);
+    opacity: 0.6;
+  }
+  66% {
+    transform: translate(-5px, 5px) scale(0.9);
+    opacity: 0.4;
+  }
 }
 
 /* Badge */
@@ -50,8 +270,8 @@
 }
 
 .action-btn {
-  width: 40px;
-  height: 40px;
+  width: clamp(40px, 12vw, 48px);
+  height: clamp(40px, 12vw, 48px);
   background: transparent;
   border: 1px solid var(--border-medium);
   border-radius: 0;
@@ -384,7 +604,8 @@
 }
 
 .qty-input {
-  width: 60px;
+  min-width: 60px;
+  width: clamp(60px, 15vw, 80px);
   background: transparent;
   border: none;
   color: var(--white);
@@ -450,6 +671,63 @@
 .btn-add-to-cart:active,
 .btn-buy-now:active {
   transform: translateY(0);
+}
+
+/* Enhanced button micro-interactions */
+.btn-add-to-cart,
+.btn-buy-now {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-add-to-cart::before,
+.btn-buy-now::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-add-to-cart:hover::before,
+.btn-buy-now:hover::before {
+  left: 100%;
+}
+
+/* Ripple effect for product card buttons */
+.btn-add-to-cart::after,
+.btn-buy-now::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-add-to-cart:active::after,
+.btn-buy-now:active::after {
+  width: 300px;
+  height: 300px;
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
 }
 
 /* Guarantee Badge */
@@ -608,13 +886,97 @@
   }
 }
 
+/* Swipe gesture support for image galleries */
+.swipe-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+  width: 100%;
+  height: 100%;
+}
+
+.swipe-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swipe-item.active {
+  position: relative;
+  transform: translateX(0);
+  z-index: 2;
+}
+
+.swipe-item.prev {
+  transform: translateX(-100%);
+  z-index: 1;
+}
+
+.swipe-item.next {
+  transform: translateX(100%);
+  z-index: 1;
+}
+
+.swipe-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.swipe-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+}
+
+.swipe-indicator.active {
+  background: var(--white);
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.swipe-indicator:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* Touch feedback animations */
+.touch-feedback {
+  transition: all 0.1s ease;
+}
+
+.touch-feedback:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .product-card-grid {
     grid-template-columns: 1fr;
     gap: clamp(32px, 6vw, 40px);
   }
-  
+
   .product-image-section {
     order: -1;
   }

@@ -25,6 +25,21 @@ const ReviewForm = ({ onClose, onSubmit }) => {
       return;
     }
 
+    if (reviewText.trim().length > 500) {
+      alert('Review text cannot exceed 500 characters');
+      return;
+    }
+
+    if (!name.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+
+    if (name.trim().length < 2) {
+      alert('Name must be at least 2 characters long');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -180,7 +195,7 @@ Share your honest thoughts - your review helps others discover this fragrance! â
             <button
               type="submit"
               className="submit-review-btn"
-              disabled={isSubmitting || !reviewText.trim() || reviewText.length < 10}
+              disabled={isSubmitting || !reviewText.trim() || reviewText.length < 10 || !name.trim() || name.trim().length < 2}
             >
               {isSubmitting ? (
                 <>
