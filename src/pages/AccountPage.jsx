@@ -1,7 +1,7 @@
 import { orderService } from '../services/firestore';
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Package, LogOut, Shield, Calendar, MapPin, CreditCard, Clock, CheckCircle, Truck, XCircle, RefreshCw, Eye, ShoppingBag, ChevronLeft, ChevronRight, Loader2, Search, Filter, SortAsc, SortDesc, ChevronDown, ChevronUp, BarChart3, Download, MoreHorizontal } from 'lucide-react';
+import { User, Mail, Lock, Package, LogOut, Shield, Calendar, MapPin, CreditCard, Clock, CheckCircle, Truck, XCircle, RefreshCw, Eye, ShoppingBag, ChevronLeft, ChevronRight, Loader2, Search, Filter, SortAsc, SortDesc, ChevronDown, ChevronUp, BarChart3, Download, MoreHorizontal, Edit3, Save, X, Plus, Home, Building, Heart, Settings, Bell, Key, Star, Trash2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
@@ -39,6 +39,31 @@ const AccountPage = () => {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Profile editing state
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  // Address management state
+  const [addresses, setAddresses] = useState([]);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
+  const [addressFormData, setAddressFormData] = useState({
+    type: 'home',
+    name: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    pincode: '',
+    isDefault: false
+  });
+
   useEffect(() => {
     const loadUserOrders = async () => {
       if (user) {
@@ -55,6 +80,42 @@ const AccountPage = () => {
     };
 
     loadUserOrders();
+  }, [user]);
+
+  // Load user addresses
+  useEffect(() => {
+    const loadUserAddresses = async () => {
+      if (user) {
+        // Mock address loading - replace with actual service call
+        setAddresses([
+          {
+            id: '1',
+            type: 'home',
+            name: 'John Doe',
+            phone: '+91 9876543210',
+            addressLine1: '123 Main Street',
+            addressLine2: 'Apartment 4B',
+            city: 'Mumbai',
+            state: 'Maharashtra',
+            pincode: '400001',
+            isDefault: true
+          }
+        ]);
+      }
+    };
+
+    loadUserAddresses();
+  }, [user]);
+
+  // Initialize edit form data when user changes
+  useEffect(() => {
+    if (user) {
+      setEditFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || ''
+      });
+    }
   }, [user]);
 
   // Memoized filtered and sorted orders
@@ -117,7 +178,20 @@ const AccountPage = () => {
       return counts;
     }, {});
 
-    return { totalOrders, totalSpent, statusCounts };
+    // Calculate additional insights
+    const averageOrderValue = totalOrders > 0 ? totalSpent / totalOrders : 0;
+    const lastOrderDate = orders.length > 0 ?
+      orders.sort((a, b) => new Date(b.createdAt?.toDate?.() || b.createdAt) - new Date(a.createdAt?.toDate?.() || a.createdAt))[0].createdAt : null;
+    const favoriteCategory = 'Premium'; // Mock data - would be calculated from order items
+
+    return {
+      totalOrders,
+      totalSpent,
+      statusCounts,
+      averageOrderValue,
+      lastOrderDate,
+      favoriteCategory
+    };
   }, [orders]);
 
   const totalPages = Math.ceil(filteredAndSortedOrders.length / ordersPerPage);
@@ -139,44 +213,85 @@ const AccountPage = () => {
     return configs[status] || configs.pending;
   };
 
-  // Order tracking timeline data
+  // Enhanced Order tracking timeline data with real-time updates
   const getOrderTracking = (order) => {
     const baseDate = order.createdAt?.toDate?.() || new Date(order.createdAt);
+    const now = new Date();
     const trackingSteps = [
       {
         status: 'Order Placed',
         icon: CheckCircle,
         date: baseDate,
         completed: true,
-        description: 'Your order has been confirmed'
+        description: 'Your order has been confirmed',
+        isCurrent: false
       }
     ];
 
+    // Calculate expected times based on order status
+    const processingTime = new Date(baseDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours
+    const shippingTime = new Date(baseDate.getTime() + 24 * 60 * 60 * 1000); // 1 day
+    const deliveryTime = new Date(baseDate.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days
+
     switch (order.status) {
+      case 'pending':
+        trackingSteps.push({
+          status: 'Processing',
+          icon: RefreshCw,
+          date: processingTime,
+          completed: false,
+          description: 'Your order is being prepared',
+          isCurrent: true,
+          estimatedTime: '2 hours'
+        });
+        break;
       case 'processing':
         trackingSteps.push({
           status: 'Processing',
           icon: RefreshCw,
-          date: new Date(baseDate.getTime() + 2 * 60 * 60 * 1000), // 2 hours later
-          completed: true,
-          description: 'Your order is being prepared'
+          date: processingTime,
+          completed: now >= processingTime,
+          description: 'Your order is being prepared',
+          isCurrent: now >= processingTime && order.status === 'processing',
+          estimatedTime: now >= processingTime ? 'Ready for shipping' : '2 hours remaining'
         });
+        if (now >= processingTime) {
+          trackingSteps.push({
+            status: 'Ready for Shipping',
+            icon: Package,
+            date: shippingTime,
+            completed: false,
+            description: 'Your order is ready for shipping',
+            isCurrent: true,
+            estimatedTime: 'Within 24 hours'
+          });
+        }
         break;
       case 'shipped':
         trackingSteps.push(
           {
             status: 'Processing',
             icon: RefreshCw,
-            date: new Date(baseDate.getTime() + 2 * 60 * 60 * 1000),
+            date: processingTime,
             completed: true,
             description: 'Your order is being prepared'
           },
           {
             status: 'Shipped',
             icon: Truck,
-            date: new Date(baseDate.getTime() + 24 * 60 * 60 * 1000), // 1 day later
+            date: shippingTime,
             completed: true,
-            description: 'Your order has been shipped'
+            description: 'Your order has been shipped',
+            isCurrent: false
+          },
+          {
+            status: 'Out for Delivery',
+            icon: Truck,
+            date: deliveryTime,
+            completed: false,
+            description: 'Your order is out for delivery',
+            isCurrent: true,
+            estimatedTime: '1-2 days'
           }
         );
         break;
@@ -185,23 +300,24 @@ const AccountPage = () => {
           {
             status: 'Processing',
             icon: RefreshCw,
-            date: new Date(baseDate.getTime() + 2 * 60 * 60 * 1000),
+            date: processingTime,
             completed: true,
             description: 'Your order is being prepared'
           },
           {
             status: 'Shipped',
             icon: Truck,
-            date: new Date(baseDate.getTime() + 24 * 60 * 60 * 1000),
+            date: shippingTime,
             completed: true,
             description: 'Your order has been shipped'
           },
           {
             status: 'Delivered',
             icon: CheckCircle,
-            date: new Date(baseDate.getTime() + 3 * 24 * 60 * 60 * 1000), // 3 days later
+            date: deliveryTime,
             completed: true,
-            description: 'Your order has been delivered successfully'
+            description: 'Your order has been delivered successfully',
+            isCurrent: false
           }
         );
         break;
@@ -209,9 +325,10 @@ const AccountPage = () => {
         trackingSteps.push({
           status: 'Cancelled',
           icon: XCircle,
-          date: new Date(baseDate.getTime() + 1 * 60 * 60 * 1000), // 1 hour later
+          date: new Date(baseDate.getTime() + 1 * 60 * 60 * 1000),
           completed: true,
-          description: 'Your order has been cancelled'
+          description: 'Your order has been cancelled',
+          isCurrent: false
         });
         break;
     }
@@ -440,6 +557,96 @@ const AccountPage = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleEditFormChange = (e) => {
+    setEditFormData({
+      ...editFormData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleAddressFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAddressFormData({
+      ...addressFormData,
+      [name]: type === 'checkbox' ? checked : value,
+    });
+  };
+
+  const handleSaveProfile = async () => {
+    setProfileLoading(true);
+    try {
+      // Mock profile update - replace with actual service call
+      console.log('Updating profile:', editFormData);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setIsEditingProfile(false);
+      // Update user context if needed
+    } catch (error) {
+      console.error('Profile update failed:', error);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditFormData({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || ''
+    });
+    setIsEditingProfile(false);
+  };
+
+  const handleSaveAddress = async () => {
+    try {
+      if (editingAddress) {
+        // Update existing address
+        setAddresses(prev => prev.map(addr =>
+          addr.id === editingAddress.id ? { ...addressFormData, id: editingAddress.id } : addr
+        ));
+      } else {
+        // Add new address
+        const newAddress = {
+          ...addressFormData,
+          id: Date.now().toString()
+        };
+        setAddresses(prev => [...prev, newAddress]);
+      }
+      setShowAddressForm(false);
+      setEditingAddress(null);
+      setAddressFormData({
+        type: 'home',
+        name: '',
+        phone: '',
+        addressLine1: '',
+        addressLine2: '',
+        city: '',
+        state: '',
+        pincode: '',
+        isDefault: false
+      });
+    } catch (error) {
+      console.error('Address save failed:', error);
+    }
+  };
+
+  const handleEditAddress = (address) => {
+    setEditingAddress(address);
+    setAddressFormData(address);
+    setShowAddressForm(true);
+  };
+
+  const handleDeleteAddress = (addressId) => {
+    setAddresses(prev => prev.filter(addr => addr.id !== addressId));
+  };
+
+  const handleSetDefaultAddress = (addressId) => {
+    setAddresses(prev => prev.map(addr => ({
+      ...addr,
+      isDefault: addr.id === addressId
+    })));
   };
 
   if (!isAuthenticated) {
@@ -735,27 +942,103 @@ const AccountPage = () => {
             {/* Profile Info */}
             <div className="profile-card">
               <div className="card-header">
-                <h3>Profile</h3>
-              </div>
-              
-              <div className="profile-header">
-                <div className="profile-avatar">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="profile-info">
-                  <h4>{user.name}</h4>
-                  <p className="profile-email">
-                    <Mail size={14} />
-                    {user.email}
-                  </p>
-                  {user.role === 'admin' && (
-                    <span className="admin-badge">
-                      <Shield size={12} />
-                      Admin
-                    </span>
-                  )}
+                <div className="header-with-actions">
+                  <h3>Profile Information</h3>
+                  <button
+                    className="edit-profile-button"
+                    onClick={() => setIsEditingProfile(!isEditingProfile)}
+                    aria-label="Edit profile"
+                  >
+                    <Edit3 size={16} />
+                    {isEditingProfile ? 'Cancel' : 'Edit'}
+                  </button>
                 </div>
               </div>
+
+              {isEditingProfile ? (
+                <div className="profile-edit-form">
+                  <div className="form-group">
+                    <label>
+                      <User size={18} />
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={editFormData.name}
+                      onChange={handleEditFormChange}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      <Mail size={18} />
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={editFormData.email}
+                      onChange={handleEditFormChange}
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      📱 Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={editFormData.phone}
+                      onChange={handleEditFormChange}
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                  <div className="edit-actions">
+                    <button
+                      className="cancel-edit-button"
+                      onClick={handleCancelEdit}
+                      disabled={profileLoading}
+                    >
+                      <X size={16} />
+                      Cancel
+                    </button>
+                    <button
+                      className="save-profile-button"
+                      onClick={handleSaveProfile}
+                      disabled={profileLoading}
+                    >
+                      {profileLoading ? <Loader2 size={16} className="spinning" /> : <Save size={16} />}
+                      {profileLoading ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="profile-header">
+                  <div className="profile-avatar">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="profile-info">
+                    <h4>{user.name}</h4>
+                    <p className="profile-email">
+                      <Mail size={14} />
+                      {user.email}
+                    </p>
+                    {user.phone && (
+                      <p className="profile-phone">
+                        📱 {user.phone}
+                      </p>
+                    )}
+                    {user.role === 'admin' && (
+                      <span className="admin-badge">
+                        <Shield size={12} />
+                        Admin
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="profile-stats">
                 <div className="stat-box">
@@ -776,7 +1059,7 @@ const AccountPage = () => {
 
               <div className="profile-actions">
                 {user.role === 'admin' && (
-                  <button 
+                  <button
                     className="admin-panel-button"
                     onClick={() => navigate('/admin')}
                   >
@@ -787,6 +1070,272 @@ const AccountPage = () => {
                 <button className="logout-button" onClick={handleLogout}>
                   <LogOut size={18} />
                   Logout
+                </button>
+              </div>
+
+              {/* Addresses Section */}
+              <div className="addresses-section">
+                <div className="section-header">
+                  <h4>
+                    <MapPin size={18} />
+                    Delivery Addresses
+                  </h4>
+                  <button
+                    className="add-address-button"
+                    onClick={() => setShowAddressForm(true)}
+                  >
+                    <Plus size={16} />
+                    Add Address
+                  </button>
+                </div>
+
+                {addresses.length === 0 ? (
+                  <div className="no-addresses">
+                    <MapPin size={48} strokeWidth={1} />
+                    <p>No addresses saved yet</p>
+                    <span className="no-addresses-hint">Add your delivery addresses for faster checkout</span>
+                  </div>
+                ) : (
+                  <div className="addresses-list">
+                    {addresses.map((address) => (
+                      <div key={address.id} className={`address-card ${address.isDefault ? 'default' : ''}`}>
+                        <div className="address-header">
+                          <div className="address-type">
+                            {address.type === 'home' ? <Home size={16} /> : <Building size={16} />}
+                            <span>{address.type === 'home' ? 'Home' : 'Work'}</span>
+                            {address.isDefault && <span className="default-badge">Default</span>}
+                          </div>
+                          <div className="address-actions">
+                            <button
+                              className="edit-address-button"
+                              onClick={() => handleEditAddress(address)}
+                              aria-label="Edit address"
+                            >
+                              <Edit3 size={14} />
+                            </button>
+                            <button
+                              className="delete-address-button"
+                              onClick={() => handleDeleteAddress(address.id)}
+                              aria-label="Delete address"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="address-content">
+                          <p className="address-name">{address.name}</p>
+                          <p className="address-phone">{address.phone}</p>
+                          <p className="address-lines">
+                            {address.addressLine1}
+                            {address.addressLine2 && `, ${address.addressLine2}`}
+                          </p>
+                          <p className="address-city">
+                            {address.city}, {address.state} - {address.pincode}
+                          </p>
+                        </div>
+                        {!address.isDefault && (
+                          <button
+                            className="set-default-button"
+                            onClick={() => handleSetDefaultAddress(address.id)}
+                          >
+                            Set as Default
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Address Form Modal */}
+              {showAddressForm && (
+                <div className="address-form-overlay">
+                  <div className="address-form-modal">
+                    <div className="modal-header">
+                      <h4>{editingAddress ? 'Edit Address' : 'Add New Address'}</h4>
+                      <button
+                        className="close-modal-button"
+                        onClick={() => {
+                          setShowAddressForm(false);
+                          setEditingAddress(null);
+                          setAddressFormData({
+                            type: 'home',
+                            name: '',
+                            phone: '',
+                            addressLine1: '',
+                            addressLine2: '',
+                            city: '',
+                            state: '',
+                            pincode: '',
+                            isDefault: false
+                          });
+                        }}
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                    <div className="modal-body">
+                      <div className="form-group">
+                        <label>Address Type</label>
+                        <select
+                          name="type"
+                          value={addressFormData.type}
+                          onChange={handleAddressFormChange}
+                        >
+                          <option value="home">Home</option>
+                          <option value="work">Work</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label>Full Name</label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={addressFormData.name}
+                          onChange={handleAddressFormChange}
+                          placeholder="Enter full name"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Phone Number</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={addressFormData.phone}
+                          onChange={handleAddressFormChange}
+                          placeholder="Enter phone number"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Address Line 1</label>
+                        <input
+                          type="text"
+                          name="addressLine1"
+                          value={addressFormData.addressLine1}
+                          onChange={handleAddressFormChange}
+                          placeholder="Street address, building, apartment"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Address Line 2 (Optional)</label>
+                        <input
+                          type="text"
+                          name="addressLine2"
+                          value={addressFormData.addressLine2}
+                          onChange={handleAddressFormChange}
+                          placeholder="Landmark, area, etc."
+                        />
+                      </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>City</label>
+                          <input
+                            type="text"
+                            name="city"
+                            value={addressFormData.city}
+                            onChange={handleAddressFormChange}
+                            placeholder="City"
+                            required
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>State</label>
+                          <input
+                            type="text"
+                            name="state"
+                            value={addressFormData.state}
+                            onChange={handleAddressFormChange}
+                            placeholder="State"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Pincode</label>
+                        <input
+                          type="text"
+                          name="pincode"
+                          value={addressFormData.pincode}
+                          onChange={handleAddressFormChange}
+                          placeholder="Pincode"
+                          required
+                        />
+                      </div>
+                      <div className="form-group checkbox-group">
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            name="isDefault"
+                            checked={addressFormData.isDefault}
+                            onChange={handleAddressFormChange}
+                          />
+                          <span>Set as default address</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="modal-footer">
+                      <button
+                        className="cancel-button"
+                        onClick={() => {
+                          setShowAddressForm(false);
+                          setEditingAddress(null);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="save-button"
+                        onClick={handleSaveAddress}
+                      >
+                        {editingAddress ? 'Update Address' : 'Save Address'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Actions & Wishlist */}
+            <div className="quick-actions-card">
+              <div className="card-header">
+                <h3>Quick Actions</h3>
+              </div>
+
+              <div className="quick-actions-grid">
+                <button
+                  className="quick-action-button"
+                  onClick={() => navigate('/')}
+                >
+                  <ShoppingBag size={20} />
+                  <span>Continue Shopping</span>
+                </button>
+
+                <button
+                  className="quick-action-button wishlist-button"
+                  onClick={() => navigate('/', { state: { showWishlist: true } })}
+                >
+                  <Heart size={20} />
+                  <span>My Wishlist</span>
+                  <span className="wishlist-count">0</span>
+                </button>
+
+                <button
+                  className="quick-action-button"
+                  onClick={() => navigate('/')}
+                >
+                  <Package size={20} />
+                  <span>Track Orders</span>
+                </button>
+
+                <button
+                  className="quick-action-button"
+                  onClick={() => setIsEditingProfile(true)}
+                >
+                  <Settings size={20} />
+                  <span>Account Settings</span>
                 </button>
               </div>
             </div>
@@ -815,7 +1364,7 @@ const AccountPage = () => {
                 </div>
               </div>
 
-              {/* Order Statistics */}
+              {/* Enhanced Order Statistics & Insights */}
               {orders.length > 0 && (
                 <div className="order-stats">
                   <div className="stat-card">
@@ -837,6 +1386,53 @@ const AccountPage = () => {
                     <div>
                       <span className="stat-value">{orderStats.statusCounts.delivered || 0}</span>
                       <span className="stat-label">Delivered</span>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <Star size={20} />
+                    <div>
+                      <span className="stat-value">₹{orderStats.averageOrderValue.toFixed(0)}</span>
+                      <span className="stat-label">Avg. Order Value</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Account Insights */}
+              {orders.length > 0 && (
+                <div className="account-insights">
+                  <h4>Account Insights</h4>
+                  <div className="insights-grid">
+                    <div className="insight-card">
+                      <div className="insight-icon">
+                        <Calendar size={16} />
+                      </div>
+                      <div className="insight-content">
+                        <span className="insight-label">Last Order</span>
+                        <span className="insight-value">
+                          {orderStats.lastOrderDate ? formatDate(orderStats.lastOrderDate) : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="insight-card">
+                      <div className="insight-icon">
+                        <Heart size={16} />
+                      </div>
+                      <div className="insight-content">
+                        <span className="insight-label">Favorite Category</span>
+                        <span className="insight-value">{orderStats.favoriteCategory}</span>
+                      </div>
+                    </div>
+                    <div className="insight-card">
+                      <div className="insight-icon">
+                        <RefreshCw size={16} />
+                      </div>
+                      <div className="insight-content">
+                        <span className="insight-label">Order Frequency</span>
+                        <span className="insight-value">
+                          {orderStats.totalOrders > 0 ? `${(30 / Math.max(orderStats.totalOrders, 1)).toFixed(1)} days` : 'N/A'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -976,6 +1572,9 @@ const AccountPage = () => {
                                            })}
                                          </div>
                                          <div className="tracking-description">{step.description}</div>
+                                         {step.estimatedTime && (
+                                           <div className="estimated-time">{step.estimatedTime}</div>
+                                         )}
                                        </div>
                                      </div>
                                    );
