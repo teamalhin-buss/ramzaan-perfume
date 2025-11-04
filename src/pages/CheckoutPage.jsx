@@ -18,6 +18,7 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
+  const DELIVERY_FEE = 10;
   const keralaDistricts = [
     'Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod',
     'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad',
@@ -384,7 +385,7 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      const finalTotal = getCartTotal() - discount;
+      const finalTotal = getCartTotal() - discount + DELIVERY_FEE;
       trackPaymentAttempt(paymentMethod);
 
 
@@ -887,7 +888,7 @@ const CheckoutPage = () => {
                       ) : (
                         <>
                           <CreditCard size={20} />
-                          Pay ₹{getCartTotal() - discount}
+                          Pay ₹{getCartTotal() - discount + DELIVERY_FEE}
                         </>
                       )}
                     </button>
@@ -933,12 +934,12 @@ const CheckoutPage = () => {
                   </div>
                 )}
                 <div className="total-row">
-                  <span>Shipping</span>
-                  <span>Free</span>
+                  <span>Delivery Fee</span>
+                  <span>₹{DELIVERY_FEE}</span>
                 </div>
                 <div className="total-row grand-total">
                   <span>Total</span>
-                  <span>₹{getCartTotal() - discount}</span>
+                  <span>₹{getCartTotal() - discount + DELIVERY_FEE}</span>
                 </div>
               </div>
             </div>
