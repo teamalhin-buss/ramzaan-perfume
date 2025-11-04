@@ -22,14 +22,12 @@ const HomePage = () => {
 
   const [reviews, setReviews] = useState([]);
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [visibleSections, setVisibleSections] = useState(new Set());
+  const [visibleSections, setVisibleSections] = useState(new Set(['home']));
   const [isLoading, setIsLoading] = useState(true);
   const [averageRating, setAverageRating] = useState(5.0);
   const [totalReviews, setTotalReviews] = useState(0);
   const [sortBy, setSortBy] = useState('newest');
   const [filterRating, setFilterRating] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 6;
   const [reviewVotes, setReviewVotes] = useState({});
 
   const sectionRefs = useRef({});
@@ -87,7 +85,7 @@ const HomePage = () => {
   useEffect(() => {
     const loadData = async () => {
       // Simulate loading time for the loading screen
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Load product data from Firestore
       const productResult = await productService.getProduct();
@@ -247,22 +245,7 @@ const HomePage = () => {
     }
   }, []);
 
-  // Scroll progress indicator
-  useEffect(() => {
-    const updateScrollProgress = () => {
-      const scrollTop = window.pageYOffset;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-
-      const progressBar = document.querySelector('.scroll-progress-bar');
-      if (progressBar) {
-        progressBar.style.width = `${scrollPercent}%`;
-      }
-    };
-
-    window.addEventListener('scroll', updateScrollProgress);
-    return () => window.removeEventListener('scroll', updateScrollProgress);
-  }, []);
+  // Scroll progress indicator - Removed
 
   // Konami Code Easter Egg
   useEffect(() => {
@@ -392,16 +375,10 @@ const HomePage = () => {
     return filteredReviews;
   };
 
-  // Get paginated reviews
-  const getPaginatedReviews = () => {
-    const filteredReviews = getFilteredAndSortedReviews();
-    const startIndex = (currentPage - 1) * reviewsPerPage;
-    const endIndex = startIndex + reviewsPerPage;
-    return filteredReviews.slice(startIndex, endIndex);
+  // Get all filtered reviews (no pagination)
+  const getFilteredReviews = () => {
+    return getFilteredAndSortedReviews();
   };
-
-  // Calculate total pages
-  const totalPages = Math.ceil(getFilteredAndSortedReviews().length / reviewsPerPage);
 
   // Mystery item handlers
   const handleLogoTripleClick = () => {
@@ -489,16 +466,13 @@ const HomePage = () => {
 
   return (
     <div className="home-page">
-      {/* Scroll Progress Indicator */}
-      <div className="scroll-progress">
-        <div className="scroll-progress-bar"></div>
-      </div>
+      {/* Scroll Progress Indicator - Removed */}
 
       {/* Loading Screen */}
       {isLoading && (
-        <div className="loading-screen">
+        <div className="loading-screen" aria-live="polite" aria-label="Loading application">
           <div className="loading-content">
-            <div className="perfume-bottle">
+            <div className="perfume-bottle" aria-hidden="true">
               <div className="bottle-silhouette">
                 <div className="bottle-neck"></div>
                 <div className="bottle-body">
@@ -523,7 +497,7 @@ const HomePage = () => {
             <div className="loading-text">
               <h1 className="brand-name">Ramzaan</h1>
               <p className="tagline">Timeless elegance in every drop</p>
-              <div className="loading-progress">
+              <div className="loading-progress" aria-label="Loading progress">
                 <div className="progress-bar"></div>
               </div>
             </div>
@@ -534,390 +508,456 @@ const HomePage = () => {
       <div className={`main-content ${!isLoading ? 'loaded' : ''}`}>
         <Header onLogoClick={handleLogoTripleClick} />
 
-      {/* Hero Section */}
-      <section
-        className={`hero-section ${visibleSections.has('home') ? 'animate-in' : ''}`}
-        id="home"
-        ref={(el) => sectionRefs.current.home = el}
-      >
-        <div className="hero-content">
-          <div className="container">
-            <div className="hero-text">
-              <div className="hero-badge animate-fade-in">
-                <Sparkles size={16} />
-                <span>Premium Collection</span>
+        <main id="main-content">
+          {/* Hero Section */}
+          <header
+            className={`hero-section ${visibleSections.has('home') ? 'animate-in' : ''}`}
+            id="home"
+            ref={(el) => sectionRefs.current.home = el}
+            role="banner"
+            aria-labelledby="hero-title"
+          >
+            <div className="hero-content">
+              <div className="container">
+                <div className="hero-text">
+                  <div className="hero-badge animate-fade-in" aria-label="Premium collection badge">
+                    <Sparkles size={16} aria-hidden="true" />
+                    <span>Premium Collection</span>
+                  </div>
+
+                  <h1 id="hero-title" className="hero-title animate-slide-up">
+                    Ramzaan
+                  </h1>
+
+                  <p className="hero-subtitle animate-fade-in-delay">
+                    Timeless elegance in every drop
+                  </p>
+
+                  <div className="hero-cta-group animate-fade-in-delay-2">
+                     <button
+                       className="hero-cta-primary"
+                       onClick={() => scrollToSection('product')}
+                       aria-label="Discover the signature fragrance"
+                     >
+                       <span>Discover</span>
+                       <ArrowRight size={20} aria-hidden="true" />
+                     </button>
+                     <button
+                       className="hero-cta-secondary"
+                       onClick={() => scrollToSection('about')}
+                       aria-label="Learn more about Ramzaan"
+                     >
+                       Learn More
+                     </button>
+                   </div>
+                </div>
+
+                {/* Minimal Stats */}
+                <div className="hero-stats animate-fade-in-delay-3" aria-label="Product statistics">
+                  <div className="stat-item">
+                    <div className="stat-number" aria-label={`Average rating: ${averageRating} stars`}>{averageRating}</div>
+                    <div className="stat-label">Rating</div>
+                  </div>
+                  <div className="stat-divider" aria-hidden="true"></div>
+                  <div className="stat-item">
+                    <div className="stat-number" aria-label={`Total reviews: ${totalReviews}`}>{totalReviews}</div>
+                    <div className="stat-label">Reviews</div>
+                  </div>
+                  <div className="stat-divider" aria-hidden="true"></div>
+                  <div className="stat-item">
+                    <div className="stat-number" aria-label="Available in 1 city">1</div>
+                    <div className="stat-label">Cities</div>
+                  </div>
+                </div>
+
               </div>
-
-              <h1 className="hero-title animate-slide-up">
-                Ramzaan
-              </h1>
-
-              <p className="hero-subtitle animate-fade-in-delay">
-                Timeless elegance in every drop
-              </p>
-
-              <div className="hero-cta-group animate-fade-in-delay-2">
-                 <button
-                   className="hero-cta-primary"
-                   onClick={() => scrollToSection('product')}
-                   aria-label="Discover the signature fragrance"
-                 >
-                   <span>Discover</span>
-                   <ArrowRight size={20} />
-                 </button>
-                 <button
-                   className="hero-cta-secondary"
-                   onClick={() => scrollToSection('about')}
-                   aria-label="Learn more about Ramzaan"
-                 >
-                   Learn More
-                 </button>
-               </div>
             </div>
+          </header>
 
-            {/* Minimal Stats */}
-            <div className="hero-stats animate-fade-in-delay-3">
-              <div className="stat-item">
-                <div className="stat-number">{averageRating}</div>
-                <div className="stat-label">Rating</div>
-              </div>
-              <div className="stat-divider"></div>
-              <div className="stat-item">
-                <div className="stat-number">{totalReviews}</div>
-                <div className="stat-label">Reviews</div>
-              </div>
-              <div className="stat-divider"></div>
-              <div className="stat-item">
-                <div className="stat-number">1</div>
-                <div className="stat-label">Cities</div>
+          {/* Product Highlight Section */}
+          <section
+            className={`product-section ${visibleSections.has('product') ? 'animate-in' : ''}`}
+            id="product"
+            ref={(el) => sectionRefs.current.product = el}
+            aria-labelledby="product-title"
+          >
+            <div className="container">
+              <header className="section-header animate-fade-in">
+                <h2 id="product-title" className="section-title">Signature Fragrance</h2>
+                <p className="section-subtitle">Discover the essence of luxury</p>
+              </header>
+
+              <div className="animate-slide-up-delay-1">
+                <ProductCard
+                  product={{
+                    ...product,
+                    averageRating,
+                    totalReviews
+                  }}
+                  onBuyNow={handleBuyNow}
+                  onBottleClick={handleBottleDoubleClick}
+                />
               </div>
             </div>
+          </section>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </button>
+          {/* Reviews Section */}
+          <section
+            className={`reviews-section ${visibleSections.has('reviews') ? 'animate-in' : ''}`}
+            id="reviews"
+            ref={(el) => sectionRefs.current.reviews = el}
+            aria-labelledby="reviews-title"
+          >
+            <div className="container">
+              <header className="section-header animate-fade-in">
+                <h2 id="reviews-title" className="section-title">Customer Reviews</h2>
+                <p className="section-subtitle">Trusted across India</p>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                {/* Review Controls */}
+                <div className="review-controls" role="group" aria-label="Review filtering and sorting options">
+                  <div className="control-group">
+                    <Filter size={16} aria-hidden="true" />
+                    <label htmlFor="filter-rating" className="sr-only">Filter by rating</label>
+                    <select
+                      id="filter-rating"
+                      value={filterRating}
+                      onChange={(e) => setFilterRating(e.target.value)}
+                      className="filter-select"
+                      aria-label="Filter reviews by star rating"
+                    >
+                      <option value="all">All Ratings</option>
+                      <option value="5">5 Stars</option>
+                      <option value="4">4 Stars</option>
+                      <option value="3">3 Stars</option>
+                      <option value="2">2 Stars</option>
+                      <option value="1">1 Star</option>
+                    </select>
+                  </div>
+
+                  <div className="control-group">
+                    <SortDesc size={16} aria-hidden="true" />
+                    <label htmlFor="sort-reviews" className="sr-only">Sort reviews</label>
+                    <select
+                      id="sort-reviews"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="sort-select"
+                      aria-label="Sort reviews by criteria"
+                    >
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                      <option value="highest">Highest Rated</option>
+                      <option value="lowest">Lowest Rated</option>
+                    </select>
+                  </div>
+
                   <button
-                    key={page}
-                    className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
-                    onClick={() => setCurrentPage(page)}
+                    className="write-review-btn"
+                    onClick={() => {
+                      setShowReviewForm(true);
+                      // Scroll to bottom of page where the form modal appears
+                      setTimeout(() => {
+                        window.scrollTo({
+                          top: document.body.scrollHeight,
+                          behavior: 'smooth'
+                        });
+                      }, 100);
+                    }}
+                    aria-label="Open review form to write a new review"
                   >
-                    {page}
+                    <Star size={16} aria-hidden="true" />
+                    <span>Write a Review</span>
                   </button>
+                </div>
+              </header>
+
+              <div className="reviews-grid" role="region" aria-label="Customer reviews">
+                {getFilteredReviews().map((review, index) => (
+                  <article key={review.id} className={`review-card animate-slide-up-delay-${(index % 3) + 1}`} aria-labelledby={`review-${review.id}-author`}>
+                    <div className="review-rating" aria-label={`Rating: ${review.rating} out of 5 stars`}>
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star key={i} size={16} fill="currentColor" aria-hidden="true" />
+                      ))}
+                    </div>
+                    <p className="review-text">"{review.text}"</p>
+                    <div className="review-author">
+                      <div className="author-avatar" aria-hidden="true">{review.name.charAt(0)}</div>
+                      <div>
+                        <div id={`review-${review.id}-author`} className="author-name">
+                          {review.name}
+                          {review.verified && (
+                            <span className="verified-badge" title="Verified Purchase" aria-label="Verified purchase">
+                              <Check size={12} aria-hidden="true" />
+                            </span>
+                          )}
+                        </div>
+                        <div className="review-date">{review.date}</div>
+                      </div>
+                    </div>
+
+                    {/* Helpfulness voting */}
+                    <div className="review-helpfulness" role="group" aria-label="Helpfulness voting">
+                      <span className="helpfulness-text">Was this helpful?</span>
+                      <button
+                        className={`helpfulness-btn ${reviewVotes[review.id]?.voted ? 'voted' : ''}`}
+                        onClick={() => handleVote(review.id, 'helpful')}
+                        disabled={reviewVotes[review.id]?.voted}
+                        title="Yes"
+                        aria-label={`Mark as helpful. Current count: ${(review.helpful || 0) + (reviewVotes[review.id]?.helpful || 0)}`}
+                      >
+                        👍 {(review.helpful || 0) + (reviewVotes[review.id]?.helpful || 0)}
+                      </button>
+                      <button
+                        className={`helpfulness-btn ${reviewVotes[review.id]?.voted ? 'voted' : ''}`}
+                        onClick={() => handleVote(review.id, 'notHelpful')}
+                        disabled={reviewVotes[review.id]?.voted}
+                        title="No"
+                        aria-label={`Mark as not helpful. Current count: ${(review.notHelpful || 0) + (reviewVotes[review.id]?.notHelpful || 0)}`}
+                      >
+                        👎 {(review.notHelpful || 0) + (reviewVotes[review.id]?.notHelpful || 0)}
+                      </button>
+                    </div>
+                  </article>
                 ))}
 
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-
-
-
-      {/* Product Highlight Section */}
-      <section
-        className={`product-section ${visibleSections.has('product') ? 'animate-in' : ''}`}
-        id="product"
-        ref={(el) => sectionRefs.current.product = el}
-      >
-        <div className="container">
-          <div className="section-header animate-fade-in">
-            <h2 className="section-title">Signature Fragrance</h2>
-            <p className="section-subtitle">Discover the essence of luxury</p>
-          </div>
-
-          <div className="animate-slide-up-delay-1">
-            <ProductCard
-              product={{
-                ...product,
-                averageRating,
-                totalReviews
-              }}
-              onBuyNow={handleBuyNow}
-              onBottleClick={handleBottleDoubleClick}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Reviews Section */}
-      <section
-        className={`reviews-section ${visibleSections.has('reviews') ? 'animate-in' : ''}`}
-        id="reviews"
-        ref={(el) => sectionRefs.current.reviews = el}
-      >
-        <div className="container">
-          <div className="section-header animate-fade-in">
-            <h2 className="section-title">Customer Reviews</h2>
-            <p className="section-subtitle">Trusted across India</p>
-
-            {/* Review Controls */}
-            <div className="review-controls">
-              <div className="control-group">
-                <Filter size={16} />
-                <select
-                  value={filterRating}
-                  onChange={(e) => setFilterRating(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="all">All Ratings</option>
-                  <option value="5">5 Stars</option>
-                  <option value="4">4 Stars</option>
-                  <option value="3">3 Stars</option>
-                  <option value="2">2 Stars</option>
-                  <option value="1">1 Star</option>
-                </select>
-              </div>
-
-              <div className="control-group">
-                <SortDesc size={16} />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-select"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="highest">Highest Rated</option>
-                  <option value="lowest">Lowest Rated</option>
-                </select>
-              </div>
-
-              <button
-                className="write-review-btn"
-                onClick={() => {
-                  setShowReviewForm(true);
-                  // Scroll to bottom of page where the form modal appears
-                  setTimeout(() => {
-                    window.scrollTo({
-                      top: document.body.scrollHeight,
-                      behavior: 'smooth'
-                    });
-                  }, 100);
-                }}
-              >
-                <Star size={16} />
-                <span>Write a Review</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="reviews-grid">
-            {getPaginatedReviews().map((review, index) => (
-              <div key={review.id} className={`review-card animate-slide-up-delay-${(index % 3) + 1}`}>
-                <div className="review-rating">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <Star key={i} size={16} fill="currentColor" />
-                  ))}
-                </div>
-                <p className="review-text">"{review.text}"</p>
-                <div className="review-author">
-                  <div className="author-avatar">{review.name.charAt(0)}</div>
-                  <div>
-                    <div className="author-name">
-                      {review.name}
-                      {review.verified && (
-                        <span className="verified-badge" title="Verified Purchase">
-                          <Check size={12} />
-                        </span>
-                      )}
+                {/* Always show the write review card */}
+                <article className="review-card write-review-card animate-slide-up-delay-4" onClick={() => setShowReviewForm(true)} role="button" tabIndex={0} aria-label="Open review form to share your experience">
+                  <div className="write-review-content">
+                    <div className="write-review-icon" aria-hidden="true">
+                      <Sparkles size={48} />
                     </div>
-                    <div className="review-date">{review.date}</div>
+                    <h3>Share Your Experience</h3>
+                    <p>Help others discover this fragrance by writing a review</p>
+                    <div className="write-review-benefits">
+                      <span className="benefit-tag">⭐ Rate & Review</span>
+                      <span className="benefit-tag">💝 Help Others</span>
+                      <span className="benefit-tag">🎯 Build Community</span>
+                    </div>
+                    <button className="write-review-card-btn" onClick={(e) => {
+                      e.stopPropagation();
+                      setShowReviewForm(true);
+                      // Scroll to bottom of page where the form modal appears
+                      setTimeout(() => {
+                        window.scrollTo({
+                          top: document.body.scrollHeight,
+                          behavior: 'smooth'
+                        });
+                      }, 100);
+                    }} aria-label="Write a review">
+                      <Star size={16} aria-hidden="true" />
+                      <span>Write a Review</span>
+                    </button>
                   </div>
-                </div>
- 
-                {/* Helpfulness voting */}
-                <div className="review-helpfulness">
-                  <span className="helpfulness-text">Was this helpful?</span>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section
+            className={`features-section ${visibleSections.has('features') ? 'animate-in' : ''}`}
+            id="features"
+            ref={(el) => sectionRefs.current.features = el}
+            aria-labelledby="features-title"
+          >
+            <div className="container">
+              <header className="section-header animate-fade-in">
+                <h2 id="features-title" className="section-title">Why Choose Ramzaan</h2>
+                <p className="section-subtitle">Experience luxury in every aspect</p>
+              </header>
+
+              <div className="features-grid" role="region" aria-label="Product features">
+                {features.map((feature, index) => {
+                  const IconComponent = feature.icon;
+                  return (
+                    <article
+                      key={feature.id}
+                      className={`feature-card animate-slide-up-delay-${(index % 4) + 1}`}
+                      aria-labelledby={`feature-${feature.id}-title`}
+                    >
+                      <div className="feature-icon" aria-hidden="true">
+                        <IconComponent size={40} />
+                      </div>
+                      <h3 id={`feature-${feature.id}-title`} className="feature-title">
+                        {feature.title}
+                      </h3>
+                      <p className="feature-description">{feature.description}</p>
+                      <div className="feature-benefits">
+                        {feature.benefits.map((benefit, i) => (
+                          <span key={i} className="benefit-tag" aria-label={`Benefit: ${benefit}`}>{benefit}</span>
+                        ))}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          {/* Ingredients Section */}
+          <section
+            className={`ingredients-section ${visibleSections.has('ingredients') ? 'animate-in' : ''}`}
+            id="ingredients"
+            ref={(el) => sectionRefs.current.ingredients = el}
+            aria-labelledby="ingredients-title"
+          >
+            <div className="container">
+              <header className="section-header animate-fade-in">
+                <h2 id="ingredients-title" className="section-title">Signature Notes</h2>
+                <p className="section-subtitle">A symphony of premium ingredients</p>
+              </header>
+
+              <div className="ingredients-grid" role="region" aria-label="Fragrance ingredients">
+                {ingredients.map((ingredient, index) => {
+                  const IconComponent = ingredient.icon;
+                  return (
+                    <article
+                      key={ingredient.id}
+                      className={`ingredient-card animate-slide-up-delay-${(index % 4) + 1}`}
+                      aria-labelledby={`ingredient-${ingredient.id}-title`}
+                    >
+                      <div className="ingredient-icon" aria-hidden="true">
+                        <IconComponent size={48} />
+                      </div>
+                      <h3 id={`ingredient-${ingredient.id}-title`} className="ingredient-title">
+                        {ingredient.name}
+                      </h3>
+                      <p className="ingredient-description">{ingredient.description}</p>
+                      <div className="ingredient-benefits">
+                        {ingredient.benefits.map((benefit, i) => (
+                          <span key={i} className="benefit-tag" aria-label={`Benefit: ${benefit}`}>{benefit}</span>
+                        ))}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section
+            className={`features-section ${visibleSections.has('features') ? 'animate-in' : ''}`}
+            id="features"
+            ref={(el) => sectionRefs.current.features = el}
+            aria-labelledby="features-title"
+          >
+            <div className="container">
+              <header className="section-header animate-fade-in">
+                <h2 id="features-title" className="section-title">Why Choose Ramzaan</h2>
+                <p className="section-subtitle">Experience luxury in every aspect</p>
+              </header>
+
+              <div className="features-grid" role="region" aria-label="Product features">
+                {features.map((feature, index) => {
+                  const IconComponent = feature.icon;
+                  return (
+                    <article
+                      key={feature.id}
+                      className={`feature-card animate-slide-up-delay-${(index % 4) + 1}`}
+                      aria-labelledby={`feature-${feature.id}-title`}
+                    >
+                      <div className="feature-icon" aria-hidden="true">
+                        <IconComponent size={40} />
+                      </div>
+                      <h3 id={`feature-${feature.id}-title`} className="feature-title">
+                        {feature.title}
+                      </h3>
+                      <p className="feature-description">{feature.description}</p>
+                      <div className="feature-benefits">
+                        {feature.benefits.map((benefit, i) => (
+                          <span key={i} className="benefit-tag" aria-label={`Benefit: ${benefit}`}>{benefit}</span>
+                        ))}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          {/* About Section */}
+          <section
+            className={`about-section ${visibleSections.has('about') ? 'animate-in' : ''}`}
+            id="about"
+            ref={(el) => sectionRefs.current.about = el}
+            aria-labelledby="about-title"
+          >
+            <div className="container">
+              <div className="about-content">
+                <article className="about-text-block animate-fade-in">
+                  <h2 id="about-title" className="section-title">About Ramzaan</h2>
+                  <p className="about-text animate-fade-in-delay">
+                    Inspired by the essence of purity and devotion, Ramzaan captures the spirit of timeless elegance.
+                    Each note has been carefully curated to create an unforgettable olfactory experience.
+                  </p>
+                  <p className="about-text animate-fade-in-delay-2">
+                    Crafted with premium natural ingredients from around the world. Made in India with expertise in
+                    traditional perfumery, this signature fragrance embodies sophistication and luxury in every drop.
+                  </p>
                   <button
-                    className={`helpfulness-btn ${reviewVotes[review.id]?.voted ? 'voted' : ''}`}
-                    onClick={() => handleVote(review.id, 'helpful')}
-                    disabled={reviewVotes[review.id]?.voted}
-                    title="Yes"
+                    className="about-cta animate-fade-in-delay-3"
+                    onClick={() => scrollToSection('product')}
+                    aria-label="Explore the product collection"
                   >
-                    👍 {(review.helpful || 0) + (reviewVotes[review.id]?.helpful || 0)}
+                    <span>Explore Collection</span>
+                    <ArrowRight size={18} aria-hidden="true" />
                   </button>
-                  <button
-                    className={`helpfulness-btn ${reviewVotes[review.id]?.voted ? 'voted' : ''}`}
-                    onClick={() => handleVote(review.id, 'notHelpful')}
-                    disabled={reviewVotes[review.id]?.voted}
-                    title="No"
-                  >
-                    👎 {(review.notHelpful || 0) + (reviewVotes[review.id]?.notHelpful || 0)}
-                  </button>
-                </div>
+                </article>
               </div>
-            ))}
+            </div>
+          </section>
+        </main>
 
-            {/* Always show the write review card */}
-            <div className="review-card write-review-card animate-slide-up-delay-4" onClick={() => setShowReviewForm(true)}>
-              <div className="write-review-content">
-                <div className="write-review-icon">
-                  <Sparkles size={48} />
+        {/* Review Form Modal */}
+        {showReviewForm && (
+          <ReviewForm
+            onClose={() => setShowReviewForm(false)}
+            onSubmit={handleReviewSubmit}
+          />
+        )}
+
+        {/* Secret Collection Modal */}
+        {showSecretCollection && (
+          <div className="secret-modal-overlay" onClick={() => setShowSecretCollection(false)} role="dialog" aria-modal="true" aria-labelledby="secret-modal-title">
+            <div className="secret-modal" onClick={(e) => e.stopPropagation()}>
+              <button className="secret-close" onClick={() => setShowSecretCollection(false)} aria-label="Close secret collection modal">×</button>
+              <div className="secret-content">
+                <h2 id="secret-modal-title">🔮 The Hidden Collection</h2>
+                <p>You've discovered the legendary ALH secret fragrances...</p>
+                <div className="secret-perfumes">
+                  <article className="secret-perfume">
+                    <div className="secret-icon" aria-hidden="true">🌙</div>
+                    <h3>Midnight Oud</h3>
+                    <p>The forbidden essence of the desert night</p>
+                  </article>
+                  <article className="secret-perfume">
+                    <div className="secret-icon" aria-hidden="true">⭐</div>
+                    <h3>Celestial Amber</h3>
+                    <p>Whispers from the stars above</p>
+                  </article>
+                  <article className="secret-perfume">
+                    <div className="secret-icon" aria-hidden="true">🌸</div>
+                    <h3>Mystic Rose</h3>
+                    <p>The eternal bloom of hidden gardens</p>
+                  </article>
                 </div>
-                <h3>Share Your Experience</h3>
-                <p>Help others discover this fragrance by writing a review</p>
-                <div className="write-review-benefits">
-                  <span className="benefit-tag">⭐ Rate & Review</span>
-                  <span className="benefit-tag">💝 Help Others</span>
-                  <span className="benefit-tag">🎯 Build Community</span>
-                </div>
-                <button className="write-review-card-btn" onClick={(e) => {
-                  e.stopPropagation();
-                  setShowReviewForm(true);
-                  // Scroll to bottom of page where the form modal appears
-                  setTimeout(() => {
-                    window.scrollTo({
-                      top: document.body.scrollHeight,
-                      behavior: 'smooth'
-                    });
-                  }, 100);
-                }}>
-                  <Star size={16} />
-                  <span>Write a Review</span>
-                </button>
+                <p className="secret-note">These fragrances are reserved for the worthy. Contact us for exclusive access.</p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Features Section */}
-      <section
-        className={`features-section ${visibleSections.has('features') ? 'animate-in' : ''}`}
-        id="features"
-        ref={(el) => sectionRefs.current.features = el}
-      >
-        <div className="container">
-          <div className="section-header animate-fade-in">
-            <h2 className="section-title">Why Choose Ramzaan</h2>
-            <p className="section-subtitle">Experience luxury in every aspect</p>
-          </div>
-
-          <div className="features-grid">
-            {features.map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <div
-                  key={feature.id}
-                  className={`feature-card animate-slide-up-delay-${(index % 4) + 1}`}
-                  role="article"
-                  aria-labelledby={`feature-${feature.id}-title`}
-                >
-                  <div className="feature-icon">
-                    <IconComponent size={40} />
-                  </div>
-                  <h3 id={`feature-${feature.id}-title`} className="feature-title">
-                    {feature.title}
-                  </h3>
-                  <p className="feature-description">{feature.description}</p>
-                  <div className="feature-benefits">
-                    {feature.benefits.map((benefit, i) => (
-                      <span key={i} className="benefit-tag">{benefit}</span>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section
-        className={`about-section ${visibleSections.has('about') ? 'animate-in' : ''}`}
-        id="about"
-        ref={(el) => sectionRefs.current.about = el}
-      >
-        <div className="container">
-          <div className="about-content">
-            <div className="about-text-block animate-fade-in">
-              <h2 className="section-title">About Ramzaan</h2>
-              <p className="about-text animate-fade-in-delay">
-                Inspired by the essence of purity and devotion, Ramzaan captures the spirit of timeless elegance.
-                Each note has been carefully curated to create an unforgettable olfactory experience.
-              </p>
-              <p className="about-text animate-fade-in-delay-2">
-                Crafted with premium natural ingredients from around the world. Made in India with expertise in
-                traditional perfumery, this signature fragrance embodies sophistication and luxury in every drop.
-              </p>
-              <button
-                className="about-cta animate-fade-in-delay-3"
-                onClick={() => scrollToSection('product')}
-              >
-                <span>Explore Collection</span>
-                <ArrowRight size={18} />
-              </button>
+        {/* Hidden Message Toast */}
+        {showHiddenMessage && (
+          <div className="hidden-message-toast" role="alert" aria-live="assertive">
+            <div className="message-icon" aria-hidden="true">💫</div>
+            <div className="message-content">
+              <h4>Secret Discovered!</h4>
+              <p>The true essence lies in the journey...</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Review Form Modal */}
-      {showReviewForm && (
-        <ReviewForm
-          onClose={() => setShowReviewForm(false)}
-          onSubmit={handleReviewSubmit}
-        />
-      )}
-
-      {/* Secret Collection Modal */}
-      {showSecretCollection && (
-        <div className="secret-modal-overlay" onClick={() => setShowSecretCollection(false)}>
-          <div className="secret-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="secret-close" onClick={() => setShowSecretCollection(false)}>×</button>
-            <div className="secret-content">
-              <h2>🔮 The Hidden Collection</h2>
-              <p>You've discovered the legendary ALH secret fragrances...</p>
-              <div className="secret-perfumes">
-                <div className="secret-perfume">
-                  <div className="secret-icon">🌙</div>
-                  <h3>Midnight Oud</h3>
-                  <p>The forbidden essence of the desert night</p>
-                </div>
-                <div className="secret-perfume">
-                  <div className="secret-icon">⭐</div>
-                  <h3>Celestial Amber</h3>
-                  <p>Whispers from the stars above</p>
-                </div>
-                <div className="secret-perfume">
-                  <div className="secret-icon">🌸</div>
-                  <h3>Mystic Rose</h3>
-                  <p>The eternal bloom of hidden gardens</p>
-                </div>
-              </div>
-              <p className="secret-note">These fragrances are reserved for the worthy. Contact us for exclusive access.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hidden Message Toast */}
-      {showHiddenMessage && (
-        <div className="hidden-message-toast">
-          <div className="message-icon">💫</div>
-          <div className="message-content">
-            <h4>Secret Discovered!</h4>
-            <p>The true essence lies in the journey...</p>
-          </div>
-        </div>
-      )}
+        )}
 
         <Footer onSecretClick={handleFooterSecretClick} />
       </div>

@@ -44,13 +44,16 @@
   --shadow-strong: 0 8px 16px rgba(0, 0, 0, 0.2);
   --shadow-layered: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.15);
 
-  /* Spacing system - 8px grid */
+  /* Enhanced spacing system - 8px grid with additional scales */
   --spacing-xs: 8px;
   --spacing-sm: 16px;
   --spacing-md: 24px;
   --spacing-lg: 32px;
   --spacing-xl: 48px;
   --spacing-2xl: 64px;
+  --spacing-3xl: 80px;
+  --spacing-4xl: 96px;
+  --spacing-5xl: 128px;
 }
 
 /* Remove default link styles */
@@ -64,37 +67,73 @@ a:hover {
   opacity: 0.8;
 }
 
-/* Improved body layout */
+/* Enhanced body layout with subtle background effects */
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000000 100%);
+  background-attachment: fixed;
 }
 
-/* Modernized button styles */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(201, 176, 55, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 140, 0, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(201, 176, 55, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Enhanced button styles with gradients and luxurious effects */
 button {
   font-family: inherit;
   cursor: pointer;
-  border: none;
-  background: rgba(201, 176, 55, 0.1);
+  border: 1px solid rgba(201, 176, 55, 0.3);
+  background: linear-gradient(135deg, rgba(201, 176, 55, 0.2), rgba(255, 140, 0, 0.1));
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 6px;
-  box-shadow: var(--shadow-subtle);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(201, 176, 55, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
   color: var(--primary-text);
   will-change: transform;
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 button:hover {
-  background: var(--gold-accent);
-  box-shadow: var(--shadow-medium);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--gold-accent), rgba(255, 140, 0, 0.8));
+  box-shadow: 0 4px 16px rgba(201, 176, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  border-color: var(--gold-accent);
+}
+
+button:hover::before {
+  left: 100%;
 }
 
 button:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-subtle);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(201, 176, 55, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Image optimization */
@@ -154,74 +193,124 @@ p {
   min-height: 100vh;
 }
 
-/* Standardized section padding */
+/* Enhanced section padding with responsive scaling */
 .section-padding {
-  padding: clamp(80px, 12vw, 120px);
+  padding: clamp(var(--spacing-3xl), 12vw, var(--spacing-5xl));
 }
 
-/* Consistent container max-widths */
+.section-padding-sm {
+  padding: clamp(var(--spacing-xl), 8vw, var(--spacing-2xl));
+}
+
+.section-padding-lg {
+  padding: clamp(var(--spacing-4xl), 15vw, var(--spacing-5xl));
+}
+
+/* Enhanced container system with consistent spacing */
 .container-lg {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 var(--spacing-md);
 }
 
 .container-md {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 0 var(--spacing-md);
 }
 
 .container-sm {
   max-width: 800px;
   margin: 0 auto;
+  padding: 0 var(--spacing-md);
 }
 
-/* Modernized card layouts with aspect ratios, rounded corners, and shadows */
+.container-xl {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Enhanced card layouts with luxurious effects */
 .card {
   aspect-ratio: 4/3;
-  border-radius: 8px;
-  box-shadow: var(--shadow-layered);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(201, 176, 55, 0.1);
+  transition: box-shadow 0.4s ease, transform 0.4s ease, border 0.3s ease;
   will-change: transform;
+  border: 1px solid rgba(201, 176, 55, 0.1);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .card:hover {
-  box-shadow: var(--shadow-strong);
-  transform: translateY(-4px);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.3),
+    0 6px 16px rgba(201, 176, 55, 0.2);
+  transform: translateY(-6px);
+  border-color: rgba(201, 176, 55, 0.3);
 }
 
 .card-square {
   aspect-ratio: 1/1;
-  border-radius: 8px;
-  box-shadow: var(--shadow-layered);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(201, 176, 55, 0.1);
+  transition: box-shadow 0.4s ease, transform 0.4s ease, border 0.3s ease;
   will-change: transform;
+  border: 1px solid rgba(201, 176, 55, 0.1);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .card-square:hover {
-  box-shadow: var(--shadow-strong);
-  transform: translateY(-4px);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.3),
+    0 6px 16px rgba(201, 176, 55, 0.2);
+  transform: translateY(-6px);
+  border-color: rgba(201, 176, 55, 0.3);
 }
 
 .card-wide {
   aspect-ratio: 16/9;
-  border-radius: 8px;
-  box-shadow: var(--shadow-layered);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(201, 176, 55, 0.1);
+  transition: box-shadow 0.4s ease, transform 0.4s ease, border 0.3s ease;
   will-change: transform;
+  border: 1px solid rgba(201, 176, 55, 0.1);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .card-wide:hover {
-  box-shadow: var(--shadow-strong);
-  transform: translateY(-4px);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.3),
+    0 6px 16px rgba(201, 176, 55, 0.2);
+  transform: translateY(-6px);
+  border-color: rgba(201, 176, 55, 0.3);
 }
 
-/* Glassmorphism overlay effect */
+/* Enhanced glassmorphism overlay effect */
 .glass-overlay {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-overlay-strong {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(25px) saturate(200%);
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: var(--shadow-medium);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* Mobile Navigation Slide-out Menu */
@@ -309,18 +398,38 @@ p {
   border-color: var(--white);
 }
 
-/* Touch-friendly button sizing */
+/* Enhanced touch-friendly button sizing */
 .touch-target {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 48px;
+  min-height: 48px;
   touch-action: manipulation;
-  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
-/* Enhanced mobile typography scaling */
+.touch-target::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(201, 176, 55, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.touch-target:active::after {
+  width: 60px;
+  height: 60px;
+  opacity: 0;
+}
+
+/* Enhanced mobile typography and spacing scaling */
 @media (max-width: 768px) {
   h1 {
     font-size: clamp(2rem, 8vw, 3rem);
@@ -343,9 +452,25 @@ p {
   }
 
   button {
-    min-height: 44px;
-    padding: 12px 24px;
-    font-size: clamp(14px, 4vw, 16px);
+    min-height: 48px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: clamp(16px, 4vw, 18px);
+    border-radius: 10px;
+  }
+
+  .section-padding {
+    padding: clamp(var(--spacing-xl), 10vw, var(--spacing-3xl));
+  }
+
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container-xl {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .card, .card-square, .card-wide {
+    border-radius: 10px;
   }
 }
 
@@ -491,17 +616,17 @@ textarea:focus-visible {
 
 /* Enhanced button animations with GPU acceleration */
 button {
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-  will-change: transform, background-color, box-shadow;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  will-change: transform, background, box-shadow, border-color;
   transform: translateZ(0);
 }
 
 button:hover {
-  transform: translateY(-2px) translateZ(0);
+  transform: translateY(-3px) translateZ(0);
 }
 
 button:active {
-  transform: translateY(0) translateZ(0);
+  transform: translateY(-1px) translateZ(0);
 }
 
 /* Optimized card hover effects */
@@ -566,16 +691,37 @@ button:active {
   }
 }
 
-/* Mobile-first responsive utilities */
+/* Enhanced mobile-first responsive utilities */
 @media (max-width: 480px) {
   .touch-target {
-    min-width: 48px;
-    min-height: 48px;
-    min-height: 48px;
+    min-width: 52px;
+    min-height: 52px;
   }
 
   .mobile-nav-link {
     font-size: 20px;
-    padding: 20px 0;
+    padding: 24px 0;
+    min-height: 52px;
+  }
+
+  button {
+    min-height: 52px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: 16px;
+  }
+
+  .section-padding {
+    padding: clamp(var(--spacing-lg), 8vw, var(--spacing-2xl));
+  }
+
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container-xl {
+    padding: 0 var(--spacing-xs);
+  }
+
+  .card, .card-square, .card-wide {
+    border-radius: 8px;
   }
 }
