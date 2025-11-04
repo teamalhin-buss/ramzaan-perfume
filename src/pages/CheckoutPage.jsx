@@ -511,6 +511,26 @@ const CheckoutPage = () => {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="checkout-page">
+        <Header />
+        <div className="login-required-container">
+          <div className="container">
+            <div className="login-required glass-card">
+              <h2>Please Login</h2>
+              <p>You need to login to proceed with checkout.</p>
+              <button className="glow-button" onClick={() => navigate('/account')}>
+                Go to Login
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="checkout-page">
       <Header />
