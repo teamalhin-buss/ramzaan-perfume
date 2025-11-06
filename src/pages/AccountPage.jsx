@@ -1,6 +1,6 @@
 import { orderService } from '../services/firestore';
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, Package, LogOut, Shield, Calendar, MapPin, CreditCard, Clock, CheckCircle, Truck, XCircle, RefreshCw, Eye, ShoppingBag, ChevronLeft, ChevronRight, Loader2, Search, Filter, SortAsc, SortDesc, ChevronDown, ChevronUp, BarChart3, Download, MoreHorizontal, Edit3, Save, X, Plus, Home, Building, Heart, Settings, Bell, Key, Star, Trash2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -9,6 +9,7 @@ import './AccountPage.css';
 
 const AccountPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, login, signup, logout, loginWithGoogle, sendOTP, verifyOTP, isAuthenticated } = useAuth();
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [authMethod, setAuthMethod] = useState(null); // 'email' or 'phone' or null
@@ -701,6 +702,12 @@ const AccountPage = () => {
             <p className="auth-subtitle">
               {isLoginMode ? 'Login to access your account' : 'Join us today'}
             </p>
+
+            {location.state?.message && (
+              <div className="auth-message">
+                <p>{location.state.message}</p>
+              </div>
+            )}
 
             {/* Google Sign-In as Primary Option */}
             {isLoginMode && (

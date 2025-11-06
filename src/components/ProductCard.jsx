@@ -114,8 +114,7 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   const handleAddToCart = (e) => {
     const success = addToCart(product, quantity);
     if (!success) {
-      showNotification('Please login to add items to cart');
-      setTimeout(() => navigate('/account'), 2000);
+      navigate('/account', { state: { message: 'Please log in or create an account to proceed with adding items to your cart.' } });
       return;
     }
     showNotification('Added to cart!');
