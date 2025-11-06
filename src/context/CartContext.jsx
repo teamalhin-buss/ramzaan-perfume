@@ -50,6 +50,11 @@ export const CartProvider = ({ children }) => {
   }, [cartItems, user, loading]);
 
   const addToCart = (product, quantity = 1) => {
+    if (!user) {
+      // Don't allow adding to cart without login
+      return false;
+    }
+
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
 
@@ -63,13 +68,18 @@ export const CartProvider = ({ children }) => {
 
       return [...prevItems, { ...product, quantity }];
     });
+
+    return true;
   };
 
   const removeFromCart = (productId) => {
+    if (!user) return;
     setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
 
   const updateQuantity = (productId, quantity) => {
+    if (!user) return;
+
     if (quantity <= 0) {
       removeFromCart(productId);
       return;

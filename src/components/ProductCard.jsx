@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { ShoppingCart, Heart, Share2, ZoomIn, Minus, Plus, Check, Sparkles } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './ProductCard.css';
 
 // Swipe gesture hook for image galleries
@@ -39,6 +41,8 @@ const useSwipe = (onSwipeLeft, onSwipeRight) => {
 
 const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -108,13 +112,23 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   };
 
   const handleAddToCart = (e) => {
-    addToCart(product, quantity);
+    const success = addToCart(product, quantity);
+    if (!success) {
+      showNotification('Please login to add items to cart');
+      setTimeout(() => navigate('/account'), 2000);
+      return;
+    }
     showNotification('Added to cart!');
     createSprayEffect(e.currentTarget);
   };
 
   const handleBuyNow = (e) => {
-    addToCart(product, quantity);
+    const success = addToCart(product, quantity);
+    if (!success) {
+      showNotification('Please login to purchase items');
+      setTimeout(() => navigate('/account'), 2000);
+      return;
+    }
     createSprayEffect(e.currentTarget);
     if (onBuyNow) {
       onBuyNow();
