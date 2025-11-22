@@ -983,10 +983,20 @@ const AdminPanel = () => {
                   <p>Current free shipping threshold: ₹999+</p>
                 </div>
 
-                <button type="submit" className="submit-button">
-                  <Truck size={18} />
-                  Update Delivery Fee
-                </button>
+                <div className="delivery-actions">
+                  <button
+                    type="button"
+                    className="free-delivery-btn"
+                    onClick={() => setDeliveryFee(0)}
+                  >
+                    <Truck size={18} />
+                    Set Free Delivery
+                  </button>
+                  <button type="submit" className="submit-button">
+                    <Truck size={18} />
+                    Update Delivery Fee
+                  </button>
+                </div>
               </form>
             </div>
           )}
