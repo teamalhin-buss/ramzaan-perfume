@@ -118,6 +118,16 @@ const CheckoutPage = () => {
       }
     };
     loadDeliveryFee();
+
+    // Set up periodic refresh for delivery fee (every 30 seconds)
+    const deliveryFeeInterval = setInterval(loadDeliveryFee, 30000);
+
+    // Cleanup interval on unmount
+    return () => {
+      if (deliveryFeeInterval) {
+        clearInterval(deliveryFeeInterval);
+      }
+    };
   }, [user]);
 
   // Auto-save form data to localStorage whenever it changes
