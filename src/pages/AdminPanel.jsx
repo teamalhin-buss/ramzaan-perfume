@@ -1,4 +1,4 @@
-import { orderService, reviewService, productService, userService } from '../services/firestore';
+import { orderService, reviewService, productService, userService, settingsService } from '../services/firestore';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -54,6 +54,7 @@ const AdminPanel = () => {
     description: 'Experience timeless elegance in every drop',
     notes: 'Oud, Amber, Musk',
   });
+  const [deliveryFee, setDeliveryFee] = useState(20);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -101,6 +102,12 @@ const AdminPanel = () => {
         if (productResult.success) {
           setProductData(productResult.data);
         }
+
+        // Load delivery fee
+        const deliveryResult = await settingsService.getDeliveryFee();
+        if (deliveryResult.success) {
+          setDeliveryFee(deliveryResult.data);
+        }
       } catch (error) {
         console.error('Error loading admin data:', error);
       } finally {
@@ -128,6 +135,16 @@ const AdminPanel = () => {
       alert('Product updated successfully!');
     } else {
       alert('Failed to update product: ' + result.error);
+    }
+  };
+
+  const handleDeliveryFeeUpdate = async (e) => {
+    e.preventDefault();
+    const result = await settingsService.updateDeliveryFee(deliveryFee);
+    if (result.success) {
+      alert('Delivery fee updated successfully!');
+    } else {
+      alert('Failed to update delivery fee: ' + result.error);
     }
   };
 
@@ -481,6 +498,13 @@ const AdminPanel = () => {
             <BarChart size={20} />
             Analytics
           </button>
+          <button
+            className={activeTab === 'delivery' ? 'active' : ''}
+            onClick={() => setActiveTab('delivery')}
+          >
+            <Truck size={20} />
+            Delivery Settings
+          </button>
         </nav>
 
         <button className="admin-logout" onClick={handleLogout}>
@@ -510,6 +534,7 @@ const AdminPanel = () => {
               {activeTab === 'reviews' && 'Review Moderation'}
               {activeTab === 'product' && 'Product Settings'}
               {activeTab === 'analytics' && 'Analytics & Insights'}
+              {activeTab === 'delivery' && 'Delivery Settings'}
             </h1>
             {(activeTab === 'orders' || activeTab === 'reviews' || activeTab === 'customers') && (
               <div className="header-actions">
@@ -931,6 +956,35 @@ const AdminPanel = () => {
                 <button type="submit" className="submit-button">
                   <Settings size={18} />
                   Update Product
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Delivery Settings Tab */}
+          {activeTab === 'delivery' && (
+            <div className="delivery-settings">
+              <form onSubmit={handleDeliveryFeeUpdate} className="settings-form glass-card">
+                <div className="form-group">
+                  <label>Delivery Fee (₹)</label>
+                  <input
+                    type="number"
+                    value={deliveryFee}
+                    onChange={(e) => setDeliveryFee(parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    placeholder="Enter delivery fee"
+                  />
+                </div>
+
+                <div className="settings-info">
+                  <p><strong>Note:</strong> This fee will be applied to all orders. Set to 0 for free delivery.</p>
+                  <p>Current free shipping threshold: ₹999+</p>
+                </div>
+
+                <button type="submit" className="submit-button">
+                  <Truck size={18} />
+                  Update Delivery Fee
                 </button>
               </form>
             </div>

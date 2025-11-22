@@ -1,4 +1,4 @@
-import { orderService } from '../services/firestore';
+import { orderService, settingsService } from '../services/firestore';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, MapPin, User, Mail, Phone, CheckCircle, Truck, Shield, Lock, Info, Eye, EyeOff, Home, Building } from 'lucide-react';
@@ -18,7 +18,7 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
-  const DELIVERY_FEE = 10;
+  const [deliveryFee, setDeliveryFee] = useState(20);
   const keralaDistricts = [
     'Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod',
     'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad',
@@ -109,6 +109,15 @@ const CheckoutPage = () => {
 
     loadSavedData();
     loadSavedAddresses();
+
+    // Load delivery fee
+    const loadDeliveryFee = async () => {
+      const result = await settingsService.getDeliveryFee();
+      if (result.success) {
+        setDeliveryFee(result.data);
+      }
+    };
+    loadDeliveryFee();
   }, [user]);
 
   // Auto-save form data to localStorage whenever it changes
@@ -385,7 +394,7 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      const finalTotal = getCartTotal() - discount + DELIVERY_FEE;
+      const finalTotal = getCartTotal() - discount + deliveryFee;
       trackPaymentAttempt(paymentMethod);
 
 
@@ -908,7 +917,7 @@ const CheckoutPage = () => {
                       ) : (
                         <>
                           <CreditCard size={20} />
-                          Pay ₹{getCartTotal() - discount + DELIVERY_FEE}
+                          Pay ₹{getCartTotal() - discount + deliveryFee}
                         </>
                       )}
                     </button>
@@ -955,11 +964,11 @@ const CheckoutPage = () => {
                 )}
                 <div className="total-row">
                   <span>Delivery Fee</span>
-                  <span>₹{DELIVERY_FEE}</span>
+                  <span>₹{deliveryFee}</span>
                 </div>
                 <div className="total-row grand-total">
                   <span>Total</span>
-                  <span>₹{getCartTotal() - discount + DELIVERY_FEE}</span>
+                  <span>₹{getCartTotal() - discount + deliveryFee}</span>
                 </div>
               </div>
             </div>

@@ -21,7 +21,8 @@ const COLLECTIONS = {
   ORDERS: 'orders',
   REVIEWS: 'reviews',
   PRODUCTS: 'products',
-  CARTS: 'carts'
+  CARTS: 'carts',
+  SETTINGS: 'settings'
 };
 
 // User operations
@@ -366,6 +367,40 @@ export const cartService = {
       return { success: true };
     } catch (error) {
       console.error('Error clearing cart:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};
+
+// Settings operations
+export const settingsService = {
+  // Get delivery fee
+  getDeliveryFee: async () => {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.SETTINGS, 'delivery'));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        return { success: true, data: data.fee || 20 };
+      } else {
+        // Return default delivery fee if not set
+        return { success: true, data: 20 };
+      }
+    } catch (error) {
+      console.error('Error getting delivery fee:', error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Update delivery fee
+  updateDeliveryFee: async (fee) => {
+    try {
+      await setDoc(doc(db, COLLECTIONS.SETTINGS, 'delivery'), {
+        fee: parseFloat(fee),
+        updatedAt: Timestamp.now()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating delivery fee:', error);
       return { success: false, error: error.message };
     }
   }
