@@ -33,7 +33,8 @@ import {
   Info,
   Menu,
   X as CloseIcon,
-  Plus
+  Plus,
+  Truck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { createUserWithEmailAndPassword, updateProfile as updateFirebaseProfile } from 'firebase/auth';
