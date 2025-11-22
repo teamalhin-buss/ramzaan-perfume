@@ -107,7 +107,10 @@ const AdminPanel = () => {
         // Load delivery fee
         const deliveryResult = await settingsService.getDeliveryFee();
         if (deliveryResult.success) {
+          console.log('Loaded delivery fee:', deliveryResult.data);
           setDeliveryFee(deliveryResult.data);
+        } else {
+          console.error('Failed to load delivery fee:', deliveryResult.error);
         }
       } catch (error) {
         console.error('Error loading admin data:', error);
@@ -141,11 +144,27 @@ const AdminPanel = () => {
 
   const handleDeliveryFeeUpdate = async (e) => {
     e.preventDefault();
+    console.log('Updating delivery fee to:', deliveryFee);
     const result = await settingsService.updateDeliveryFee(deliveryFee);
     if (result.success) {
+      console.log('Delivery fee updated successfully');
       alert('Delivery fee updated successfully!');
     } else {
+      console.error('Failed to update delivery fee:', result.error);
       alert('Failed to update delivery fee: ' + result.error);
+    }
+  };
+
+  const refreshDeliveryFee = async () => {
+    console.log('Manually refreshing delivery fee...');
+    const result = await settingsService.getDeliveryFee();
+    if (result.success) {
+      console.log('Refreshed delivery fee:', result.data);
+      setDeliveryFee(result.data);
+      alert('Delivery fee refreshed: ₹' + result.data);
+    } else {
+      console.error('Failed to refresh delivery fee:', result.error);
+      alert('Failed to refresh delivery fee: ' + result.error);
     }
   };
 
@@ -981,6 +1000,15 @@ const AdminPanel = () => {
                 <div className="settings-info">
                   <p><strong>Note:</strong> This fee will be applied to all orders. Set to 0 for free delivery.</p>
                   <p>Current free shipping threshold: ₹999+</p>
+                  <button
+                    type="button"
+                    onClick={refreshDeliveryFee}
+                    className="refresh-delivery-btn"
+                    title="Refresh delivery fee from database"
+                  >
+                    <RefreshCw size={16} />
+                    Refresh Fee
+                  </button>
                 </div>
 
                 <div className="delivery-actions">

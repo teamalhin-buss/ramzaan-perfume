@@ -377,11 +377,14 @@ export const settingsService = {
   // Get delivery fee
   getDeliveryFee: async () => {
     try {
+      console.log('Fetching delivery fee from Firestore...');
       const docSnap = await getDoc(doc(db, COLLECTIONS.SETTINGS, 'delivery'));
       if (docSnap.exists()) {
         const data = docSnap.data();
+        console.log('Delivery fee document exists:', data);
         return { success: true, data: data.fee || 20 };
       } else {
+        console.log('Delivery fee document does not exist, returning default: 20');
         // Return default delivery fee if not set
         return { success: true, data: 20 };
       }
@@ -394,10 +397,12 @@ export const settingsService = {
   // Update delivery fee
   updateDeliveryFee: async (fee) => {
     try {
+      console.log('Updating delivery fee in Firestore to:', fee);
       await setDoc(doc(db, COLLECTIONS.SETTINGS, 'delivery'), {
         fee: parseFloat(fee),
         updatedAt: Timestamp.now()
       });
+      console.log('Delivery fee updated successfully in Firestore');
       return { success: true };
     } catch (error) {
       console.error('Error updating delivery fee:', error);
