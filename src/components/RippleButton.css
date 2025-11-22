@@ -1,0 +1,192 @@
+/* Premium Ripple Button - Luxurious Touch Feedback */
+
+.ripple-button {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 50px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    min-height: 52px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    will-change: transform, box-shadow;
+}
+
+/* Primary Variant - Gold gradient */
+.ripple-button-primary {
+    background: linear-gradient(135deg, var(--gold-accent), #b8860b);
+    color: #000;
+    border: 1px solid transparent;
+}
+
+.ripple-button-primary:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 176, 55, 0.4);
+    background: linear-gradient(135deg, #d4bb46, var(--gold-accent));
+}
+
+.ripple-button-primary:active:not(.disabled) {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(201, 176, 55, 0.3);
+}
+
+/* Secondary Variant - Outline */
+.ripple-button-secondary {
+    background: transparent;
+    color: var(--primary-text);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.ripple-button-secondary:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.ripple-button-secondary:active:not(.disabled) {
+    transform: translateY(0);
+}
+
+/* Tertiary Variant - Minimal */
+.ripple-button-tertiary {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--primary-text);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+}
+
+.ripple-button-tertiary:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Danger Variant */
+.ripple-button-danger {
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    color: #fff;
+    border: 1px solid transparent;
+}
+
+.ripple-button-danger:hover:not(.disabled) {
+    background: linear-gradient(135deg, #ff5555, #dd0000);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 68, 68, 0.4);
+}
+
+/* Success Variant */
+.ripple-button-success {
+    background: linear-gradient(135deg, #00cc66, #009944);
+    color: #fff;
+    border: 1px solid transparent;
+}
+
+.ripple-button-success:hover:not(.disabled) {
+    background: linear-gradient(135deg, #00dd77, #00aa55);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 204, 102, 0.4);
+}
+
+/* Disabled State */
+.ripple-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    from {
+        transform: scale(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .ripple-button {
+        min-height: 48px;
+        padding: 14px 28px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ripple-button {
+        min-height: 52px;
+        padding: 16px 24px;
+        font-size: 14px;
+    }
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) {
+    .ripple-button:active:not(.disabled) {
+        transform: scale(0.98);
+    }
+}
+
+/* Focus state for accessibility */
+.ripple-button:focus-visible {
+    outline: 2px solid var(--gold-accent);
+    outline-offset: 2px;
+}
+
+/* Loading state */
+.ripple-button.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.ripple-button.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Icon alignment */
+.ripple-button svg {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.ripple-button:hover:not(.disabled) svg {
+    transform: scale(1.1);
+}

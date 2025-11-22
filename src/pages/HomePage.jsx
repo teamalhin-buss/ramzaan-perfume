@@ -1,966 +1,201 @@
-import { useState, useEffect, useRef } from 'react';
-import { Star, Award, Users, ArrowRight, Check, Sparkles, Filter, SortDesc, Leaf, Clock, Package, Droplets, Flower, Citrus, Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingBag, Star, Sparkles, Heart, Award } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import ReviewForm from '../components/ReviewForm';
-import { ASSETS } from '../config/assets';
-import { reviewService, productService } from '../services/firestore';
+import LoadingScreen from '../components/LoadingScreen';
+import { productService, reviewService } from '../services/firestore';
 import './HomePage.css';
 
 const HomePage = () => {
-  const [product, setProduct] = useState({
-    id: 'ramzaan-001',
-    name: 'Ramzaan',
-    price: 150,
-    image: ASSETS.product.main,
-    imageFallback: ASSETS.product.fallback,
-    description: 'A masterfully crafted fragrance that embodies sophistication, luxury, and timeless elegance in every drop.',
-    notes: ['Inspired by CR7'],
-    badge: 'Premium',
-  });
-
+  const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [visibleSections, setVisibleSections] = useState(new Set(['home']));
-  const [isLoading, setIsLoading] = useState(true);
-  const [averageRating, setAverageRating] = useState(5.0);
-  const [totalReviews, setTotalReviews] = useState(0);
-  const [sortBy, setSortBy] = useState('newest');
-  const [filterRating, setFilterRating] = useState('all');
-  const [reviewVotes, setReviewVotes] = useState({});
-
-  const sectionRefs = useRef({});
-
-  // Ingredients data
-  const ingredients = [
-    {
-      id: 'citrus',
-      name: 'Citrus Notes',
-      description: 'Bright and refreshing top notes',
-      icon: Citrus,
-      benefits: ['Energizing', 'Fresh', 'Uplifting']
-    },
-    {
-      id: 'floral',
-      name: 'Floral Essence',
-      description: 'Delicate and sophisticated heart',
-      icon: Flower,
-      benefits: ['Elegant', 'Romantic', 'Timeless']
-    },
-    {
-      id: 'woody',
-      name: 'Woody Base',
-      description: 'Rich and grounding foundation',
-      icon: Leaf,
-      benefits: ['Sophisticated', 'Enduring', 'Luxurious']
-    },
-    {
-      id: 'amber',
-      name: 'Amber Accord',
-      description: 'Warm and mysterious depth',
-      icon: Droplets,
-      benefits: ['Warm', 'Seductive', 'Captivating']
-    }
-  ];
-
-  // Features data
-  const features = [
-    {
-      id: 'longevity',
-      title: 'Exceptional Longevity',
-      description: 'Lasts up to 8-10 hours on skin',
-      icon: Clock,
-      benefits: ['Long-lasting', 'Intense', 'Memorable']
-    },
-    {
-      id: 'versatile',
-      title: 'Versatile Wear',
-      description: 'Perfect for day or night, any occasion',
-      icon: Heart,
-      benefits: ['Adaptable', 'Sophisticated', 'Confident']
-    }
-  ];
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      // Simulate loading time for the loading screen
-      await new Promise(resolve => setTimeout(resolve, 500));
+      try {
+        // Add artificial delay to make loading screen visible
+        await new Promise(resolve => setTimeout(resolve, 5000));
 
-      // Load product data from Firestore
-      const productResult = await productService.getProduct();
-      if (productResult.success) {
-        setProduct(prevProduct => ({
-          ...prevProduct,
-          ...productResult.data,
-          image: ASSETS.product.main, // Keep static assets
-          imageFallback: ASSETS.product.fallback,
-          notes: productResult.data.notes ? productResult.data.notes.split(', ') : ['Inspired by CR7'],
-        }));
-      }
-
-      // Load approved reviews from Firestore
-      const reviewsResult = await reviewService.getApprovedReviews();
-      if (reviewsResult.success) {
-        setReviews(reviewsResult.data);
-        setTotalReviews(reviewsResult.data.length);
-
-        // Calculate average rating
-        if (reviewsResult.data.length > 0) {
-          const totalRating = reviewsResult.data.reduce((sum, review) => sum + review.rating, 0);
-          const avgRating = totalRating / reviewsResult.data.length;
-          setAverageRating(Math.round(avgRating * 10) / 10); // Round to 1 decimal place
-        } else {
-          setAverageRating(5.0); // Default rating when no reviews
+        const productResult = await productService.getProduct();
+        if (productResult.success) {
+          setProduct(productResult.data);
         }
-      }
 
-      // Hide loading screen after data is loaded
-      setIsLoading(false);
+        const reviewsResult = await reviewService.getApprovedReviews();
+        if (reviewsResult.success) {
+          setReviews(reviewsResult.data);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadData();
   }, []);
 
-  // Enhanced Intersection Observer for scroll animations
-  useEffect(() => {
-    const observerOptions = {
-      threshold: [0.1, 0.3, 0.5],
-      rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const sectionId = entry.target.id;
-        if (entry.isIntersecting) {
-          setVisibleSections(prev => new Set([...prev, sectionId]));
-          // Add staggered animation classes with enhanced timing
-          const children = entry.target.querySelectorAll('.animate-slide-up-delay-1, .animate-slide-up-delay-2, .animate-slide-up-delay-3, .animate-slide-up-delay-4');
-          children.forEach((child, index) => {
-            setTimeout(() => {
-              child.classList.add('animate-triggered');
-              // Add premium particle effects for ingredient cards
-              if (child.classList.contains('ingredient-card')) {
-                const particles = child.querySelectorAll('.particle');
-                particles.forEach((particle, pIndex) => {
-                  setTimeout(() => particle.classList.add('animate-particle'), pIndex * 200);
-                });
-              }
-            }, index * 200); // Increased delay for more luxurious feel
-          });
-        }
-      });
-    }, observerOptions);
-
-    // Observe all sections including new ones
-    Object.values(sectionRefs.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Parallax effect for hero background
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.pageYOffset;
-      const heroSection = sectionRefs.current.home;
-      if (heroSection) {
-        const background = heroSection.querySelector('::before');
-        if (background) {
-          const rate = scrolled * -0.5;
-          background.style.transform = `translateY(${rate}px)`;
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Enhanced mouse following effect for interactive elements
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const cards = document.querySelectorAll('.feature-card, .review-card, .enhanced-product-card, .ingredient-card, .packaging-mockup');
-      cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-
-        // Add premium hover effects for ingredient cards
-        if (card.classList.contains('ingredient-card')) {
-          const distance = Math.sqrt(x * x + y * y);
-          const intensity = Math.max(0, 1 - distance / 200);
-          card.style.setProperty('--hover-intensity', intensity);
-        }
-      });
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    return () => document.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Particle system for background effects
-  useEffect(() => {
-    const createParticle = () => {
-      const particle = document.createElement('div');
-      particle.className = 'floating-particle';
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 10 + 's';
-      particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-      document.body.appendChild(particle);
-
-      setTimeout(() => {
-        if (particle.parentNode) {
-          particle.parentNode.removeChild(particle);
-        }
-      }, 20000);
-    };
-
-    const particleInterval = setInterval(createParticle, 3000);
-    return () => clearInterval(particleInterval);
-  }, []);
-
-  // Typing effect for hero title
-  useEffect(() => {
-    const heroTitle = document.querySelector('.hero-title');
-    if (heroTitle && !heroTitle.hasAttribute('data-typed')) {
-      heroTitle.setAttribute('data-typed', 'true');
-      const text = heroTitle.textContent;
-      heroTitle.textContent = '';
-      let i = 0;
-
-      const typeWriter = () => {
-        if (i < text.length) {
-          heroTitle.textContent += text.charAt(i);
-          i++;
-          setTimeout(typeWriter, 100);
-        }
-      };
-
-      setTimeout(typeWriter, 1000);
-    }
-  }, []);
-
-  // Scroll progress indicator - Removed
-
-  // Konami Code Easter Egg
-  useEffect(() => {
-    let konamiCode = [];
-    const secretCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
-
-    const handleKeyPress = (e) => {
-      konamiCode.push(e.code);
-
-      if (konamiCode.length > secretCode.length) {
-        konamiCode.shift();
-      }
-
-      if (JSON.stringify(konamiCode) === JSON.stringify(secretCode)) {
-        // Unlock secret perfume collection
-        setShowSecretCollection(true);
-        // Create a custom notification function
-        const notification = document.createElement('div');
-        notification.className = 'toast-notification';
-        notification.innerHTML = `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-          <span>🎉 Secret Collection Unlocked! ✨</span>
-        `;
-        document.body.appendChild(notification);
-
-        // Remove notification after 3 seconds
-        setTimeout(() => {
-          if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-          }
-        }, 3000);
-        konamiCode = [];
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
-
-  // Hidden click counters for Easter eggs
-  const [clickCounts, setClickCounts] = useState({
-    logo: 0,
-    bottle: 0,
-    footer: 0
-  });
-
-  const [showSecretCollection, setShowSecretCollection] = useState(false);
-  const [showHiddenMessage, setShowHiddenMessage] = useState(false);
-
-  const handleBuyNow = () => {
-    window.location.href = '/checkout';
-  };
-
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const headerOffset = 80; // Account for sticky header
-      const elementPosition = element.offsetTop;
-      const offsetPosition = elementPosition - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
-
   const handleReviewSubmit = (newReview) => {
-    // Refresh reviews after submission
-    const loadReviews = async () => {
-      const reviewsResult = await reviewService.getApprovedReviews();
-      if (reviewsResult.success) {
-        setReviews(reviewsResult.data);
-        setTotalReviews(reviewsResult.data.length);
-
-        // Recalculate average rating
-        if (reviewsResult.data.length > 0) {
-          const totalRating = reviewsResult.data.reduce((sum, review) => sum + review.rating, 0);
-          const avgRating = totalRating / reviewsResult.data.length;
-          setAverageRating(Math.round(avgRating * 10) / 10);
-        }
-      }
-    };
-    loadReviews();
+    setReviews(prev => [newReview, ...prev]);
   };
 
-  const handleVote = (reviewId, voteType) => {
-    setReviewVotes(prev => ({
-      ...prev,
-      [reviewId]: {
-        ...prev[reviewId],
-        [voteType]: (prev[reviewId]?.[voteType] || 0) + 1,
-        voted: true
-      }
-    }));
-  };
-
-  // Sort and filter reviews
-  const getFilteredAndSortedReviews = () => {
-    let filteredReviews = [...reviews];
-
-    // Apply rating filter
-    if (filterRating !== 'all') {
-      filteredReviews = filteredReviews.filter(review => review.rating === parseInt(filterRating));
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'newest':
-        filteredReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case 'oldest':
-        filteredReviews.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-        break;
-      case 'highest':
-        filteredReviews.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'lowest':
-        filteredReviews.sort((a, b) => a.rating - b.rating);
-        break;
-      default:
-        break;
-    }
-
-    return filteredReviews;
-  };
-
-  // Get all filtered reviews (no pagination)
-  const getFilteredReviews = () => {
-    return getFilteredAndSortedReviews();
-  };
-
-  // Mystery item handlers
-  const handleLogoTripleClick = () => {
-    setClickCounts(prev => ({ ...prev, logo: prev.logo + 1 }));
-    if (clickCounts.logo + 1 === 3) {
-      // Create a custom notification function
-      const notification = document.createElement('div');
-      notification.className = 'toast-notification';
-      notification.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-        </svg>
-        <span>🌟 You found the hidden message! Check the console...</span>
-      `;
-      document.body.appendChild(notification);
-
-      console.log('🎉 SECRET: The true essence of Ramzaan lies in the journey, not the destination. - ALH');
-      setShowHiddenMessage(true);
-      setTimeout(() => setShowHiddenMessage(false), 5000);
-
-      // Remove notification after 3 seconds
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 3000);
-    }
-  };
-
-  const handleBottleDoubleClick = () => {
-    setClickCounts(prev => ({ ...prev, bottle: prev.bottle + 1 }));
-    if (clickCounts.bottle + 1 === 2) {
-      // Create a custom notification function
-      const notification = document.createElement('div');
-      notification.className = 'toast-notification';
-      notification.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-        </svg>
-        <span>💫 A mysterious scent fills the air...</span>
-      `;
-      document.body.appendChild(notification);
-
-      // Trigger special animation
-      const bottle = document.querySelector('.product-main-image');
-      if (bottle) {
-        bottle.style.animation = 'mysteryGlow 2s ease-in-out';
-        setTimeout(() => bottle.style.animation = '', 2000);
-      }
-
-      // Remove notification after 3 seconds
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 3000);
-    }
-  };
-
-  const handleFooterSecretClick = () => {
-    setClickCounts(prev => ({ ...prev, footer: prev.footer + 1 }));
-    if (clickCounts.footer + 1 === 5) {
-      // Create a custom notification function
-      const notification = document.createElement('div');
-      notification.className = 'toast-notification';
-      notification.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-        </svg>
-        <span>🔮 The ancient formula reveals itself...</span>
-      `;
-      document.body.appendChild(notification);
-
-      // Show secret modal or effect
-      setShowSecretCollection(true);
-
-      // Remove notification after 3 seconds
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      }, 3000);
-    }
-  };
+  if (loading) {
+    return <LoadingScreen isVisible={true} estimatedTime={5000} />;
+  }
 
   return (
-    <div className="home-page">
-      {/* Scroll Progress Indicator - Removed */}
+    <div className="homepage">
+      <Header />
 
-      {/* Loading Screen */}
-      {isLoading && (
-        <div className="loading-screen" aria-live="polite" aria-label="Loading application">
-          <div className="loading-content">
-            <div className="perfume-bottle" aria-hidden="true">
-              <div className="bottle-silhouette">
-                <div className="bottle-neck"></div>
-                <div className="bottle-body">
-                  <div className="bottle-label"></div>
-                </div>
-                <div className="bottle-cap"></div>
-              </div>
-              <div className="mist-particles">
-                <div className="mist-particle particle-1"></div>
-                <div className="mist-particle particle-2"></div>
-                <div className="mist-particle particle-3"></div>
-                <div className="mist-particle particle-4"></div>
-                <div className="mist-particle particle-5"></div>
-                <div className="mist-particle particle-6"></div>
-              </div>
-              <div className="droplets">
-                <div className="droplet droplet-1"></div>
-                <div className="droplet droplet-2"></div>
-                <div className="droplet droplet-3"></div>
-              </div>
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="container">
+          <div className="hero-content">
+            <div className="hero-text">
+              <h1 className="hero-title">Ramzaan</h1>
+              <p className="hero-subtitle">Premium Fragrance</p>
+              <button className="btn-primary">
+                <ShoppingBag size={20} />
+                Shop Now
+              </button>
             </div>
-            <div className="loading-text">
-              <h1 className="brand-name">Ramzaan</h1>
-              <p className="tagline">Timeless elegance in every drop</p>
-              <div className="loading-progress" aria-label="Loading progress">
-                <div className="progress-bar"></div>
-              </div>
+            <div className="hero-image">
+              <img
+                src="/images/perfume-bottle.png"
+                alt="Ramzaan Premium Fragrance"
+                onError={(e) => {
+                  e.target.src = 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&q=80';
+                }}
+              />
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Product Section */}
+      <section className="product-section">
+        <div className="container">
+          {product && (
+            <ProductCard
+              product={{
+                ...product,
+                image: '/images/perfume-bottle.png',
+                imageFallback: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&q=80',
+                notes: product.notes ? product.notes.split(', ') : ['Oud', 'Amber', 'Musk'],
+                averageRating: 4.8,
+                totalReviews: reviews.length,
+                badge: 'Bestseller'
+              }}
+              onBuyNow={() => window.location.href = '/checkout'}
+            />
+          )}
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="about-section">
+        <div className="container">
+          <div className="section-header">
+            <h2>About Ramzaan</h2>
+          </div>
+          <div className="about-content">
+            <div className="about-text">
+              <p>Crafted with premium natural ingredients, Ramzaan offers a sophisticated blend of oud, amber, and musk notes that lasts all day.</p>
+              <p>Loved by customers with an average rating of {reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : '0.0'} stars from {reviews.length} reviews.</p>
+              <div className="about-features">
+                <div className="feature">
+                  <Sparkles size={20} />
+                  <span>Premium Quality</span>
+                </div>
+                <div className="feature">
+                  <Heart size={20} />
+                  <span>Natural Ingredients</span>
+                </div>
+                <div className="feature">
+                  <Award size={20} />
+                  <span>Long-lasting</span>
+                </div>
+              </div>
+            </div>
+            <div className="about-image">
+              <img
+                src="/images/perfume-bottle.png"
+                alt="Ramzaan Fragrance"
+                onError={(e) => {
+                  e.target.src = 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=300&q=80';
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Reviews Section */}
+      <section className="reviews-section">
+        <div className="container">
+          <div className="section-header">
+            <h2>Customer Reviews</h2>
+          </div>
+
+          <div className="reviews-stats">
+            <div className="stat">
+              <div className="stat-number">{reviews.length}</div>
+              <div className="stat-label">Reviews</div>
+            </div>
+            <div className="stat">
+              <div className="stat-number">
+                {reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : '0.0'}
+              </div>
+              <div className="stat-label">Rating</div>
+            </div>
+          </div>
+
+          <div className="reviews-grid">
+            {reviews.slice(0, 3).map((review) => (
+              <div key={review.id} className="review-card">
+                <div className="review-header">
+                  <div className="reviewer-name">{review.name}</div>
+                  <div className="review-rating">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={14}
+                        fill={i < review.rating ? 'currentColor' : 'none'}
+                        className={i < review.rating ? 'filled' : ''}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="review-text">{review.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="reviews-actions">
+            <button
+              className="btn-secondary"
+              onClick={() => setShowReviewForm(true)}
+            >
+              <Star size={18} />
+              Write Review
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+
+      {/* Review Form Modal */}
+      {showReviewForm && (
+        <ReviewForm
+          onClose={() => setShowReviewForm(false)}
+          onSubmit={handleReviewSubmit}
+        />
       )}
-
-      <div className={`main-content ${!isLoading ? 'loaded' : ''}`}>
-        <Header onLogoClick={handleLogoTripleClick} />
-
-        <main id="main-content">
-          {/* Hero Section */}
-          <header
-            className={`hero-section ${visibleSections.has('home') ? 'animate-in' : ''}`}
-            id="home"
-            ref={(el) => sectionRefs.current.home = el}
-            role="banner"
-            aria-labelledby="hero-title"
-          >
-            <div className="hero-content">
-              <div className="container">
-                <div className="hero-text">
-                  <div className="hero-badge animate-fade-in" aria-label="Premium collection badge">
-                    <Sparkles size={16} aria-hidden="true" />
-                    <span>Premium Collection</span>
-                  </div>
-
-                  <h1 id="hero-title" className="hero-title animate-slide-up">
-                    Ramzaan
-                  </h1>
-
-                  <p className="hero-subtitle animate-fade-in-delay">
-                    Timeless elegance in every drop
-                  </p>
-
-                  <div className="hero-cta-group animate-fade-in-delay-2">
-                     <button
-                       className="hero-cta-primary"
-                       onClick={() => scrollToSection('product')}
-                       aria-label="Discover the signature fragrance"
-                     >
-                       <span>Discover</span>
-                       <ArrowRight size={20} aria-hidden="true" />
-                     </button>
-                     <button
-                       className="hero-cta-secondary"
-                       onClick={() => scrollToSection('about')}
-                       aria-label="Learn more about Ramzaan"
-                     >
-                       Learn More
-                     </button>
-                   </div>
-                </div>
-
-                {/* Minimal Stats */}
-                <div className="hero-stats animate-fade-in-delay-3" aria-label="Product statistics">
-                  <div className="stat-item">
-                    <div className="stat-number" aria-label={`Average rating: ${averageRating} stars`}>{averageRating}</div>
-                    <div className="stat-label">Rating</div>
-                  </div>
-                  <div className="stat-divider" aria-hidden="true"></div>
-                  <div className="stat-item">
-                    <div className="stat-number" aria-label={`Total reviews: ${totalReviews}`}>{totalReviews}</div>
-                    <div className="stat-label">Reviews</div>
-                  </div>
-                  <div className="stat-divider" aria-hidden="true"></div>
-                  <div className="stat-item">
-                    <div className="stat-number" aria-label="Available in 1 city">1</div>
-                    <div className="stat-label">Cities</div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </header>
-
-          {/* Product Highlight Section */}
-          <section
-            className={`product-section ${visibleSections.has('product') ? 'animate-in' : ''}`}
-            id="product"
-            ref={(el) => sectionRefs.current.product = el}
-            aria-labelledby="product-title"
-          >
-            <div className="container">
-              <header className="section-header animate-fade-in">
-                <h2 id="product-title" className="section-title">Signature Fragrance</h2>
-                <p className="section-subtitle">Discover the essence of luxury</p>
-              </header>
-
-              <div className="animate-slide-up-delay-1">
-                <ProductCard
-                  product={{
-                    ...product,
-                    averageRating,
-                    totalReviews
-                  }}
-                  onBuyNow={handleBuyNow}
-                  onBottleClick={handleBottleDoubleClick}
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Reviews Section */}
-          <section
-            className={`reviews-section ${visibleSections.has('reviews') ? 'animate-in' : ''}`}
-            id="reviews"
-            ref={(el) => sectionRefs.current.reviews = el}
-            aria-labelledby="reviews-title"
-          >
-            <div className="container">
-              <header className="section-header animate-fade-in">
-                <h2 id="reviews-title" className="section-title">Customer Reviews</h2>
-                <p className="section-subtitle">Trusted across India</p>
-
-                {/* Review Controls */}
-                <div className="review-controls" role="group" aria-label="Review filtering and sorting options">
-                  <div className="control-group">
-                    <Filter size={16} aria-hidden="true" />
-                    <label htmlFor="filter-rating" className="sr-only">Filter by rating</label>
-                    <select
-                      id="filter-rating"
-                      value={filterRating}
-                      onChange={(e) => setFilterRating(e.target.value)}
-                      className="filter-select"
-                      aria-label="Filter reviews by star rating"
-                    >
-                      <option value="all">All Ratings</option>
-                      <option value="5">5 Stars</option>
-                      <option value="4">4 Stars</option>
-                      <option value="3">3 Stars</option>
-                      <option value="2">2 Stars</option>
-                      <option value="1">1 Star</option>
-                    </select>
-                  </div>
-
-                  <div className="control-group">
-                    <SortDesc size={16} aria-hidden="true" />
-                    <label htmlFor="sort-reviews" className="sr-only">Sort reviews</label>
-                    <select
-                      id="sort-reviews"
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="sort-select"
-                      aria-label="Sort reviews by criteria"
-                    >
-                      <option value="newest">Newest First</option>
-                      <option value="oldest">Oldest First</option>
-                      <option value="highest">Highest Rated</option>
-                      <option value="lowest">Lowest Rated</option>
-                    </select>
-                  </div>
-
-                  <button
-                    className="write-review-btn"
-                    onClick={() => {
-                      setShowReviewForm(true);
-                      // Scroll to bottom of page where the form modal appears
-                      setTimeout(() => {
-                        window.scrollTo({
-                          top: document.body.scrollHeight,
-                          behavior: 'smooth'
-                        });
-                      }, 100);
-                    }}
-                    aria-label="Open review form to write a new review"
-                  >
-                    <Star size={16} aria-hidden="true" />
-                    <span>Write a Review</span>
-                  </button>
-                </div>
-              </header>
-
-              <div className="reviews-grid" role="region" aria-label="Customer reviews">
-                {getFilteredReviews().map((review, index) => (
-                  <article key={review.id} className={`review-card animate-slide-up-delay-${(index % 3) + 1}`} aria-labelledby={`review-${review.id}-author`}>
-                    <div className="review-rating" aria-label={`Rating: ${review.rating} out of 5 stars`}>
-                      {[...Array(review.rating)].map((_, i) => (
-                        <Star key={i} size={16} fill="currentColor" aria-hidden="true" />
-                      ))}
-                    </div>
-                    <p className="review-text">"{review.text}"</p>
-                    <div className="review-author">
-                      <div className="author-avatar" aria-hidden="true">{review.name.charAt(0)}</div>
-                      <div>
-                        <div id={`review-${review.id}-author`} className="author-name">
-                          {review.name}
-                          {review.verified && (
-                            <span className="verified-badge" title="Verified Purchase" aria-label="Verified purchase">
-                              <Check size={12} aria-hidden="true" />
-                            </span>
-                          )}
-                        </div>
-                        <div className="review-date">{review.date}</div>
-                      </div>
-                    </div>
-
-                    {/* Helpfulness voting */}
-                    <div className="review-helpfulness" role="group" aria-label="Helpfulness voting">
-                      <span className="helpfulness-text">Was this helpful?</span>
-                      <button
-                        className={`helpfulness-btn ${reviewVotes[review.id]?.voted ? 'voted' : ''}`}
-                        onClick={() => handleVote(review.id, 'helpful')}
-                        disabled={reviewVotes[review.id]?.voted}
-                        title="Yes"
-                        aria-label={`Mark as helpful. Current count: ${(review.helpful || 0) + (reviewVotes[review.id]?.helpful || 0)}`}
-                      >
-                        👍 {(review.helpful || 0) + (reviewVotes[review.id]?.helpful || 0)}
-                      </button>
-                      <button
-                        className={`helpfulness-btn ${reviewVotes[review.id]?.voted ? 'voted' : ''}`}
-                        onClick={() => handleVote(review.id, 'notHelpful')}
-                        disabled={reviewVotes[review.id]?.voted}
-                        title="No"
-                        aria-label={`Mark as not helpful. Current count: ${(review.notHelpful || 0) + (reviewVotes[review.id]?.notHelpful || 0)}`}
-                      >
-                        👎 {(review.notHelpful || 0) + (reviewVotes[review.id]?.notHelpful || 0)}
-                      </button>
-                    </div>
-                  </article>
-                ))}
-
-                {/* Always show the write review card */}
-                <article className="review-card write-review-card animate-slide-up-delay-4" onClick={() => setShowReviewForm(true)} role="button" tabIndex={0} aria-label="Open review form to share your experience">
-                  <div className="write-review-content">
-                    <div className="write-review-icon" aria-hidden="true">
-                      <Sparkles size={48} />
-                    </div>
-                    <h3>Share Your Experience</h3>
-                    <p>Help others discover this fragrance by writing a review</p>
-                    <div className="write-review-benefits">
-                      <span className="benefit-tag">⭐ Rate & Review</span>
-                      <span className="benefit-tag">💝 Help Others</span>
-                      <span className="benefit-tag">🎯 Build Community</span>
-                    </div>
-                    <button className="write-review-card-btn" onClick={(e) => {
-                      e.stopPropagation();
-                      setShowReviewForm(true);
-                      // Scroll to bottom of page where the form modal appears
-                      setTimeout(() => {
-                        window.scrollTo({
-                          top: document.body.scrollHeight,
-                          behavior: 'smooth'
-                        });
-                      }, 100);
-                    }} aria-label="Write a review">
-                      <Star size={16} aria-hidden="true" />
-                      <span>Write a Review</span>
-                    </button>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </section>
-
-          {/* Features Section */}
-          <section
-            className={`features-section ${visibleSections.has('features') ? 'animate-in' : ''}`}
-            id="features"
-            ref={(el) => sectionRefs.current.features = el}
-            aria-labelledby="features-title"
-          >
-            <div className="container">
-              <header className="section-header animate-fade-in">
-                <h2 id="features-title" className="section-title">Why Choose Ramzaan</h2>
-                <p className="section-subtitle">Experience luxury in every aspect</p>
-              </header>
-
-              <div className="features-grid" role="region" aria-label="Product features">
-                {features.map((feature, index) => {
-                  const IconComponent = feature.icon;
-                  return (
-                    <article
-                      key={feature.id}
-                      className={`feature-card animate-slide-up-delay-${(index % 4) + 1}`}
-                      aria-labelledby={`feature-${feature.id}-title`}
-                    >
-                      <div className="feature-icon" aria-hidden="true">
-                        <IconComponent size={40} />
-                      </div>
-                      <h3 id={`feature-${feature.id}-title`} className="feature-title">
-                        {feature.title}
-                      </h3>
-                      <p className="feature-description">{feature.description}</p>
-                      <div className="feature-benefits">
-                        {feature.benefits.map((benefit, i) => (
-                          <span key={i} className="benefit-tag" aria-label={`Benefit: ${benefit}`}>{benefit}</span>
-                        ))}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* Ingredients Section */}
-          <section
-            className={`ingredients-section ${visibleSections.has('ingredients') ? 'animate-in' : ''}`}
-            id="ingredients"
-            ref={(el) => sectionRefs.current.ingredients = el}
-            aria-labelledby="ingredients-title"
-          >
-            <div className="container">
-              <header className="section-header animate-fade-in">
-                <h2 id="ingredients-title" className="section-title">Signature Notes</h2>
-                <p className="section-subtitle">A symphony of premium ingredients</p>
-              </header>
-
-              <div className="ingredients-grid" role="region" aria-label="Fragrance ingredients">
-                {ingredients.map((ingredient, index) => {
-                  const IconComponent = ingredient.icon;
-                  return (
-                    <article
-                      key={ingredient.id}
-                      className={`ingredient-card animate-slide-up-delay-${(index % 4) + 1}`}
-                      aria-labelledby={`ingredient-${ingredient.id}-title`}
-                    >
-                      <div className="ingredient-icon" aria-hidden="true">
-                        <IconComponent size={48} />
-                      </div>
-                      <h3 id={`ingredient-${ingredient.id}-title`} className="ingredient-title">
-                        {ingredient.name}
-                      </h3>
-                      <p className="ingredient-description">{ingredient.description}</p>
-                      <div className="ingredient-benefits">
-                        {ingredient.benefits.map((benefit, i) => (
-                          <span key={i} className="benefit-tag" aria-label={`Benefit: ${benefit}`}>{benefit}</span>
-                        ))}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* Features Section */}
-          <section
-            className={`features-section ${visibleSections.has('features') ? 'animate-in' : ''}`}
-            id="features"
-            ref={(el) => sectionRefs.current.features = el}
-            aria-labelledby="features-title"
-          >
-            <div className="container">
-              <header className="section-header animate-fade-in">
-                <h2 id="features-title" className="section-title">Why Choose Ramzaan</h2>
-                <p className="section-subtitle">Experience luxury in every aspect</p>
-              </header>
-
-              <div className="features-grid" role="region" aria-label="Product features">
-                {features.map((feature, index) => {
-                  const IconComponent = feature.icon;
-                  return (
-                    <article
-                      key={feature.id}
-                      className={`feature-card animate-slide-up-delay-${(index % 4) + 1}`}
-                      aria-labelledby={`feature-${feature.id}-title`}
-                    >
-                      <div className="feature-icon" aria-hidden="true">
-                        <IconComponent size={40} />
-                      </div>
-                      <h3 id={`feature-${feature.id}-title`} className="feature-title">
-                        {feature.title}
-                      </h3>
-                      <p className="feature-description">{feature.description}</p>
-                      <div className="feature-benefits">
-                        {feature.benefits.map((benefit, i) => (
-                          <span key={i} className="benefit-tag" aria-label={`Benefit: ${benefit}`}>{benefit}</span>
-                        ))}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* About Section */}
-          <section
-            className={`about-section ${visibleSections.has('about') ? 'animate-in' : ''}`}
-            id="about"
-            ref={(el) => sectionRefs.current.about = el}
-            aria-labelledby="about-title"
-          >
-            <div className="container">
-              <div className="about-content">
-                <article className="about-text-block animate-fade-in">
-                  <h2 id="about-title" className="section-title">About Ramzaan</h2>
-                  <p className="about-text animate-fade-in-delay">
-                    Inspired by the essence of purity and devotion, Ramzaan captures the spirit of timeless elegance.
-                    Each note has been carefully curated to create an unforgettable olfactory experience.
-                  </p>
-                  <p className="about-text animate-fade-in-delay-2">
-                    Crafted with premium natural ingredients from around the world. Made in India with expertise in
-                    traditional perfumery, this signature fragrance embodies sophistication and luxury in every drop.
-                  </p>
-                  <button
-                    className="about-cta animate-fade-in-delay-3"
-                    onClick={() => scrollToSection('product')}
-                    aria-label="Explore the product collection"
-                  >
-                    <span>Explore Collection</span>
-                    <ArrowRight size={18} aria-hidden="true" />
-                  </button>
-                </article>
-              </div>
-            </div>
-          </section>
-        </main>
-
-        {/* Review Form Modal */}
-        {showReviewForm && (
-          <ReviewForm
-            onClose={() => setShowReviewForm(false)}
-            onSubmit={handleReviewSubmit}
-          />
-        )}
-
-        {/* Secret Collection Modal */}
-        {showSecretCollection && (
-          <div className="secret-modal-overlay" onClick={() => setShowSecretCollection(false)} role="dialog" aria-modal="true" aria-labelledby="secret-modal-title">
-            <div className="secret-modal" onClick={(e) => e.stopPropagation()}>
-              <button className="secret-close" onClick={() => setShowSecretCollection(false)} aria-label="Close secret collection modal">×</button>
-              <div className="secret-content">
-                <h2 id="secret-modal-title">🔮 The Hidden Collection</h2>
-                <p>You've discovered the legendary ALH secret fragrances...</p>
-                <div className="secret-perfumes">
-                  <article className="secret-perfume">
-                    <div className="secret-icon" aria-hidden="true">🌙</div>
-                    <h3>Midnight Oud</h3>
-                    <p>The forbidden essence of the desert night</p>
-                  </article>
-                  <article className="secret-perfume">
-                    <div className="secret-icon" aria-hidden="true">⭐</div>
-                    <h3>Celestial Amber</h3>
-                    <p>Whispers from the stars above</p>
-                  </article>
-                  <article className="secret-perfume">
-                    <div className="secret-icon" aria-hidden="true">🌸</div>
-                    <h3>Mystic Rose</h3>
-                    <p>The eternal bloom of hidden gardens</p>
-                  </article>
-                </div>
-                <p className="secret-note">These fragrances are reserved for the worthy. Contact us for exclusive access.</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Hidden Message Toast */}
-        {showHiddenMessage && (
-          <div className="hidden-message-toast" role="alert" aria-live="assertive">
-            <div className="message-icon" aria-hidden="true">💫</div>
-            <div className="message-content">
-              <h4>Secret Discovered!</h4>
-              <p>The true essence lies in the journey...</p>
-            </div>
-          </div>
-        )}
-
-        <Footer onSecretClick={handleFooterSecretClick} />
-      </div>
     </div>
   );
 };

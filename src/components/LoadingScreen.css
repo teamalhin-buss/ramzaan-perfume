@@ -1,0 +1,702 @@
+/* Loading Screen Styles - Modern, Accessible, and Performant */
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+.loading-screen__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(201, 176, 55, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 140, 0, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(201, 176, 55, 0.05) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.loading-screen__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 3rem);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Brand Section */
+.loading-screen__brand {
+  animation: fadeInUp 0.8s ease-out forwards;
+  transform: translateZ(0);
+}
+
+.loading-screen__logo {
+  position: relative;
+  display: inline-block;
+}
+
+.loading-screen__logo-text {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  z-index: 1;
+  animation: logoGlow 2s ease-in-out infinite alternate;
+}
+
+.loading-screen__logo-accent {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
+  border-radius: 1px;
+  animation: accentSlide 3s ease-in-out infinite;
+}
+
+/* Main Animation - 3D Rotating Perfume Bottle */
+.loading-screen__animation {
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+  transform: translateZ(0);
+  perspective: 1000px;
+}
+
+.loading-screen__bottle-3d {
+  position: relative;
+  width: 120px;
+  height: 180px;
+  transform-style: preserve-3d;
+  animation: bottleRotate 4s ease-in-out infinite;
+}
+
+.loading-screen__bottle-body {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.loading-screen__bottle-cap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 25px;
+  background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+  border-radius: 4px 4px 2px 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-screen__bottle-neck {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 30px;
+  background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.loading-screen__bottle-base {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 125px;
+  background: linear-gradient(135deg,
+    rgba(201, 176, 55, 0.9) 0%,
+    rgba(255, 140, 0, 0.8) 50%,
+    rgba(201, 176, 55, 0.9) 100%);
+  border-radius: 30px 30px 8px 8px;
+  box-shadow:
+    0 0 20px rgba(201, 176, 55, 0.4),
+    inset 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.loading-screen__bottle-liquid {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 80px;
+  background: linear-gradient(135deg,
+    rgba(138, 43, 226, 0.8) 0%,
+    rgba(75, 0, 130, 0.9) 50%,
+    rgba(138, 43, 226, 0.8) 100%);
+  border-radius: 25px 25px 6px 6px;
+  animation: liquidSwirl 3s ease-in-out infinite;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Sparkling Mist Particles */
+.loading-screen__mist-particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.loading-screen__mist-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, rgba(201, 176, 55, 0.8) 0%, rgba(255, 140, 0, 0.6) 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(201, 176, 55, 0.5);
+  animation: mistEmit 2s ease-out infinite;
+  opacity: 0;
+}
+
+.loading-screen__mist-particle::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: mistSparkle 1s ease-in-out infinite;
+}
+
+/* Progress Indicator */
+.loading-screen__progress {
+  width: 100%;
+  max-width: 280px;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+  transform: translateZ(0);
+}
+
+.loading-screen__progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.loading-screen__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-accent) 0%, rgba(255, 140, 0, 0.9) 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease-out;
+  position: relative;
+  box-shadow: 0 0 10px rgba(201, 176, 55, 0.5);
+}
+
+.loading-screen__progress-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShine 2s ease-in-out infinite;
+}
+
+.loading-screen__progress-text {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.05em;
+}
+
+/* Messages */
+.loading-screen__message {
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+  transform: translateZ(0);
+}
+
+.loading-screen__text {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 400;
+  font-family: 'Playfair Display', serif;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-screen__time {
+  font-size: 0.875rem;
+  color: rgba(201, 176, 55, 0.8);
+  margin: 0.5rem 0 0 0;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+/* Fun Facts */
+.loading-screen__fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+  transform: translateZ(0);
+  max-width: 320px;
+  width: 100%;
+}
+
+.loading-screen__fact-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  animation: factIconPulse 3s ease-in-out infinite;
+}
+
+.loading-screen__fact-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  margin: 0;
+  text-align: left;
+  font-weight: 300;
+}
+
+/* Perfume Bottles Animation */
+.loading-screen__bottles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.loading-screen__bottle {
+  position: absolute;
+  width: 60px;
+  height: 120px;
+  opacity: 0;
+  animation: bottleFloat 6s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+.loading-screen__bottle--1 {
+  top: 20%;
+  left: 15%;
+  animation-delay: 0s;
+}
+
+.loading-screen__bottle--2 {
+  top: 60%;
+  right: 20%;
+  animation-delay: 2s;
+  transform: scale(0.8);
+}
+
+.loading-screen__bottle--3 {
+  top: 40%;
+  left: 70%;
+  animation-delay: 4s;
+  transform: scale(0.6);
+}
+
+.loading-screen__bottle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 80px;
+  background: linear-gradient(135deg,
+    rgba(201, 176, 55, 0.8) 0%,
+    rgba(255, 140, 0, 0.6) 50%,
+    rgba(201, 176, 55, 0.8) 100%);
+  border-radius: 10px 10px 4px 4px;
+  box-shadow:
+    0 0 20px rgba(201, 176, 55, 0.4),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.loading-screen__bottle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 40px;
+  background: linear-gradient(135deg,
+    rgba(201, 176, 55, 0.9) 0%,
+    rgba(255, 140, 0, 0.7) 100%);
+  border-radius: 15px 15px 2px 2px;
+  box-shadow:
+    0 0 15px rgba(201, 176, 55, 0.3),
+    inset 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.loading-screen__bottle-glow {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle, rgba(201, 176, 55, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: bottleGlow 3s ease-in-out infinite alternate;
+}
+
+/* Particles/Micro-interactions */
+.loading-screen__particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.loading-screen__particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(201, 176, 55, 0.6);
+  border-radius: 50%;
+  animation: particleFloat 4s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(201, 176, 55, 0.4);
+}
+
+/* Keyframe Animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes logoGlow {
+  0% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+  }
+  100% {
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+  }
+}
+
+@keyframes accentSlide {
+  0%, 100% {
+    width: 30px;
+    opacity: 0.7;
+  }
+  50% {
+    width: 90px;
+    opacity: 1;
+  }
+}
+
+@keyframes bottleRotate {
+  0% {
+    transform: rotateY(0deg) rotateX(0deg);
+  }
+  25% {
+    transform: rotateY(90deg) rotateX(5deg);
+  }
+  50% {
+    transform: rotateY(180deg) rotateX(0deg);
+  }
+  75% {
+    transform: rotateY(270deg) rotateX(-5deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateX(0deg);
+  }
+}
+
+@keyframes liquidSwirl {
+  0%, 100% {
+    transform: translateX(-50%) scaleY(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(-50%) scaleY(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes mistEmit {
+  0% {
+    transform: rotate(var(--angle)) translateY(0) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--angle)) translateY(-80px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes mistSparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes factIconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes bottleFloat {
+  0% {
+    transform: translateY(100vh) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg) scale(1);
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes bottleGlow {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Variants */
+.loading-screen--minimal {
+  .loading-screen__fact,
+  .loading-screen__progress,
+  .loading-screen__time {
+    display: none;
+  }
+}
+
+.loading-screen--fullscreen {
+  .loading-screen__content {
+    max-width: none;
+    padding: 4rem 2rem;
+  }
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Performance Optimizations */
+.loading-screen *,
+.loading-screen *::before,
+.loading-screen *::after {
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen__bottle-3d,
+  .loading-screen__bottle-liquid,
+  .loading-screen__mist-particle,
+  .loading-screen__mist-particle::before,
+  .loading-screen__particle,
+  .loading-screen__bottle,
+  .loading-screen__progress-fill::before {
+    animation: none;
+  }
+
+  .loading-screen__logo-accent {
+    animation: none;
+    width: 60px;
+    opacity: 1;
+  }
+
+  .loading-screen__fact-icon {
+    animation: none;
+  }
+
+  .fadeInUp {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .loading-screen__content {
+    gap: clamp(1.5rem, 4vw, 2rem);
+    padding: 1rem;
+  }
+
+  .loading-screen__bottle-3d {
+    width: 100px;
+    height: 150px;
+  }
+
+  .loading-screen__bottle-cap {
+    width: 25px;
+    height: 20px;
+  }
+
+  .loading-screen__bottle-neck {
+    width: 16px;
+    height: 25px;
+  }
+
+  .loading-screen__bottle-base {
+    width: 50px;
+    height: 105px;
+  }
+
+  .loading-screen__bottle-liquid {
+    width: 42px;
+    height: 68px;
+  }
+
+  .loading-screen__fact {
+    padding: 0.875rem;
+    gap: 0.625rem;
+  }
+
+  .loading-screen__fact-text {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-screen__logo-text {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .loading-screen__bottle-3d {
+    width: 80px;
+    height: 120px;
+  }
+
+  .loading-screen__bottle-cap {
+    width: 20px;
+    height: 16px;
+  }
+
+  .loading-screen__bottle-neck {
+    width: 14px;
+    height: 20px;
+  }
+
+  .loading-screen__bottle-base {
+    width: 40px;
+    height: 84px;
+  }
+
+  .loading-screen__bottle-liquid {
+    width: 34px;
+    height: 54px;
+  }
+
+  .loading-screen__progress {
+    max-width: 240px;
+  }
+}

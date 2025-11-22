@@ -1,0 +1,631 @@
+/* India Post Address Form - WORLD-CLASS UI - Luxury E-commerce Grade */
+
+.india-post-address-form {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Stunning Header with Gradient & Animation */
+.india-post-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 40px;
+    background: linear-gradient(135deg, #ff8c00 0%, #ff6600 50%, #ff8c00 100%);
+    background-size: 200% 200%;
+    border-radius: 24px;
+    margin-bottom: 40px;
+    overflow: hidden;
+    box-shadow:
+        0 20px 60px rgba(255, 140, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.india-post-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 50%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.india-post-logo {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.india-post-logo svg {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.india-post-title {
+    position: relative;
+    z-index: 1;
+}
+
+.india-post-title h4 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.03em;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.india-post-title p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+    font-weight: 500;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Beautiful Glass-morphic Sections */
+.form-section {
+    margin-bottom: 32px;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.form-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+            transparent,
+            var(--gold-accent),
+            transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.form-section:hover {
+    border-color: rgba(201, 176, 55, 0.3);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(201, 176, 55, 0.2) inset;
+    transform: translateY(-4px);
+}
+
+.form-section:hover::before {
+    opacity: 1;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--gold-accent), #f4d03f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 32px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(201, 176, 55, 0.2);
+    position: relative;
+}
+
+.section-title::before {
+    content: '';
+    width: 6px;
+    height: 32px;
+    background: linear-gradient(180deg, var(--gold-accent), #f4d03f);
+    border-radius: 3px;
+    box-shadow: 0 0 20px rgba(201, 176, 55, 0.5);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold-accent), transparent);
+}
+
+/* Hide Helper for Cleaner Look */
+.address-format-helper {
+    display: none;
+}
+
+/* Premium Grid Layout */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.form-group {
+    position: relative;
+}
+
+/* Enhanced State Field */
+.state-readonly {
+    background: linear-gradient(135deg, rgba(201, 176, 55, 0.1), rgba(201, 176, 55, 0.05)) !important;
+    cursor: not-allowed;
+    border-color: rgba(201, 176, 55, 0.3) !important;
+    position: relative;
+}
+
+.state-readonly::after {
+    content: '🔒';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    opacity: 0.6;
+}
+
+/* STUNNING Premium Select Dropdown */
+.premium-select {
+    width: 100%;
+    padding: 18px 56px 18px 20px;
+    background: linear-gradient(135deg, #000000, #0a0a0a) !important;
+    border: 2px solid rgba(201, 176, 55, 0.3);
+    border-radius: 16px;
+    color: #ffffff !important;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C9B037' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 24px;
+    color-scheme: dark;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(201, 176, 55, 0.1) inset;
+}
+
+.premium-select:hover {
+    border-color: var(--gold-accent);
+    box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px var(--gold-accent) inset,
+        0 0 30px rgba(201, 176, 55, 0.2);
+    transform: translateY(-2px);
+}
+
+.premium-select:focus {
+    outline: none;
+    border-color: var(--gold-accent);
+    box-shadow:
+        0 0 0 4px rgba(201, 176, 55, 0.2),
+        0 12px 32px rgba(201, 176, 55, 0.3),
+        0 0 0 1px var(--gold-accent) inset;
+    transform: translateY(-2px);
+}
+
+.premium-select.valid {
+    border-color: #00cc66;
+    box-shadow:
+        0 8px 24px rgba(0, 204, 102, 0.2),
+        0 0 0 1px #00cc66 inset;
+}
+
+.premium-select.error {
+    border-color: #ff4444;
+    box-shadow:
+        0 8px 24px rgba(255, 68, 68, 0.2),
+        0 0 0 1px #ff4444 inset;
+}
+
+.premium-select option {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    padding: 16px;
+    font-size: 15px;
+}
+
+.premium-select optgroup {
+    background: linear-gradient(135deg, #0a0a0a, #000000) !important;
+    color: var(--gold-accent) !important;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 12px;
+    border-bottom: 1px solid rgba(201, 176, 55, 0.2);
+}
+
+.premium-select optgroup option {
+    background-color: #000000 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    padding-left: 24px;
+    font-weight: 500;
+    text-transform: none;
+    font-size: 15px;
+}
+
+/* Stunning Address Preview */
+.address-preview {
+    margin-top: 40px;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(0, 204, 102, 0.1), rgba(0, 204, 102, 0.05));
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(0, 204, 102, 0.3);
+    border-left: 6px solid #00cc66;
+    border-radius: 24px;
+    box-shadow:
+        0 16px 48px rgba(0, 204, 102, 0.2),
+        0 0 0 1px rgba(0, 204, 102, 0.1) inset;
+    animation: slideInUp 0.6s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.address-preview::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 204, 102, 0.05), transparent 70%);
+    animation: rotate 30s linear infinite;
+}
+
+.address-preview h6 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #00dd77;
+    margin: 0 0 24px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.address-preview h6::before {
+    content: '✓';
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #00cc66, #00dd77);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 4px 16px rgba(0, 204, 102, 0.4);
+    color: #000;
+    font-weight: 900;
+}
+
+.preview-address {
+    font-family: 'Inter', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 2;
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 28px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 1;
+}
+
+.preview-address div {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.preview-address div:hover {
+    padding-left: 12px;
+    color: #fff;
+    border-bottom-color: rgba(201, 176, 55, 0.2);
+}
+
+.preview-address div:last-child {
+    border-bottom: none;
+    padding-top: 16px;
+    margin-top: 12px;
+    color: var(--gold-accent);
+    font-weight: 600;
+}
+
+/* Beautiful Info Banner */
+.india-post-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(0, 136, 255, 0.1), rgba(0, 136, 255, 0.05));
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(0, 136, 255, 0.3);
+    border-left: 6px solid #0088ff;
+    border-radius: 20px;
+    margin-top: 32px;
+    box-shadow: 0 8px 32px rgba(0, 136, 255, 0.15);
+}
+
+.info-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.info-text {
+    flex: 1;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.7;
+}
+
+.info-text strong {
+    color: #66b3ff;
+    font-weight: 700;
+    font-size: 16px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* Required Indicator */
+.required-indicator {
+    color: #ff6b6b;
+    margin-left: 6px;
+    font-size: 16px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .india-post-header {
+        padding: 32px 24px;
+        border-radius: 20px;
+    }
+
+    .india-post-logo {
+        width: 64px;
+        height: 64px;
+    }
+
+    .india-post-title h4 {
+        font-size: 22px;
+    }
+
+    .form-section {
+        padding: 32px 24px;
+        border-radius: 20px;
+    }
+
+    .section-title {
+        font-size: 16px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .premium-select {
+        padding: 16px 48px 16px 18px;
+    }
+
+    .address-preview {
+        padding: 32px 24px;
+    }
+
+    .india-post-info {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .india-post-header {
+        padding: 24px 20px;
+        gap: 16px;
+    }
+
+    .india-post-logo {
+        width: 56px;
+        height: 56px;
+    }
+
+    .india-post-title h4 {
+        font-size: 20px;
+    }
+
+    .form-section {
+        padding: 24px 20px;
+    }
+
+    .section-title {
+        font-size: 15px;
+    }
+
+    .preview-address {
+        font-size: 14px;
+        padding: 20px;
+    }
+}
+
+/* Print Optimization */
+@media print {
+    .india-post-address-form {
+        max-width: 100%;
+    }
+
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .india-post-header,
+    .form-section {
+        border: 2px solid #000 !important;
+        background: #fff !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+    }
+
+    .preview-address {
+        border: 2px solid #000 !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    .india-post-info {
+        display: none;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+
+    .india-post-header,
+    .form-section,
+    .address-preview,
+    .premium-select {
+        border-width: 3px !important;
+    }
+}
+
+/* Focus States for Accessibility */
+*:focus-visible {
+    outline: 3px solid var(--gold-accent);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(201, 176, 55, 0.2);
+}
+
+/* Smooth Page Load Animation */
+.india-post-address-form {
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -963,7 +963,6 @@ const AccountPage = () => {
 
           </div>
         </div>
-        <Footer />
       </div>
     );
   }

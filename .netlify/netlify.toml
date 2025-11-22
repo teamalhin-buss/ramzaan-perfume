@@ -7,7 +7,7 @@ headers = []
 [functions."*"]
 
 [build]
-publish = "d:\\ramzaan-perfume\\dist"
+publish = "d:\\ramzaan-perfume - Copy - Copy - Copy\\dist"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "npm run build"

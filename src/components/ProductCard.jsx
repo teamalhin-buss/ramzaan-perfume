@@ -122,18 +122,32 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
   };
 
   const handleBuyNow = (e) => {
+    // Try to add to cart first
     const success = addToCart(product, quantity);
+
     if (!success) {
-      showNotification('Please login to purchase items');
-      setTimeout(() => navigate('/account'), 2000);
+      // User is not logged in
+      createSprayEffect(e.currentTarget);
+      showNotification('⚠️ Please log in to purchase');
+      setTimeout(() => {
+        navigate('/account', {
+          state: {
+            message: 'Please log in or create an account to purchase items.',
+            returnTo: '/'
+          }
+        });
+      }, 2000);
       return;
     }
+
+    // Successfully added to cart
     createSprayEffect(e.currentTarget);
-    if (onBuyNow) {
-      onBuyNow();
-    } else {
-      window.location.href = '/checkout';
-    }
+    showNotification('✓ Added to cart! Taking you to checkout...');
+
+    // Navigate to checkout after a short delay
+    setTimeout(() => {
+      navigate('/checkout');
+    }, 1000);
   };
 
   const handleWishlist = () => {
@@ -190,21 +204,21 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
 
       {/* Action Buttons */}
       <div className="product-quick-actions">
-        <button 
+        <button
           className={`action-btn ${isWishlisted ? 'active' : ''}`}
           onClick={handleWishlist}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
         </button>
-        <button 
+        <button
           className="action-btn"
           onClick={handleShare}
           aria-label="Share product"
         >
           <Share2 size={20} />
         </button>
-        <button 
+        <button
           className="action-btn"
           onClick={() => setIsImageZoomed(!isImageZoomed)}
           aria-label="Zoom image"
@@ -323,7 +337,7 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
               Quantity
             </label>
             <div className="quantity-selector-enhanced">
-              <button 
+              <button
                 className="qty-btn"
                 onClick={decrementQuantity}
                 disabled={quantity <= 1}
@@ -340,7 +354,7 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
                 min="1"
                 aria-label="Product quantity"
               />
-              <button 
+              <button
                 className="qty-btn"
                 onClick={incrementQuantity}
                 aria-label="Increase quantity"
@@ -352,14 +366,14 @@ const ProductCard = ({ product, onBuyNow, onBottleClick }) => {
 
           {/* Action Buttons */}
           <div className="product-actions-enhanced">
-            <button 
+            <button
               className="btn-add-to-cart"
               onClick={handleAddToCart}
             >
               <ShoppingCart size={20} />
               <span>Add to Cart</span>
             </button>
-            <button 
+            <button
               className="btn-buy-now"
               onClick={handleBuyNow}
             >

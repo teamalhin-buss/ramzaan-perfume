@@ -1,9 +1,9 @@
 /* Enhanced Product Card with Advanced Animations */
 .enhanced-product-card {
   position: relative;
-  background: transparent;
-  border: 1px solid var(--border-light);
-  border-radius: 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(201, 176, 55, 0.2);
+  border-radius: 24px;
   padding: clamp(40px, 5vw, 60px);
   transition: all var(--transition-base);
   overflow: hidden;
@@ -11,13 +11,178 @@
   transform: translateY(30px);
   animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   cursor: pointer;
+  backdrop-filter: blur(10px);
 }
 
 .enhanced-product-card:hover {
-  border-color: var(--border-medium);
-  background: var(--bg-secondary);
+  border-color: var(--gold-accent);
+  background: rgba(255, 255, 255, 0.05);
   transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
+
+/* ... (keep existing animations) ... */
+
+/* Badge */
+.product-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, var(--gold-accent), #b8860b);
+  color: #000;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(201, 176, 55, 0.3);
+}
+
+/* Action Buttons */
+.action-btn {
+  width: clamp(40px, 12vw, 48px);
+  height: clamp(40px, 12vw, 48px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background: var(--gold-accent);
+  color: #000;
+  border-color: var(--gold-accent);
+  transform: scale(1.1);
+}
+
+.action-btn.active {
+  background: var(--gold-accent);
+  border-color: var(--gold-accent);
+  color: #000;
+}
+
+/* Product Title */
+.product-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #fff 0%, #e6d7c3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+/* Rating */
+.rating-value {
+  color: var(--gold-accent);
+  font-size: 18px;
+}
+
+/* Price */
+.currency {
+  color: var(--gold-accent);
+  font-family: 'Playfair Display', serif;
+}
+
+.price-amount {
+  color: var(--white);
+  font-family: 'Playfair Display', serif;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Quantity Selector */
+.quantity-selector-enhanced {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.qty-btn {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--gold-accent);
+}
+
+/* Main Buttons */
+.btn-add-to-cart,
+.btn-buy-now {
+  padding: 1.2rem 2.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn-add-to-cart {
+  background: transparent;
+  border: 1px solid var(--gold-accent);
+  color: var(--gold-accent);
+}
+
+.btn-add-to-cart:hover {
+  background: rgba(201, 176, 55, 0.1);
+  color: var(--gold-accent);
+  box-shadow: 0 0 20px rgba(201, 176, 55, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-buy-now {
+  background: linear-gradient(135deg, var(--gold-accent), #b8860b);
+  border: none;
+  color: #000;
+  box-shadow: 0 10px 20px rgba(201, 176, 55, 0.2);
+}
+
+.btn-buy-now:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(201, 176, 55, 0.3);
+  background: linear-gradient(135deg, #d4bb46, #c9920b);
+}
+
+/* Scent Notes */
+.product-scent-notes {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+}
+
+.notes-title {
+  color: var(--gold-accent);
+}
+
+.note-item {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.note-item:hover {
+  border-color: var(--gold-accent);
+  background: rgba(201, 176, 55, 0.1);
+}
+
+.note-dot {
+  background: var(--gold-accent);
+}
+
 
 /* Enhanced mouse following spotlight effect for product card */
 .enhanced-product-card::after {
@@ -69,18 +234,23 @@
 }
 
 @keyframes liquidMorph {
-  0%, 100% {
+
+  0%,
+  100% {
     border-radius: 0;
     transform: scale(1.03);
   }
+
   25% {
     border-radius: 20px 0 20px 0;
     transform: scale(1.05) rotate(1deg);
   }
+
   50% {
     border-radius: 0 20px 0 20px;
     transform: scale(1.03) rotate(-1deg);
   }
+
   75% {
     border-radius: 20px 20px 0 0;
     transform: scale(1.05) rotate(0.5deg);
@@ -97,9 +267,12 @@
 }
 
 @keyframes holographicShimmer {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -119,18 +292,24 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.1),
+      transparent);
   animation: crystalRefraction 4s ease-in-out infinite;
 }
 
 @keyframes crystalRefraction {
-  0%, 100% { left: -100%; }
-  50% { left: 100%; }
+
+  0%,
+  100% {
+    left: -100%;
+  }
+
+  50% {
+    left: 100%;
+  }
 }
 
 /* Neon glow pulse for quantity selector */
@@ -139,9 +318,12 @@
 }
 
 @keyframes neonPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2);
   }
+
   50% {
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.6), 0 0 25px rgba(255, 255, 255, 0.4);
   }
@@ -161,19 +343,25 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(-45deg,
-    rgba(255, 255, 255, 0.03),
-    rgba(255, 255, 255, 0.08),
-    rgba(255, 255, 255, 0.03),
-    rgba(255, 255, 255, 0.08)
-  );
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.08));
   background-size: 400% 400%;
   animation: auroraFlow 8s ease infinite;
   pointer-events: none;
 }
 
 @keyframes auroraFlow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Breathing animation for guarantee badge */
@@ -182,10 +370,13 @@
 }
 
 @keyframes gentleBreathe {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.9;
   }
+
   50% {
     transform: scale(1.02);
     opacity: 1;
@@ -224,14 +415,18 @@
 }
 
 @keyframes quantumParticles {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
     opacity: 0.3;
   }
+
   33% {
     transform: translate(5px, -5px) scale(1.1);
     opacity: 0.6;
   }
+
   66% {
     transform: translate(-5px, 5px) scale(0.9);
     opacity: 0.4;
@@ -347,7 +542,7 @@
   transform: translate(-50%, -50%);
   width: 80%;
   height: 80%;
-  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
@@ -724,6 +919,7 @@
     transform: scale(0);
     opacity: 1;
   }
+
   100% {
     transform: scale(4);
     opacity: 0;
@@ -801,6 +997,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -812,6 +1009,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -880,6 +1078,7 @@
     transform: scale(0.8);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -924,6 +1123,47 @@
   z-index: 1;
 }
 
+.swipe-navigation {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.swipe-arrow {
+  pointer-events: auto;
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.swipe-arrow:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.swipe-arrow:active {
+  transform: scale(0.95);
+}
+
 .swipe-indicators {
   position: absolute;
   bottom: 20px;
@@ -935,14 +1175,14 @@
 }
 
 .swipe-indicator {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.5);
   transition: all 0.3s ease;
   cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 32px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -991,26 +1231,51 @@
 
 @media (max-width: 768px) {
   .enhanced-product-card {
-    padding: clamp(24px, 5vw, 32px);
+    padding: clamp(32px, 6vw, 40px);
   }
 
   .product-actions-enhanced {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .btn-add-to-cart,
+  .btn-buy-now {
+    padding: 18px 24px;
+    font-size: 16px;
   }
 
   .product-badge {
     left: 50%;
     transform: translateX(-50%);
+    padding: 8px 20px;
+    font-size: 12px;
+  }
+
+  .action-btn {
+    width: 48px;
+    height: 48px;
   }
 
   .quantity-label {
     min-width: auto;
+    font-size: 14px;
   }
 
   .product-quantity {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
+  }
+
+  .qty-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .qty-input {
+    min-width: 70px;
+    font-size: 18px;
   }
 
   .toast-notification {
@@ -1018,6 +1283,16 @@
     right: 16px;
     left: 16px;
     max-width: calc(100% - 32px);
+    padding: 18px 24px;
+    font-size: 16px;
+  }
+
+  .product-title {
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+  }
+
+  .price-amount {
+    font-size: clamp(2.2rem, 6vw, 3rem);
   }
 }
 
@@ -1029,6 +1304,12 @@
   .action-btn {
     width: 40px;
     height: 40px;
+  }
+
+  .swipe-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
   }
 
   .notes-grid {

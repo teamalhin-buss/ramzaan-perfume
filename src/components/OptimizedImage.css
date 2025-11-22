@@ -24,12 +24,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(255, 255, 255, 0.06) 50%,
-    rgba(255, 255, 255, 0.03) 100%
-  );
+  background: radial-gradient(circle, rgba(201, 176, 55, 0.05) 0%, rgba(0, 0, 0, 0.2) 100%);
   border-radius: inherit;
   display: flex;
   align-items: center;
@@ -45,12 +40,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(201, 176, 55, 0.1),
+      transparent);
   animation: shimmer 2s infinite;
 }
 
@@ -58,6 +51,7 @@
   0% {
     left: -100%;
   }
+
   100% {
     left: 100%;
   }
@@ -76,9 +70,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 0.6;
   }
@@ -139,7 +136,8 @@
 
 /* Loading State Modifier */
 .optimized-image-container[data-loading="true"] {
-  min-height: 200px; /* Prevent layout shift */
+  min-height: 200px;
+  /* Prevent layout shift */
 }
 
 /* Error State Modifier */
@@ -163,17 +161,17 @@
   .optimized-image-container[data-loading="true"] {
     min-height: 120px;
   }
-  
+
   .skeleton-icon svg {
     width: 32px;
     height: 32px;
   }
-  
+
   .image-error svg {
     width: 40px;
     height: 40px;
   }
-  
+
   .image-error p {
     font-size: 12px;
   }
@@ -181,19 +179,21 @@
 
 /* Print Optimization */
 @media print {
+
   .image-skeleton,
   .image-error,
   .image-debug-info {
     display: none !important;
   }
-  
+
   .optimized-image {
     opacity: 1 !important;
   }
 }
 
 /* High Resolution Display Optimization */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
   .optimized-image {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
@@ -205,12 +205,12 @@
   .skeleton-shimmer {
     animation: none;
   }
-  
+
   .skeleton-icon {
     animation: none;
     opacity: 0.5;
   }
-  
+
   .optimized-image {
     transition: none;
   }
@@ -228,6 +228,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -244,9 +245,11 @@
     left: -100%;
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     left: 100%;
     opacity: 0;
@@ -259,10 +262,13 @@
 
 /* Pulse Animation for Loading Icon */
 @keyframes enhancedPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.7;
     transform: scale(1.05);

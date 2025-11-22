@@ -1,0 +1,393 @@
+/* Premium Secure Input Component - Luxurious & Secure */
+
+.secure-input-wrapper {
+    position: relative;
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.secure-input-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary-text);
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.secure-input-label svg {
+    color: var(--gold-accent);
+    flex-shrink: 0;
+}
+
+.required-indicator {
+    color: #ff4444;
+    margin-left: -4px;
+    font-size: 16px;
+}
+
+.secure-indicator {
+    color: var(--gold-accent);
+    margin-left: auto;
+    opacity: 0.7;
+}
+
+.secure-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon-left {
+    position: absolute;
+    left: 16px;
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    z-index: 1;
+    transition: color 0.3s ease;
+}
+
+.secure-input-wrapper.focused .input-icon-left {
+    color: var(--gold-accent);
+}
+
+.secure-input {
+    width: 100%;
+    padding: 16px 50px 16px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--primary-text);
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.secure-input.with-left-icon {
+    padding-left: 48px;
+}
+
+.secure-input.with-validation {
+    padding-right: 80px;
+}
+
+.secure-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 300;
+}
+
+.secure-input:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.secure-input:focus {
+    outline: none;
+    border-color: var(--gold-accent);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 4px rgba(201, 176, 55, 0.1);
+}
+
+.secure-input-wrapper.focused .secure-input {
+    transform: translateY(-1px);
+}
+
+/* Error state */
+.secure-input-wrapper.has-error .secure-input {
+    border-color: rgba(255, 68, 68, 0.5);
+    background: rgba(255, 68, 68, 0.05);
+}
+
+.secure-input-wrapper.has-error .secure-input:focus {
+    border-color: #ff4444;
+    box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.1);
+}
+
+/* Success state */
+.secure-input-wrapper.has-success .secure-input {
+    border-color: rgba(0, 204, 102, 0.5);
+    background: rgba(0, 204, 102, 0.05);
+}
+
+/* Disabled state */
+.secure-input-wrapper.disabled .secure-input {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Input icons right container */
+.input-icons-right {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-password {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.toggle-password:hover {
+    color: var(--gold-accent);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.toggle-password:active {
+    transform: scale(0.95);
+}
+
+/* Validation icons */
+.validation-icon {
+    animation: iconFadeIn 0.3s ease;
+}
+
+.validation-icon.valid {
+    color: #00cc66;
+}
+
+.validation-icon.invalid {
+    color: #ff4444;
+}
+
+.validation-icon.checking {
+    color: var(--gold-accent);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes iconFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Progress bar */
+.input-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-accent), #b8860b);
+    border-radius: 0 0 12px 12px;
+    animation: progressGrow 0.3s ease forwards;
+}
+
+@keyframes progressGrow {
+    to {
+        width: 100%;
+    }
+}
+
+/* Input messages */
+.input-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    animation: messageFadeIn 0.3s ease;
+}
+
+@keyframes messageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-message-secure {
+    color: #ff6666;
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.2);
+}
+
+.success-message-secure {
+    color: #00dd77;
+    background: rgba(0, 204, 102, 0.1);
+    border: 1px solid rgba(0, 204, 102, 0.2);
+}
+
+.helper-text-secure {
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.input-message svg {
+    flex-shrink: 0;
+}
+
+/* Character count */
+.character-count {
+    position: absolute;
+    bottom: -20px;
+    right: 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+/* Loading shimmer effect for secure fields */
+.secure-input-wrapper .secure-input::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(201, 176, 55, 0.1), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        left: 100%;
+    }
+}
+
+/* Focus ring animation */
+@keyframes focusRing {
+    0% {
+        box-shadow: 0 0 0 0 rgba(201, 176, 55, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 8px rgba(201, 176, 55, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(201, 176, 55, 0);
+    }
+}
+
+.secure-input:focus {
+    animation: focusRing 0.6s ease;
+}
+
+/* Textarea specific styles */
+textarea.secure-input {
+    min-height: 100px;
+    resize: vertical;
+    padding-top: 12px;
+    line-height: 1.6;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .secure-input {
+        padding: 14px 45px 14px 14px;
+        font-size: 16px;
+        /* Prevents zoom on iOS */
+    }
+
+    .secure-input.with-left-icon {
+        padding-left: 45px;
+    }
+
+    .secure-input-label {
+        font-size: 12px;
+    }
+
+    .input-message {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .secure-input {
+        border-radius: 10px;
+    }
+
+    .input-icons-right {
+        right: 10px;
+    }
+}
+
+/* Autofill styling */
+.secure-input:-webkit-autofill,
+.secure-input:-webkit-autofill:hover,
+.secure-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px rgba(201, 176, 55, 0.1) inset !important;
+    -webkit-text-fill-color: var(--primary-text) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Remove number input spinners */
+.secure-input[type="number"]::-webkit-inner-spin-button,
+.secure-input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.secure-input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Accessibility - High contrast mode support */
+@media (prefers-contrast: high) {
+    .secure-input {
+        border-width: 2px;
+    }
+
+    .secure-input:focus {
+        outline: 3px solid var(--gold-accent);
+        outline-offset: 2px;
+    }
+}
+
+/* Dark mode adjustments (already dark, but for future light mode) */
+@media (prefers-color-scheme: light) {
+    .secure-input {
+        background: rgba(0, 0, 0, 0.05);
+        border-color: rgba(0, 0, 0, 0.2);
+        color: #000;
+    }
+
+    .secure-input::placeholder {
+        color: rgba(0, 0, 0, 0.4);
+    }
+}
