@@ -61,5 +61,11 @@ service cloud.firestore {
       // Admins can read all carts
       allow read: if isAdmin();
     }
+
+    // Settings collection
+    match /settings/{settingId} {
+      // Only admins can read/write settings
+      allow read, write: if isAdmin();
+    }
   }
 }
